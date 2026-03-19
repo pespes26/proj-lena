@@ -1,0 +1,20 @@
+# Dependencies
+frontend/node_modules/
+
+# Python
+backend/__pycache__/
+*.pyc
+
+# Data files (contain sensitive financial data)
+data.xlsx
+attendance_data.json
+projects_data.json
+reports_data.json
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
