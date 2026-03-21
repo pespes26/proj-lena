@@ -17,13 +17,13 @@ const chartData = computed(() => ({
     {
       label: 'מצטבר',
       data: props.data.cumulative.map(m => m.value),
-      borderColor: '#84cc16',
-      backgroundColor: 'rgba(132,204,22,0.12)',
+      borderColor: '#0D9488',
+      backgroundColor: 'rgba(13,148,136,0.12)',
       tension: 0.4,
       fill: true,
       pointRadius: 0,
       pointHoverRadius: 5,
-      pointHoverBackgroundColor: '#84cc16',
+      pointHoverBackgroundColor: '#0D9488',
       borderWidth: 2.5,
     },
     {

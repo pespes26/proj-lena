@@ -16,7 +16,7 @@ const chartData = computed(() => ({
   datasets: [{
     label: 'רווח תפעולי',
     data: props.data.map(m => m.operating_profit),
-    backgroundColor: props.data.map(m => m.operating_profit >= 0 ? 'rgba(132,204,22,0.8)' : 'rgba(239,68,68,0.8)'),
+    backgroundColor: props.data.map(m => m.operating_profit >= 0 ? 'rgba(13,148,136,0.8)' : 'rgba(239,68,68,0.8)'),
     borderRadius: 6,
     barPercentage: 0.6,
   }],

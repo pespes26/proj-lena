@@ -3,31 +3,83 @@
 @tailwind utilities;
 
 :root {
-  --accent: #84cc16;
-  --accent-dark: #65a30d;
-  --accent-light: #ecfccb;
-  --bg: #f8f9fa;
+  --accent: #0D9488;
+  --accent-dark: #0F766E;
+  --accent-light: #CCFBF1;
+  --bg: #EEFBF5;
   --card-bg: #ffffff;
-  --text-primary: #1a1a2e;
-  --text-secondary: #6b7280;
-  --border: #e5e7eb;
-  --sidebar-width: 240px;
+  --text-primary: #1A1A2E;
+  --text-secondary: #8E8E93;
+  --border: #E2E8F0;
+  --sidebar-width: 260px;
 }
 
 body {
-  font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+  font-family: -apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, system-ui, 'Segoe UI', Roboto, sans-serif;
   background: var(--bg);
   color: var(--text-primary);
   margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 6px; height: 6px; }
+/* Clean thin scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.10); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.18); }
 
-/* Robot popup animation */
+/* ── Sidebar / Header glass ── */
+.glass {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+}
+
+.glass-heavy {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+}
+
+/* ── Floating Card ── */
+.ios-card {
+  background: #ffffff;
+  border-radius: 20px;
+  border: none;
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.02),
+    0 4px 16px rgba(0, 0, 0, 0.04),
+    0 12px 40px rgba(0, 0, 0, 0.02);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+.ios-card:hover {
+  box-shadow:
+    0 2px 2px rgba(0, 0, 0, 0.02),
+    0 8px 24px rgba(0, 0, 0, 0.06),
+    0 16px 48px rgba(0, 0, 0, 0.03);
+  transform: translateY(-1px);
+}
+
+/* ── iOS separator ── */
+.ios-separator {
+  box-shadow: 0 0.33px 0 0 rgba(60, 60, 67, 0.10);
+}
+
+/* ── Accent icon circle ── */
+.accent-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* ── Animations ── */
 @keyframes bounce-in {
   0% { transform: scale(0.3); opacity: 0; }
   50% { transform: scale(1.05); }
@@ -35,3 +87,9 @@ body {
   100% { transform: scale(1); opacity: 1; }
 }
 .animate-bounce-in { animation: bounce-in 0.5s ease-out; }
+
+@keyframes fade-up {
+  0% { transform: translateY(8px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+.animate-fade-up { animation: fade-up 0.35s ease-out; }

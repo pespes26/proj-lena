@@ -8,7 +8,7 @@
     </div>
 
     <div v-if="error" class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl mb-6 text-sm">{{ error }}</div>
-    <div v-if="success" class="bg-lime-50 border border-lime-200 text-lime-700 px-4 py-3 rounded-xl mb-6 text-sm flex items-center gap-2">
+    <div v-if="success" class="bg-teal-50 border border-teal-200 text-teal-700 px-4 py-3 rounded-xl mb-6 text-sm flex items-center gap-2">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
       {{ success }}
     </div>
@@ -21,9 +21,9 @@
           @dragover.prevent="dragActive = true" @dragleave.prevent="dragActive = false" @drop.prevent="onDrop"
           @click="$refs.fileInput.click()"
           :class="['border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all',
-            dragActive ? 'border-lime-400 bg-lime-50' : 'border-gray-200 hover:border-lime-300 hover:bg-gray-50']">
-          <div class="w-14 h-14 mx-auto mb-3 bg-lime-50 rounded-2xl flex items-center justify-center">
-            <svg class="w-7 h-7 text-lime-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            dragActive ? 'border-teal-400 bg-teal-50' : 'border-gray-200 hover:border-teal-300 hover:bg-gray-50']">
+          <div class="w-14 h-14 mx-auto mb-3 bg-teal-50 rounded-2xl flex items-center justify-center">
+            <svg class="w-7 h-7 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
           </div>
@@ -49,7 +49,7 @@
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
             <button @click="upload" :disabled="uploading"
-              class="px-4 py-2 bg-lime-500 text-white text-sm font-medium rounded-xl hover:bg-lime-600 disabled:opacity-50 transition flex items-center gap-2">
+              class="px-4 py-2 bg-teal-500 text-white text-sm font-medium rounded-xl hover:bg-teal-600 disabled:opacity-50 transition flex items-center gap-2">
               <svg v-if="uploading" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
               {{ uploading ? 'מעבד...' : 'העלה ועבד' }}
             </button>
@@ -61,15 +61,18 @@
         <h3 class="font-semibold text-gray-700 mb-3">הגדרות</h3>
         <div class="mb-4">
           <label class="block text-xs font-medium text-gray-600 mb-1.5">תעריף שעתי (ש"ח)</label>
-          <input v-model.number="hourlyRate" type="number" min="1"
-            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-lime-300 transition" />
+          <input v-model.number="hourlyRate" type="number" min="1" max="1000" step="1"
+            @blur="hourlyRate = Math.max(1, Math.min(1000, Math.round(hourlyRate || 1)))"
+            :class="['w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-300 transition',
+              hourlyRate < 1 || hourlyRate > 1000 ? 'border-red-400! bg-red-50!' : '']" />
+          <span v-if="hourlyRate < 1 || hourlyRate > 1000" class="text-red-500 text-[10px] mt-0.5 block">תעריף חייב להיות בין 1 ל-1000 ש"ח</span>
         </div>
         <div class="bg-gray-50 rounded-xl p-4 space-y-2 text-xs text-gray-500">
-          <div class="flex items-start gap-2"><span class="text-lime-500 mt-0.5">&#x25CF;</span><span>שם עובד / שם</span></div>
-          <div class="flex items-start gap-2"><span class="text-lime-500 mt-0.5">&#x25CF;</span><span>תאריך</span></div>
-          <div class="flex items-start gap-2"><span class="text-lime-500 mt-0.5">&#x25CF;</span><span>שעת כניסה / שעת יציאה</span></div>
-          <div class="flex items-start gap-2"><span class="text-lime-500 mt-0.5">&#x25CF;</span><span>מספר פרויקט / project</span></div>
-          <div class="flex items-start gap-2"><span class="text-lime-500 mt-0.5">&#x25CF;</span><span>סה"כ שעות (אופציונלי)</span></div>
+          <div class="flex items-start gap-2"><span class="text-teal-500 mt-0.5">&#x25CF;</span><span>שם עובד / שם</span></div>
+          <div class="flex items-start gap-2"><span class="text-teal-500 mt-0.5">&#x25CF;</span><span>תאריך</span></div>
+          <div class="flex items-start gap-2"><span class="text-teal-500 mt-0.5">&#x25CF;</span><span>שעת כניסה / שעת יציאה</span></div>
+          <div class="flex items-start gap-2"><span class="text-teal-500 mt-0.5">&#x25CF;</span><span>מספר פרויקט / project</span></div>
+          <div class="flex items-start gap-2"><span class="text-teal-500 mt-0.5">&#x25CF;</span><span>סה"כ שעות (אופציונלי)</span></div>
         </div>
       </div>
     </div>
@@ -99,7 +102,7 @@
         </div>
         <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
           <div class="text-xs text-gray-400 mb-2">עלות העמסה כוללת</div>
-          <div class="text-2xl font-bold text-lime-600">{{ totalCost.toLocaleString('he-IL') }} &#8362;</div>
+          <div class="text-2xl font-bold text-teal-600">{{ totalCost.toLocaleString('he-IL') }} &#8362;</div>
         </div>
       </div>
 
@@ -130,7 +133,7 @@
             </tr></thead>
             <tbody>
               <tr v-for="(info, proj) in data.by_project" :key="proj" class="border-t border-gray-50 hover:bg-gray-50/50 transition">
-                <td class="px-4 py-3 font-mono font-medium text-blue-600">{{ proj }}</td>
+                <td class="px-4 py-3 font-mono font-medium text-teal-600">{{ proj }}</td>
                 <td class="px-4 py-3 text-gray-600">{{ info.total_hours.toLocaleString('he-IL') }}</td>
                 <td class="px-4 py-3 text-gray-600">{{ info.employees }}</td>
                 <td class="px-4 py-3 font-semibold text-gray-800">{{ info.cost.toLocaleString('he-IL') }} &#8362;</td>
@@ -157,7 +160,7 @@
                   <td class="px-4 py-3">
                     <div class="flex flex-wrap gap-1">
                       <span v-for="(hrs, p) in info.projects" :key="p"
-                        class="text-[10px] bg-blue-50 text-blue-600 font-mono px-1.5 py-0.5 rounded">
+                        class="text-[10px] bg-teal-50 text-teal-600 font-mono px-1.5 py-0.5 rounded">
                         {{ p }}: {{ hrs }}h
                       </span>
                     </div>
@@ -191,7 +194,7 @@ const hourlyRate = ref(50)
 const totalHours = computed(() => data.value ? Object.values(data.value.by_project).reduce((a, p) => a + p.total_hours, 0) : 0)
 const totalCost = computed(() => data.value ? Object.values(data.value.by_project).reduce((a, p) => a + p.cost, 0) : 0)
 
-const colors = ['#84cc16', '#22c55e', '#06b6d4', '#8b5cf6', '#f59e0b', '#ef4444', '#ec4899', '#14b8a6']
+const colors = ['#0D9488', '#22c55e', '#06b6d4', '#8b5cf6', '#f59e0b', '#ef4444', '#ec4899', '#14b8a6']
 
 const projectChartData = computed(() => {
   if (!data.value) return { labels: [], datasets: [] }

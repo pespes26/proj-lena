@@ -16,7 +16,7 @@ const chartData = computed(() => ({
   datasets: [{
     label: 'נטו חודשי',
     data: props.data.monthly_net.map(m => m.value),
-    backgroundColor: props.data.monthly_net.map(m => m.value >= 0 ? 'rgba(132,204,22,0.8)' : 'rgba(239,68,68,0.8)'),
+    backgroundColor: props.data.monthly_net.map(m => m.value >= 0 ? 'rgba(13,148,136,0.8)' : 'rgba(239,68,68,0.8)'),
     borderRadius: 6,
     barPercentage: 0.6,
   }],

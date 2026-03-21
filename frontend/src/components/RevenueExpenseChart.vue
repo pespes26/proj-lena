@@ -17,7 +17,7 @@ const chartData = computed(() => ({
     {
       label: 'הכנסות',
       data: props.data.totals.map(t => t.revenue),
-      backgroundColor: '#84cc16',
+      backgroundColor: '#0D9488',
       borderRadius: 6,
       barPercentage: 0.7,
     },

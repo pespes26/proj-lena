@@ -1,0 +1,12 @@
+[
+  {
+    "id": 1,
+    "project": "קריית מנרב",
+    "month": null,
+    "type": "expense",
+    "title": "צנרת",
+    "amount": 100.0,
+    "description": "",
+    "created_at": "2026-03-19T14:06:55.322925"
+  }
+]

@@ -17,8 +17,8 @@ const chartData = computed(() => ({
     {
       label: 'נטו חודשי',
       data: props.data.data.map(d => d.net),
-      borderColor: '#84cc16',
-      backgroundColor: 'rgba(132,204,22,0.1)',
+      borderColor: '#0D9488',
+      backgroundColor: 'rgba(13,148,136,0.1)',
       tension: 0.4,
       fill: true,
       pointRadius: 0,

@@ -21,13 +21,68 @@ app.add_middleware(
 
 @app.get("/api/projects")
 def get_projects():
-    return {"projects": list(PROJECTS.keys())}
+    # Combine Excel-based projects with form-created projects
+    excel_projects = list(PROJECTS.keys())
+    form_projects = list(_load_projects_data().keys())
+    all_projects = list(dict.fromkeys(excel_projects + form_projects))
+    return {"projects": all_projects}
+
+
+def _empty_pnl(project_name):
+    """Return empty P&L structure for form-created projects without Excel data."""
+    form_data = _load_projects_data().get(project_name, {})
+    months = []
+    for m in range(1, 13):
+        revenue = 0
+        if form_data.get('total_revenue') and form_data.get('revenue_forecast', {}).get(str(m)):
+            revenue = round(form_data['total_revenue'] * form_data['revenue_forecast'][str(m)] / 100)
+        expense = 0
+        for cat in ['manpower', 'equipment', 'insurance', 'consultants', 'financing', 'other']:
+            for line in form_data.get(f'expense_lines_{cat}', []):
+                start = line.get('start_month', 1)
+                end = line.get('end_month', 12)
+                if start <= m <= end:
+                    expense += line.get('monthly_amount', 0) or 0
+        for sub in form_data.get('subcontractors', []):
+            expense += sub.get('monthly_amount', 0) or 0
+        months.append({
+            'month': m,
+            'revenue': revenue,
+            'operational_expense': expense,
+            'salary_expense': 0,
+            'total_expense': expense,
+            'profit': revenue - expense,
+            'margin': round((revenue - expense) / revenue * 100, 1) if revenue else 0,
+            'operational_components': [],
+            'salary_components': [],
+            'payment_milestones': [],
+        })
+    total_rev = sum(m['revenue'] for m in months)
+    total_exp = sum(m['total_expense'] for m in months)
+    return {
+        'summary': {
+            'total_revenue': total_rev,
+            'total_operational': total_exp,
+            'total_salary': 0,
+            'operating_profit': total_rev - total_exp,
+            'margin': round((total_rev - total_exp) / total_rev * 100, 1) if total_rev else 0,
+            'manager': form_data.get('manager', ''),
+            'area': form_data.get('area', ''),
+            'axis': form_data.get('axis', ''),
+            'priority_id': form_data.get('priority_id', ''),
+        },
+        'months': months,
+    }
 
 
 @app.get("/api/pnl")
 def get_pnl(project: str = Query(None)):
     try:
         if project and project not in PROJECTS:
+            # Check if it's a form-created project
+            form_projects = _load_projects_data()
+            if project in form_projects:
+                return {"data": {project: _empty_pnl(project)}}
             raise HTTPException(status_code=404, detail=f"פרויקט '{project}' לא נמצא")
         data = load_pnl(project)
         return {"data": data}
@@ -58,6 +113,9 @@ def get_cashflow():
 def get_project_cashflow(project: str = Query(...)):
     try:
         if project not in PROJECTS:
+            form_projects = _load_projects_data()
+            if project in form_projects:
+                return {"data": {"months": [{"month": m, "revenue": 0, "expense": 0, "net": 0, "cumulative": 0} for m in range(1, 13)]}}
             raise HTTPException(status_code=404, detail=f"פרויקט '{project}' לא נמצא")
         data = load_project_cashflow(project)
         if not data:

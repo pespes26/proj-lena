@@ -11,7 +11,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend)
 
 const props = defineProps({ data: Object })
 
-const colors = ['#84cc16', '#22c55e', '#06b6d4', '#8b5cf6']
+const colors = ['#0D9488', '#22c55e', '#06b6d4', '#8b5cf6']
 
 const chartData = computed(() => {
   const pnames = Object.keys(props.data.projects)

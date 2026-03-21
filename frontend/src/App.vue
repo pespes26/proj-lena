@@ -3,8 +3,8 @@
     <!-- Sidebar -->
     <aside
       :class="[
-        'bg-white border-l border-gray-200 flex flex-col fixed top-0 right-0 h-full z-30 transition-all duration-300',
-        collapsed ? 'w-[72px]' : 'w-60'
+        'bg-white/90 backdrop-blur-xl border-l border-gray-100/50 flex flex-col fixed top-0 right-0 h-full z-30 transition-all duration-300',
+        collapsed ? 'w-[72px]' : 'w-[260px]'
       ]"
     >
       <!-- Logo / Home -->
@@ -12,21 +12,18 @@
         <button @click="activeTab = 'dashboard'; selectedProject = ''"
           class="flex items-center gap-3 group"
           :title="collapsed ? 'דשבורד' : ''">
-          <div class="w-10 h-10 bg-lime-500 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-lime-600 transition-colors">
+          <div class="w-10 h-10 bg-teal-600 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-teal-700 transition-colors">
             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
             </svg>
           </div>
           <div v-if="!collapsed" class="transition-opacity duration-200">
             <div class="text-sm font-bold text-gray-800 leading-tight">סנג'ר של לנה</div>
-            <div class="text-[10px] text-gray-400">ניהול פיננסי</div>
+            <div class="text-[12px] text-gray-400">מערכת ניהול פיננסי</div>
           </div>
         </button>
       </div>
 
-      <div v-if="!collapsed" class="px-5 mb-2">
-        <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">כללי</div>
-      </div>
 
       <!-- Nav items -->
       <nav class="flex-1 px-2 space-y-1 overflow-y-auto">
@@ -40,7 +37,7 @@
               'w-full flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-200',
               collapsed ? 'justify-center px-0 py-3' : 'px-4 py-2.5',
               activeTab === 'pnl'
-                ? 'bg-lime-50 text-lime-700'
+                ? 'bg-teal-50 text-teal-700'
                 : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
             ]"
           >
@@ -65,12 +62,12 @@
               :class="[
                 'w-full flex items-center gap-2 pr-5 pl-3 py-2 text-xs rounded-lg transition-all duration-150',
                 activeTab === 'pnl' && selectedProject === p
-                  ? 'bg-lime-50 text-lime-700 font-semibold'
+                  ? 'bg-teal-50 text-teal-700 font-semibold'
                   : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
               ]"
             >
               <span class="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                :class="activeTab === 'pnl' && selectedProject === p ? 'bg-lime-500' : 'bg-gray-300'"></span>
+                :class="activeTab === 'pnl' && selectedProject === p ? 'bg-teal-500' : 'bg-gray-300'"></span>
               {{ p }}
             </button>
           </div>
@@ -84,7 +81,7 @@
             'w-full flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-200 relative',
             collapsed ? 'justify-center px-0 py-3' : 'px-4 py-2.5',
             activeTab === 'cashflow'
-              ? 'bg-lime-50 text-lime-700'
+              ? 'bg-teal-50 text-teal-700'
               : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
           ]"
         >
@@ -102,7 +99,7 @@
             'w-full flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-200 relative',
             collapsed ? 'justify-center px-0 py-3' : 'px-4 py-2.5',
             activeTab === 'alerts'
-              ? 'bg-lime-50 text-lime-700'
+              ? 'bg-teal-50 text-teal-700'
               : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
           ]"
         >
@@ -127,7 +124,7 @@
             'w-full flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-200 relative',
             collapsed ? 'justify-center px-0 py-3' : 'px-4 py-2.5',
             activeTab === 'data'
-              ? 'bg-lime-50 text-lime-700'
+              ? 'bg-teal-50 text-teal-700'
               : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
           ]"
         >
@@ -145,7 +142,7 @@
             'w-full flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-200 relative',
             collapsed ? 'justify-center px-0 py-3' : 'px-4 py-2.5',
             activeTab === 'attendance'
-              ? 'bg-lime-50 text-lime-700'
+              ? 'bg-teal-50 text-teal-700'
               : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
           ]"
         >
@@ -154,14 +151,32 @@
           </svg>
           <span v-if="!collapsed">נוכחות</span>
         </button>
+
+        <!-- New project button -->
+        <div class="pt-2 mt-2 border-t border-gray-100">
+          <button
+            @click="showNewProjectModal = true"
+            :title="collapsed ? 'פרויקט חדש' : ''"
+            :class="[
+              'w-full flex items-center gap-3 rounded-full text-sm font-medium transition-all duration-200',
+              collapsed ? 'justify-center px-0 py-3' : 'px-4 py-2.5',
+              'bg-teal-600 text-white hover:bg-teal-700'
+            ]"
+          >
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+            </svg>
+            <span v-if="!collapsed">הוספת פרויקט חדש</span>
+          </button>
+        </div>
       </nav>
 
     </aside>
 
     <!-- Main content area -->
-    <div class="flex-1 transition-all duration-300" :class="collapsed ? 'mr-[72px]' : 'mr-60'">
+    <div class="flex-1 transition-all duration-300" :class="collapsed ? 'mr-[72px]' : 'mr-[260px]'">
       <!-- Top header -->
-      <header class="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between sticky top-0 z-20">
+      <header class="bg-white/80 backdrop-blur-xl ios-separator px-8 py-4 flex items-center justify-between sticky top-0 z-20">
         <div class="flex items-center gap-3">
           <button @click="collapsed = !collapsed"
             class="p-2 rounded-xl text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors">
@@ -171,7 +186,7 @@
           </button>
           <div class="relative">
             <input type="text" placeholder="חיפוש מהיר..."
-              class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 pr-10 text-sm w-72 focus:outline-none focus:ring-2 focus:ring-lime-300 focus:border-lime-400 transition" />
+              class="bg-gray-100/70 border-0 rounded-2xl px-5 py-2.5 pr-10 text-sm w-72 focus:outline-none focus:ring-2 focus:ring-teal-300/40 focus:bg-white transition placeholder-gray-400" />
             <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
@@ -186,14 +201,14 @@
           </button>
           <!-- Robot button -->
           <button @click="showRobotMsg = true"
-            class="p-2 rounded-xl hover:bg-lime-50 transition group relative" title="הסנג'ר">
-            <svg class="w-6 h-6 text-gray-400 group-hover:text-lime-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+            class="p-2 rounded-xl hover:bg-teal-50 transition group relative" title="הסנג'ר">
+            <svg class="w-6 h-6 text-gray-400 group-hover:text-teal-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714a2.25 2.25 0 00.659 1.591L19 14.5M14.25 3.104c.251.023.501.05.75.082M19 14.5l-1.482 1.484a2.25 2.25 0 00-.659 1.59V21a.75.75 0 01-.75.75h-8.22a.75.75 0 01-.75-.75v-3.426a2.25 2.25 0 00-.659-1.59L5 14.5m14 0h-2.25m-10.5 0H4"/>
             </svg>
           </button>
           <div class="flex items-center gap-3 pr-4 border-r border-gray-200">
-            <div class="w-9 h-9 bg-lime-100 rounded-full flex items-center justify-center">
-              <span class="text-lime-700 font-bold text-sm">FM</span>
+            <div class="w-9 h-9 bg-teal-100 rounded-full flex items-center justify-center">
+              <span class="text-teal-700 font-bold text-sm">FM</span>
             </div>
             <div>
               <div class="text-sm font-semibold text-gray-700">מנהל מערכת</div>
@@ -214,6 +229,15 @@
       </main>
     </div>
 
+    <!-- New project modal -->
+    <ProjectFormModal
+      :show="showNewProjectModal"
+      :new-project="true"
+      project=""
+      @close="showNewProjectModal = false"
+      @saved="onProjectSaved"
+    />
+
     <!-- Robot popup -->
     <Teleport to="body">
       <div v-if="showRobotMsg" class="fixed inset-0 z-[100] flex items-center justify-center" dir="rtl">
@@ -223,7 +247,7 @@
           <div class="text-xl font-bold text-gray-800 mb-2">איזה כיף להיות הסנג'ר של לנה!</div>
           <div class="text-sm text-gray-500 mb-5">אני כאן כדי לעזור לך לנהל את הפיננסים</div>
           <button @click="showRobotMsg = false"
-            class="px-6 py-2.5 bg-lime-500 text-white rounded-xl font-medium hover:bg-lime-600 transition">
+            class="px-6 py-2.5 bg-teal-500 text-white rounded-xl font-medium hover:bg-teal-600 transition">
             תודה! 💚
           </button>
         </div>
@@ -240,11 +264,13 @@ import CashFlowView from './components/CashFlowView.vue'
 import AlertsView from './components/AlertsView.vue'
 import DataView from './components/DataView.vue'
 import AttendanceView from './components/AttendanceView.vue'
+import ProjectFormModal from './components/ProjectFormModal.vue'
 import { getPnl, getProjects } from './services/api'
 
 const activeTab = ref('dashboard')
 const collapsed = ref(false)
 const showRobotMsg = ref(false)
+const showNewProjectModal = ref(false)
 const alertCount = ref(0)
 const pnlOpen = ref(false)
 const projects = ref([])
@@ -253,6 +279,17 @@ const selectedProject = ref('')
 function selectProject(name) {
   selectedProject.value = name
   activeTab.value = 'pnl'
+}
+
+function onProjectSaved(projectName) {
+  showNewProjectModal.value = false
+  getProjects().then(list => {
+    projects.value = list
+    if (projectName) {
+      pnlOpen.value = true
+      selectProject(projectName)
+    }
+  }).catch(() => {})
 }
 
 getProjects().then(list => { projects.value = list }).catch(() => {})

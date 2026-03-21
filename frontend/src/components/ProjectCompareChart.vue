@@ -23,7 +23,7 @@ const chartData = computed(() => {
       datasets: [{
         label: 'רווח תפעולי',
         data: names.map(n => props.summaries[n].total_operating_profit),
-        backgroundColor: names.map(n => props.summaries[n].total_operating_profit >= 0 ? '#84cc16' : '#ef4444'),
+        backgroundColor: names.map(n => props.summaries[n].total_operating_profit >= 0 ? '#0D9488' : '#ef4444'),
         borderRadius: 8,
         barPercentage: 0.5,
       }],
@@ -37,7 +37,7 @@ const chartData = computed(() => {
       {
         label: 'הכנסות',
         data: names.map(n => props.summaries[n].total_revenue),
-        backgroundColor: '#84cc16',
+        backgroundColor: '#0D9488',
         borderRadius: stacked ? 0 : 6,
         barPercentage: stacked ? 0.5 : 0.7,
         stack: stacked ? 'combined' : undefined,
