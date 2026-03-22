@@ -6,12 +6,13 @@
 import { computed } from 'vue'
 import { Bar } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js'
+import { tooltipConfig, axisConfig, legendConfig, COLORS, hebrewLabelCallback } from '../utils/chartDefaults'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend)
 
 const props = defineProps({ data: Object })
 
-const colors = ['#0D9488', '#22c55e', '#06b6d4', '#8b5cf6']
+const chartColors = [COLORS.primary, COLORS.green, COLORS.cyan, COLORS.purple]
 
 const chartData = computed(() => {
   const pnames = Object.keys(props.data.projects)
@@ -20,7 +21,7 @@ const chartData = computed(() => {
     datasets: pnames.map((name, idx) => ({
       label: name,
       data: props.data.projects[name].map(m => m.profit),
-      backgroundColor: colors[idx % colors.length] + 'cc',
+      backgroundColor: chartColors[idx % chartColors.length] + 'cc',
       borderRadius: 4,
       barPercentage: 0.8,
       stack: 'combined',
@@ -32,17 +33,15 @@ const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
-    legend: { position: 'top', rtl: true, labels: { font: { size: 10 }, usePointStyle: true, pointStyle: 'rectRounded', padding: 12 } },
+    legend: { ...legendConfig, labels: { ...legendConfig.labels, font: { size: 10 }, pointStyle: 'rectRounded', padding: 12 } },
     tooltip: {
-      rtl: true, backgroundColor: 'rgba(255,255,255,0.95)', titleColor: '#1a1a2e', bodyColor: '#374151',
-      borderColor: '#e5e7eb', borderWidth: 1, cornerRadius: 12, padding: 10,
-      callbacks: { label: ctx => ` ${ctx.dataset.label}: ${Number(ctx.raw).toLocaleString('he-IL')}` },
+      ...tooltipConfig,
+      callbacks: { label: hebrewLabelCallback() },
     },
   },
   scales: {
-    x: { stacked: true, grid: { display: false }, ticks: { font: { size: 9 }, color: '#9ca3af', maxRotation: 45 } },
-    y: { stacked: true, grid: { color: '#f3f4f6', drawBorder: false }, border: { display: false },
-      ticks: { font: { size: 10 }, color: '#9ca3af', callback: v => v.toLocaleString('he-IL') } },
+    x: { ...axisConfig.x, stacked: true, ticks: { ...axisConfig.x.ticks, font: { size: 9 }, maxRotation: 45 } },
+    y: { ...axisConfig.y, stacked: true },
   },
 }
 </script>

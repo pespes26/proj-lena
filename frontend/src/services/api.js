@@ -14,6 +14,7 @@ api.interceptors.response.use(
 )
 
 export const getProjects = () => api.get('/projects').then(r => r.data.projects)
+export const getProjectsDetail = () => api.get('/projects').then(r => r.data.projects_detail)
 export const getPnl = (project) => api.get('/pnl', { params: { project } }).then(r => r.data.data)
 export const getPnlSummary = () => api.get('/pnl/summary').then(r => r.data.data)
 export const getCashflow = () => api.get('/cashflow').then(r => r.data.data)
@@ -36,6 +37,8 @@ export const uploadAttendance = (file, hourlyRate) => {
   return api.post(`/attendance/upload?hourly_rate=${hourlyRate}`, f, { headers: { 'Content-Type': 'multipart/form-data' }, timeout: 30000 }).then(r => r.data)
 }
 export const getAttendanceByProject = (project) => api.get('/attendance/by-project', { params: { project } }).then(r => r.data)
+export const saveProjectActuals = (project, data) => api.post(`/project-form/${encodeURIComponent(project)}/actuals`, data).then(r => r.data)
+export const importExcelProject = (project) => api.post(`/import-excel-project/${encodeURIComponent(project)}`).then(r => r.data)
 
 export const formatNumber = (val) => {
   if (val == null) return '-'

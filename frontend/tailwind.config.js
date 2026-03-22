@@ -3,28 +3,35 @@ export default {
   content: ['./index.html', './src/**/*.{vue,js}'],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Heebo', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
+      },
       colors: {
-        ios: {
-          blue: '#007AFF',
-          'blue-dark': '#0056CC',
-          'blue-light': '#E8F0FE',
-          gray: { 1: '#8E8E93', 2: '#AEAEB2', 3: '#C7C7CC', 4: '#D1D1D6', 5: '#E5E5EA', 6: '#F2F2F7' },
-          red: '#FF3B30',
-          green: '#34C759',
-          orange: '#FF9500',
-          yellow: '#FFCC00',
-          purple: '#AF52DE',
-          teal: '#5AC8FA',
-          bg: '#F2F2F7',
+        brand: {
+          50: '#F0FDF4',
+          100: '#DCFCE7',
+          200: '#BBF7D0',
+          300: '#86EFAC',
+          400: '#4ADE80',
+          500: '#22C55E',
+          600: '#065F46',
+          700: '#064E3B',
+          800: '#022C22',
+          900: '#14532D',
+        },
+        warm: {
+          50: '#FFFBEB',
+          100: '#FEF3C7',
+          200: '#FDE68A',
+          300: '#FCD34D',
+          400: '#FBBF24',
+          500: '#D97706',
+          600: '#B45309',
+          700: '#92400E',
         },
       },
-      borderRadius: {
-        'ios': '16px',
-        'ios-lg': '20px',
-      },
       boxShadow: {
-        'ios': '0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)',
-        'ios-lg': '0 2px 8px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04)',
+        'card': '0 1px 3px rgba(6,95,70,0.04), 0 1px 2px rgba(0,0,0,0.02)',
       },
     },
   },

@@ -6,6 +6,7 @@
 import { computed } from 'vue'
 import { Line } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, PointElement, Filler, Title, Tooltip, Legend } from 'chart.js'
+import { tooltipConfig, axisConfig, legendConfig, COLORS, hebrewLabelCallback } from '../utils/chartDefaults'
 
 ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Filler, Title, Tooltip, Legend)
 
@@ -17,11 +18,11 @@ const chartData = computed(() => ({
     {
       label: 'תזרים חודשי נטו',
       data: props.data.monthly_net.map(m => m.value),
-      borderColor: '#0D9488',
-      backgroundColor: 'rgba(13,148,136,0.08)',
+      borderColor: COLORS.primary,
+      backgroundColor: COLORS.primaryFill,
       tension: 0.4,
       fill: false,
-      pointBackgroundColor: '#0D9488',
+      pointBackgroundColor: COLORS.primary,
       pointRadius: 4,
       pointHoverRadius: 6,
       borderWidth: 2.5,
@@ -29,11 +30,11 @@ const chartData = computed(() => ({
     {
       label: 'מצטבר',
       data: props.data.cumulative.map(m => m.value),
-      borderColor: '#22c55e',
-      backgroundColor: 'rgba(34,197,94,0.08)',
+      borderColor: COLORS.green,
+      backgroundColor: COLORS.greenFill,
       tension: 0.4,
       fill: true,
-      pointBackgroundColor: '#22c55e',
+      pointBackgroundColor: COLORS.green,
       pointRadius: 4,
       pointHoverRadius: 6,
       borderWidth: 2.5,
@@ -45,18 +46,16 @@ const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
-    title: { display: true, text: 'תזרים מזומנים — חודשי ומצטבר', font: { size: 15, family: 'Segoe UI, Arial' }, color: '#374151' },
-    legend: { position: 'top', rtl: true, labels: { font: { family: 'Segoe UI, Arial', size: 12 }, usePointStyle: true, pointStyle: 'circle' } },
+    title: { display: false },
+    legend: { ...legendConfig },
     tooltip: {
-      rtl: true,
-      backgroundColor: '#1a1a2e',
-      cornerRadius: 12,
-      callbacks: { label: ctx => `${ctx.dataset.label}: ${Number(ctx.raw).toLocaleString('he-IL')}` },
+      ...tooltipConfig,
+      callbacks: { label: hebrewLabelCallback() },
     },
   },
   scales: {
-    x: { grid: { display: false }, ticks: { font: { family: 'Segoe UI, Arial', size: 11 } } },
-    y: { grid: { color: '#f3f4f6' }, ticks: { font: { family: 'Segoe UI, Arial', size: 11 }, callback: v => v.toLocaleString('he-IL') } },
+    x: { ...axisConfig.x },
+    y: { ...axisConfig.y },
   },
 }
 </script>

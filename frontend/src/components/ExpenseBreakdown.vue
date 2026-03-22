@@ -23,6 +23,7 @@ import { computed } from 'vue'
 import { Doughnut } from 'vue-chartjs'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
 import { formatNumber } from '../services/api'
+import { tooltipConfig, COLORS, hebrewLabelCallback } from '../utils/chartDefaults'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
@@ -34,8 +35,8 @@ const items = computed(() => {
   const sal = props.summary.total_salary_expenses
   const total = op + sal
   return [
-    { label: 'הוצאות תפעול', value: op, color: '#fbbf24', percent: total > 0 ? Math.round(op / total * 100) : 0 },
-    { label: 'הוצאות שכר', value: sal, color: '#f97316', percent: total > 0 ? Math.round(sal / total * 100) : 0 },
+    { label: 'הוצאות תפעול', value: op, color: COLORS.amber, percent: total > 0 ? Math.round(op / total * 100) : 0 },
+    { label: 'הוצאות שכר', value: sal, color: COLORS.orange, percent: total > 0 ? Math.round(sal / total * 100) : 0 },
   ]
 })
 
@@ -56,14 +57,8 @@ const chartOptions = {
   plugins: {
     legend: { display: false },
     tooltip: {
-      rtl: true,
-      backgroundColor: 'rgba(255,255,255,0.95)',
-      titleColor: '#1a1a2e',
-      bodyColor: '#374151',
-      borderColor: '#e5e7eb',
-      borderWidth: 1,
-      cornerRadius: 12,
-      callbacks: { label: ctx => ` ${ctx.label}: ${Number(ctx.raw).toLocaleString('he-IL')}` },
+      ...tooltipConfig,
+      callbacks: { label: hebrewLabelCallback() },
     },
   },
 }

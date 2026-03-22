@@ -16,9 +16,15 @@
           <div class="flex items-center gap-3 mb-1">
             <h2 class="text-2xl font-bold text-gray-800">{{ selectedProject }}</h2>
             <span v-if="pnlData?.meta?.priority_id"
-              class="bg-teal-50 text-teal-600 text-xs font-mono font-semibold px-2.5 py-1 rounded-lg border border-teal-100">
+              class="bg-emerald-50 text-emerald-700 text-xs font-mono font-semibold px-2.5 py-1 rounded-lg border border-emerald-100">
               {{ pnlData.meta.priority_id }}
             </span>
+            <span v-if="projectSource === 'excel'"
+              class="bg-amber-50 text-amber-600 text-[10px] font-medium px-2 py-0.5 rounded-md border border-amber-100">Excel</span>
+            <span v-else-if="projectSource === 'excel-import'"
+              class="bg-blue-50 text-blue-600 text-[10px] font-medium px-2 py-0.5 rounded-md border border-blue-100">יובא</span>
+            <span v-else-if="projectSource === 'form'"
+              class="bg-emerald-50 text-emerald-700 text-[10px] font-medium px-2 py-0.5 rounded-md border border-emerald-100">טופס</span>
           </div>
           <!-- Tab bar (iOS segmented control) -->
           <div class="flex items-center bg-gray-100 rounded-xl p-0.5 mt-3 w-fit">
@@ -36,18 +42,30 @@
               <span v-else-if="formDataStatus === 'empty'"
                 class="absolute -top-1 -left-1 w-4 h-4 bg-red-400 text-white text-[9px] font-bold rounded-full flex items-center justify-center">!</span>
             </button>
+            <button @click="viewMode = 'details'"
+              :class="['px-5 py-1.5 text-sm font-medium rounded-lg transition-all',
+                viewMode === 'details' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-400']">
+              פרטי פרויקט
+            </button>
           </div>
         </div>
         <div class="flex items-center gap-2">
+          <button v-if="projectSource === 'excel'" @click="doImportExcel" :disabled="importingExcel"
+            class="px-4 py-2.5 bg-amber-50 text-amber-700 text-sm font-medium rounded-xl border border-amber-200 hover:bg-amber-100 disabled:opacity-50 transition flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+            </svg>
+            {{ importingExcel ? 'מייבא...' : 'ייבא מ-Excel' }}
+          </button>
           <button @click="showProjectForm = true"
-            class="px-4 py-2.5 bg-white text-gray-700 text-sm font-medium rounded-full border border-gray-200/60 hover:bg-gray-50 transition flex items-center gap-2 shadow-sm">
+            class="px-4 py-2.5 bg-white text-gray-700 text-sm font-medium rounded-xl border border-gray-200 hover:bg-gray-50 transition flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
             </svg>
             ערוך טופס
           </button>
           <button @click="showReportModal = true"
-            class="px-4 py-2.5 bg-[#0D9488] text-white text-sm font-medium rounded-full hover:bg-[#0F766E] transition flex items-center gap-2 shadow-sm">
+            class="px-4 py-2.5 bg-emerald-800 text-white text-sm font-medium rounded-xl hover:bg-emerald-900 transition flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
             </svg>
@@ -57,9 +75,17 @@
       </div>
 
       <!-- Dashboard view -->
-      <ProjectFormDashboard v-if="viewMode === 'dashboard'"
-        :project="selectedProject"
-        @edit="showProjectForm = true" />
+      <div v-if="viewMode === 'dashboard'">
+        <ProjectFormDashboard :project="selectedProject" @edit="showProjectForm = true" />
+        <div class="mt-6">
+          <MonthlyActualsEditor :project="selectedProject" @saved="loadPnl" />
+        </div>
+      </div>
+
+      <!-- Project Details view -->
+      <div v-else-if="viewMode === 'details'">
+        <ProjectDetailsView :project="selectedProject" @edit="showProjectForm = true" />
+      </div>
 
       <!-- P&L view -->
       <template v-else-if="pnlData">
@@ -78,7 +104,7 @@
                   'bg-red-50 text-red-500': r.type === 'expense',
                   'bg-green-50 text-green-500': r.type === 'revenue',
                   'bg-orange-50 text-orange-500': r.type === 'issue',
-                  'bg-teal-50 text-teal-500': r.type === 'note'
+                  'bg-emerald-50 text-emerald-700': r.type === 'note'
                 }">
                 <span class="text-sm">{{ typeIcon(r.type) }}</span>
               </div>
@@ -104,20 +130,20 @@
         <div></div>
         <div class="bg-white rounded-2xl px-5 py-3 shadow-sm border border-gray-100 flex items-center gap-4">
           <div class="flex items-center gap-2">
-            <div class="w-8 h-8 bg-teal-50 rounded-lg flex items-center justify-center">
-              <svg class="w-4 h-4 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <div class="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
+              <svg class="w-4 h-4 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"/>
               </svg>
             </div>
             <div>
               <div class="text-[10px] text-gray-400">מס' Priority</div>
-              <div class="text-sm font-semibold font-mono text-teal-600">{{ pnlData.meta?.priority_id || '-' }}</div>
+              <div class="text-sm font-semibold font-mono text-emerald-700">{{ pnlData.meta?.priority_id || '-' }}</div>
             </div>
           </div>
           <div class="w-px h-8 bg-gray-200"></div>
           <div class="flex items-center gap-2">
-            <div class="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center">
-              <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
+              <svg class="w-4 h-4 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
               </svg>
             </div>
@@ -162,12 +188,12 @@
         <div class="ios-card p-5">
           <div class="text-xs text-gray-400 mb-2">מרווח תפעולי</div>
           <div class="text-2xl font-bold"
-            :class="pnlData.summary.margin != null && pnlData.summary.margin >= 20 ? 'text-teal-600' : 'text-orange-500'">
+            :class="pnlData.summary.margin != null && pnlData.summary.margin >= 20 ? 'text-emerald-700' : 'text-orange-500'">
             {{ pnlData.summary.margin != null ? pnlData.summary.margin + '%' : '-' }}
           </div>
           <div class="mt-2 bg-gray-100 rounded-full h-1.5 overflow-hidden">
             <div class="h-full rounded-full transition-all duration-500"
-              :class="pnlData.summary.margin >= 20 ? 'bg-teal-400' : 'bg-orange-400'"
+              :class="pnlData.summary.margin >= 20 ? 'bg-emerald-500' : 'bg-orange-400'"
               :style="{ width: Math.min(100, Math.max(0, pnlData.summary.margin || 0)) + '%' }"></div>
           </div>
         </div>
@@ -250,16 +276,19 @@
                       <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
                     </svg>
                   </td>
-                  <td class="px-4 py-3 font-medium text-gray-700">{{ m.month }}</td>
+                  <td class="px-4 py-3 font-medium text-gray-700">
+                    {{ m.month }}
+                    <span v-if="m.is_actual" class="text-[8px] text-emerald-700 mr-1">●</span>
+                  </td>
                   <td class="px-4 py-3 text-gray-600">{{ fmt(m.revenue) }}</td>
-                  <td class="px-4 py-3 text-gray-600 group-hover:text-teal-600 group-hover:underline">{{ fmt(m.op_expenses) }}</td>
+                  <td class="px-4 py-3 text-gray-600 group-hover:text-emerald-700 group-hover:underline">{{ fmt(m.op_expenses) }}</td>
                   <td class="px-4 py-3" :class="m.gross_profit >= 0 ? 'text-green-600' : 'text-red-500'">{{ fmt(m.gross_profit) }}</td>
-                  <td class="px-4 py-3 text-gray-600 group-hover:text-teal-600 group-hover:underline">{{ fmt(m.salary_expenses) }}</td>
+                  <td class="px-4 py-3 text-gray-600 group-hover:text-emerald-700 group-hover:underline">{{ fmt(m.salary_expenses) }}</td>
                   <td class="px-4 py-3 font-semibold" :class="m.operating_profit >= 0 ? 'text-green-600' : 'text-red-500'">{{ fmt(m.operating_profit) }}</td>
                   <td class="px-4 py-3">
                     <span v-if="m.margin != null"
                       class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold"
-                      :class="m.margin_alert ? 'bg-red-50 text-red-600' : 'bg-teal-50 text-teal-700'">
+                      :class="m.margin_alert ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-800'">
                       {{ m.margin }}%
                     </span>
                     <span v-else class="text-gray-300">-</span>
@@ -267,7 +296,7 @@
                   <td class="px-4 py-3 text-gray-400 text-xs max-w-[180px] truncate">{{ m.notes }}</td>
                 </tr>
                 <!-- Drill-down row -->
-                <tr v-if="expandedMonth === m.month" class="bg-teal-50/30">
+                <tr v-if="expandedMonth === m.month" class="bg-emerald-50/30">
                   <td colspan="9" class="px-6 py-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <!-- Op expenses breakdown -->
@@ -326,7 +355,7 @@
               </template>
             </tbody>
             <tfoot>
-              <tr class="bg-teal-50/50 font-bold border-t-2 border-teal-200">
+              <tr class="bg-emerald-50/50 font-bold border-t-2 border-emerald-200">
                 <td class="px-4 py-4"></td>
                 <td class="px-4 py-4 text-gray-700">סה"כ</td>
                 <td class="px-4 py-4">{{ fmt(pnlData.summary.total_revenue) }}</td>
@@ -337,7 +366,7 @@
                   {{ fmt(pnlData.summary.total_operating_profit) }}
                 </td>
                 <td class="px-4 py-4">
-                  <span v-if="pnlData.summary.margin != null" class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-teal-100 text-teal-700">
+                  <span v-if="pnlData.summary.margin != null" class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-100 text-emerald-800">
                     {{ pnlData.summary.margin }}%
                   </span>
                 </td>
@@ -354,7 +383,7 @@
         <div class="text-4xl mb-3 opacity-30">📋</div>
         <div class="text-sm text-gray-500 mb-3">אין נתוני P&L מה-Excel לפרויקט זה</div>
         <button @click="viewMode = 'dashboard'"
-          class="px-5 py-2.5 bg-teal-500 text-white text-sm font-medium rounded-xl hover:bg-teal-600 transition">
+          class="px-5 py-2.5 bg-emerald-700 text-white text-sm font-medium rounded-xl hover:bg-emerald-800 transition">
           עבור לניהול פרויקט
         </button>
       </div>
@@ -368,7 +397,7 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-import { getProjects, getPnl, getProjectCashflow, getReports, getProjectForm, formatNumber } from '../services/api'
+import { getProjects, getProjectsDetail, getPnl, getProjectCashflow, getReports, getProjectForm, importExcelProject, formatNumber } from '../services/api'
 import ReportModal from './ReportModal.vue'
 import ProjectFormModal from './ProjectFormModal.vue'
 import PnlChart from './PnlChart.vue'
@@ -376,6 +405,8 @@ import ProfitBarChart from './ProfitBarChart.vue'
 import ProjectCashflowChart from './ProjectCashflowChart.vue'
 import ExpenseBreakdown from './ExpenseBreakdown.vue'
 import ProjectFormDashboard from './ProjectFormDashboard.vue'
+import ProjectDetailsView from './ProjectDetailsView.vue'
+import MonthlyActualsEditor from './MonthlyActualsEditor.vue'
 
 const props = defineProps({ initialProject: { type: String, default: '' } })
 
@@ -393,6 +424,12 @@ const showProjectForm = ref(false)
 const reports = ref([])
 const viewMode = ref('pnl') // 'pnl' or 'dashboard'
 const formDataStatus = ref(null) // null = loading, 'complete', 'incomplete', 'empty'
+const projectsDetail = ref([])
+const projectSource = computed(() => {
+  const detail = projectsDetail.value.find(p => p.name === selectedProject.value)
+  return detail?.source || 'excel'
+})
+const importingExcel = ref(false)
 
 async function checkFormStatus() {
   if (!selectedProject.value) { formDataStatus.value = null; return }
@@ -420,6 +457,17 @@ function formatDate(iso) {
 
 function onFormClose() { showProjectForm.value = false; checkFormStatus() }
 function onFormSaved() { loadPnl(); checkFormStatus() }
+
+async function doImportExcel() {
+  if (!selectedProject.value || importingExcel.value) return
+  importingExcel.value = true
+  try {
+    await importExcelProject(selectedProject.value)
+    await loadPnl()
+    await checkFormStatus()
+  } catch (e) { error.value = e.message }
+  finally { importingExcel.value = false }
+}
 
 async function loadReports() {
   if (!selectedProject.value) return
@@ -467,6 +515,7 @@ async function loadPnl() {
 onMounted(async () => {
   try {
     projects.value = await getProjects()
+    try { projectsDetail.value = await getProjectsDetail() } catch {}
     if (props.initialProject && projects.value.includes(props.initialProject)) {
       selectedProject.value = props.initialProject
     } else if (!selectedProject.value && projects.value.length) {

@@ -56,8 +56,8 @@
               @click="selectDay(day)"
               :class="[
                 'w-full aspect-square rounded-lg text-xs transition flex items-center justify-center',
-                isSelected(day) ? 'bg-teal-500 text-white font-bold' :
-                isToday(day) ? 'bg-teal-50 text-teal-700 font-semibold ring-1 ring-teal-300' :
+                isSelected(day) ? 'bg-emerald-700 text-white font-bold' :
+                isToday(day) ? 'bg-emerald-50 text-emerald-800 font-semibold ring-1 ring-emerald-300' :
                 day.outside ? 'text-gray-300' :
                 'text-gray-700 hover:bg-gray-100'
               ]">
@@ -70,7 +70,7 @@
         <!-- Today button -->
         <div class="mt-2 pt-2 border-t border-gray-100">
           <button type="button" @click="goToday"
-            class="w-full text-center text-xs text-teal-600 font-medium hover:bg-teal-50 rounded-lg py-1.5 transition">
+            class="w-full text-center text-xs text-emerald-700 font-medium hover:bg-emerald-50 rounded-lg py-1.5 transition">
             היום
           </button>
         </div>

@@ -6,7 +6,11 @@ from fastapi import FastAPI, Query, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
-from data_loader import load_pnl, load_cashflow, load_dashboard_kpis, load_project_cashflow, PROJECTS, DATA_PATH
+from data_loader import (load_pnl, load_cashflow, load_dashboard_kpis, load_project_cashflow,
+                         PROJECTS, DATA_PATH, PROJECT_META,
+                         load_unified_projects, load_unified_dashboard, form_to_pnl,
+                         form_to_cashflow, import_excel_to_form,
+                         _load_form_data, _save_form_data)
 
 app = FastAPI(title="סנג'ר - P&L & Cash Flow")
 
@@ -21,71 +25,32 @@ app.add_middleware(
 
 @app.get("/api/projects")
 def get_projects():
-    # Combine Excel-based projects with form-created projects
-    excel_projects = list(PROJECTS.keys())
-    form_projects = list(_load_projects_data().keys())
-    all_projects = list(dict.fromkeys(excel_projects + form_projects))
-    return {"projects": all_projects}
-
-
-def _empty_pnl(project_name):
-    """Return empty P&L structure for form-created projects without Excel data."""
-    form_data = _load_projects_data().get(project_name, {})
-    months = []
-    for m in range(1, 13):
-        revenue = 0
-        if form_data.get('total_revenue') and form_data.get('revenue_forecast', {}).get(str(m)):
-            revenue = round(form_data['total_revenue'] * form_data['revenue_forecast'][str(m)] / 100)
-        expense = 0
-        for cat in ['manpower', 'equipment', 'insurance', 'consultants', 'financing', 'other']:
-            for line in form_data.get(f'expense_lines_{cat}', []):
-                start = line.get('start_month', 1)
-                end = line.get('end_month', 12)
-                if start <= m <= end:
-                    expense += line.get('monthly_amount', 0) or 0
-        for sub in form_data.get('subcontractors', []):
-            expense += sub.get('monthly_amount', 0) or 0
-        months.append({
-            'month': m,
-            'revenue': revenue,
-            'operational_expense': expense,
-            'salary_expense': 0,
-            'total_expense': expense,
-            'profit': revenue - expense,
-            'margin': round((revenue - expense) / revenue * 100, 1) if revenue else 0,
-            'operational_components': [],
-            'salary_components': [],
-            'payment_milestones': [],
+    unified = load_unified_projects()
+    projects = []
+    for name, data in unified.items():
+        meta = data['pnl'].get('meta', {})
+        projects.append({
+            'name': name,
+            'status': data.get('status', 'active'),
+            'source': data.get('source', 'excel'),
+            'last_updated': data.get('last_updated', ''),
+            'manager': meta.get('manager', ''),
+            'priority_id': meta.get('priority_id', ''),
         })
-    total_rev = sum(m['revenue'] for m in months)
-    total_exp = sum(m['total_expense'] for m in months)
-    return {
-        'summary': {
-            'total_revenue': total_rev,
-            'total_operational': total_exp,
-            'total_salary': 0,
-            'operating_profit': total_rev - total_exp,
-            'margin': round((total_rev - total_exp) / total_rev * 100, 1) if total_rev else 0,
-            'manager': form_data.get('manager', ''),
-            'area': form_data.get('area', ''),
-            'axis': form_data.get('axis', ''),
-            'priority_id': form_data.get('priority_id', ''),
-        },
-        'months': months,
-    }
+    # Also return flat list for backward compatibility
+    return {"projects": [p['name'] for p in projects], "projects_detail": projects}
+
 
 
 @app.get("/api/pnl")
 def get_pnl(project: str = Query(None)):
     try:
-        if project and project not in PROJECTS:
-            # Check if it's a form-created project
-            form_projects = _load_projects_data()
-            if project in form_projects:
-                return {"data": {project: _empty_pnl(project)}}
-            raise HTTPException(status_code=404, detail=f"פרויקט '{project}' לא נמצא")
-        data = load_pnl(project)
-        return {"data": data}
+        unified = load_unified_projects()
+        if project:
+            if project not in unified:
+                raise HTTPException(status_code=404, detail=f"פרויקט '{project}' לא נמצא")
+            return {"data": {project: unified[project]['pnl']}}
+        return {"data": {name: data['pnl'] for name, data in unified.items()}}
     except HTTPException:
         raise
     except Exception as e:
@@ -95,8 +60,8 @@ def get_pnl(project: str = Query(None)):
 @app.get("/api/pnl/summary")
 def get_pnl_summary():
     try:
-        data = load_pnl()
-        return {"data": {name: info['summary'] for name, info in data.items()}}
+        unified = load_unified_projects()
+        return {"data": {name: data['pnl']['summary'] for name, data in unified.items()}}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"שגיאה בטעינת סיכום P&L: {str(e)}")
 
@@ -112,15 +77,14 @@ def get_cashflow():
 @app.get("/api/project-cashflow")
 def get_project_cashflow(project: str = Query(...)):
     try:
-        if project not in PROJECTS:
-            form_projects = _load_projects_data()
-            if project in form_projects:
-                return {"data": {"months": [{"month": m, "revenue": 0, "expense": 0, "net": 0, "cumulative": 0} for m in range(1, 13)]}}
-            raise HTTPException(status_code=404, detail=f"פרויקט '{project}' לא נמצא")
-        data = load_project_cashflow(project)
-        if not data:
-            raise HTTPException(status_code=404, detail="אין נתוני תזרים לפרויקט")
-        return {"data": data}
+        form_projects = _load_form_data()
+        if project in form_projects:
+            return {"data": form_to_cashflow(form_projects[project])}
+        if project in PROJECTS:
+            data = load_project_cashflow(project)
+            if data:
+                return {"data": data}
+        raise HTTPException(status_code=404, detail=f"פרויקט '{project}' לא נמצא")
     except HTTPException:
         raise
     except Exception as e:
@@ -130,7 +94,7 @@ def get_project_cashflow(project: str = Query(...)):
 @app.get("/api/dashboard")
 def get_dashboard():
     try:
-        return {"data": load_dashboard_kpis()}
+        return {"data": load_unified_dashboard()}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"שגיאה בטעינת נתוני דשבורד: {str(e)}")
 
@@ -246,7 +210,8 @@ def get_reports(project: str = Query(None)):
 @app.post("/api/reports")
 def create_report(report: ReportCreate):
     try:
-        if report.project not in PROJECTS:
+        all_projects = list(PROJECTS.keys()) + list(_load_projects_data().keys())
+        if report.project not in all_projects:
             raise HTTPException(status_code=404, detail=f"פרויקט '{report.project}' לא נמצא")
 
         reports = _load_reports()
@@ -299,11 +264,58 @@ def get_project_form(project: str):
 def save_project_form(project: str, form_data: dict):
     try:
         all_data = _load_projects_data()
+        form_data['last_updated'] = datetime.now().isoformat()
+        if 'source' not in form_data:
+            form_data['source'] = 'form'
+        if 'status' not in form_data:
+            form_data['status'] = 'active'
         all_data[project] = form_data
         _save_projects_data(all_data)
         return {"message": "נתוני הפרויקט נשמרו בהצלחה"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"שגיאה בשמירת נתוני פרויקט: {str(e)}")
+
+
+@app.post("/api/project-form/{project}/actuals")
+def save_project_actuals(project: str, actuals_data: dict):
+    try:
+        all_data = _load_projects_data()
+        if project not in all_data:
+            raise HTTPException(status_code=404, detail=f"פרויקט '{project}' לא נמצא בנתוני הטופס")
+
+        month = str(actuals_data.get('month', ''))
+        if not month or int(month) < 1 or int(month) > 12:
+            raise HTTPException(status_code=400, detail="חודש לא תקין")
+
+        if 'actuals' not in all_data[project]:
+            all_data[project]['actuals'] = {}
+
+        all_data[project]['actuals'][month] = {
+            'revenue': actuals_data.get('revenue', 0),
+            'op_expenses': actuals_data.get('op_expenses', 0),
+            'salary_expenses': actuals_data.get('salary_expenses', 0),
+            'notes': actuals_data.get('notes', ''),
+        }
+        all_data[project]['last_updated'] = datetime.now().isoformat()
+        _save_projects_data(all_data)
+        return {"message": f"ביצוע בפועל לחודש {month} נשמר בהצלחה"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"שגיאה בשמירת ביצוע בפועל: {str(e)}")
+
+
+@app.post("/api/import-excel-project/{project}")
+def import_excel_project(project: str):
+    try:
+        result = import_excel_to_form(project)
+        if not result:
+            raise HTTPException(status_code=404, detail=f"פרויקט '{project}' לא נמצא ב-Excel")
+        return {"message": f"פרויקט '{project}' יובא בהצלחה מ-Excel", "data": result}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"שגיאה בייבוא פרויקט: {str(e)}")
 
 
 # --- Attendance ---

@@ -11,7 +11,7 @@
       <div>
         <div class="flex items-center gap-3 mb-1">
           <h2 class="text-xl font-bold text-gray-800">{{ project }}</h2>
-          <span class="text-xs bg-teal-100 text-teal-700 px-2.5 py-1 rounded-full font-medium">{{ formData.area || 'FM' }}</span>
+          <span class="text-xs bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full font-medium">{{ formData.area || 'FM' }}</span>
         </div>
         <div class="text-sm text-gray-500 flex items-center gap-4 flex-wrap">
           <span v-if="formData.manager" class="flex items-center gap-1">
@@ -51,14 +51,14 @@
       </div>
       <div class="bg-white rounded-2xl border border-gray-200 p-5">
         <div class="text-xs text-gray-400 mb-1">רווח צפוי</div>
-        <div class="text-2xl font-bold" :class="profit >= 0 ? 'text-teal-600' : 'text-red-500'">{{ fmt(profit) }}</div>
+        <div class="text-2xl font-bold" :class="profit >= 0 ? 'text-emerald-700' : 'text-red-500'">{{ fmt(profit) }}</div>
         <div class="text-[10px] text-gray-400 mt-1">₪</div>
       </div>
       <div class="bg-white rounded-2xl border border-gray-200 p-5">
         <div class="text-xs text-gray-400 mb-1">מרווח צפוי</div>
-        <div class="text-2xl font-bold" :class="margin >= 20 ? 'text-teal-600' : margin >= 0 ? 'text-orange-500' : 'text-red-500'">{{ margin.toFixed(1) }}%</div>
+        <div class="text-2xl font-bold" :class="margin >= 20 ? 'text-emerald-700' : margin >= 0 ? 'text-orange-500' : 'text-red-500'">{{ margin.toFixed(1) }}%</div>
         <div class="w-full bg-gray-200 rounded-full h-1.5 mt-2">
-          <div class="h-full rounded-full transition-all" :class="margin >= 20 ? 'bg-teal-500' : margin >= 0 ? 'bg-orange-400' : 'bg-red-500'"
+          <div class="h-full rounded-full transition-all" :class="margin >= 20 ? 'bg-emerald-700' : margin >= 0 ? 'bg-orange-400' : 'bg-red-500'"
             :style="{ width: Math.min(Math.max(margin, 0), 100) + '%' }"></div>
         </div>
       </div>
@@ -77,7 +77,7 @@
             </div>
             <div class="w-full bg-gray-100 rounded-full h-2.5">
               <div class="h-full rounded-full transition-all" :style="{ width: term.percent + '%' }"
-                :class="term.type === 'מקדמה' || term.type === 'מזומן' ? 'bg-teal-400' : 'bg-amber-400'"></div>
+                :class="term.type === 'מקדמה' || term.type === 'מזומן' ? 'bg-emerald-500' : 'bg-amber-400'"></div>
             </div>
             <div class="text-[10px] text-gray-400 mt-0.5">
               {{ fmt(Math.round(totalRevenue * term.percent / 100)) }} ₪
@@ -95,7 +95,7 @@
           <Bar v-if="revenueChartData" :data="revenueChartData" :options="barOptions" />
         </div>
         <div class="flex items-center gap-4 mt-3 text-[10px] text-gray-400">
-          <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-teal-400"></span> הכנסה צפויה</div>
+          <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-emerald-500"></span> הכנסה צפויה</div>
           <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-amber-400"></span> כניסת תשלום (שוטף+)</div>
         </div>
       </div>
@@ -151,9 +151,9 @@
         <Bar v-if="cashflowChartData" :data="cashflowChartData" :options="cashflowOptions" />
       </div>
       <div class="flex items-center gap-4 mt-3 text-[10px] text-gray-400">
-        <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-teal-400"></span> כניסות</div>
+        <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-emerald-500"></span> כניסות</div>
         <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-orange-400"></span> יציאות</div>
-        <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-teal-400"></span> מצטבר</div>
+        <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-emerald-500"></span> מצטבר</div>
       </div>
     </div>
   </div>

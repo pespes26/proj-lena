@@ -2,7 +2,7 @@
   <Teleport to="body">
     <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center" dir="rtl">
       <!-- Backdrop -->
-      <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" @click="$emit('close')"></div>
+      <div class="absolute inset-0 bg-black/40" @click="$emit('close')"></div>
 
       <!-- Modal -->
       <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
@@ -30,7 +30,7 @@
                 :class="[
                   'px-3 py-2.5 rounded-xl text-xs font-medium border transition-all text-center',
                   form.type === t.id
-                    ? 'border-teal-400 bg-teal-50 text-teal-700'
+                    ? 'border-emerald-400 bg-emerald-50 text-emerald-800'
                     : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'
                 ]">
                 <div class="text-lg mb-0.5">{{ t.icon }}</div>
@@ -43,7 +43,7 @@
           <div>
             <label class="block text-xs font-medium text-gray-600 mb-1.5">חודש (אופציונלי)</label>
             <select v-model="form.month"
-              class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-300 focus:border-teal-400 transition">
+              class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:border-emerald-400 transition">
               <option :value="null">כללי — לא קשור לחודש ספציפי</option>
               <option v-for="m in 12" :key="m" :value="m">חודש {{ m }}</option>
             </select>
@@ -55,7 +55,7 @@
             <input v-model="form.title" type="text" placeholder="למשל: הוצאה חריגה על תיקון..."
               maxlength="100"
               @blur="validateTitle"
-              :class="['w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-300 focus:border-teal-400 transition',
+              :class="['w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:border-emerald-400 transition',
                 fe.title ? 'border-red-400! bg-red-50!' : '']" />
             <div class="flex justify-between mt-0.5">
               <span v-if="fe.title" class="text-red-500 text-[10px]">{{ fe.title }}</span>
@@ -69,7 +69,7 @@
             <label class="block text-xs font-medium text-gray-600 mb-1.5">סכום (ש"ח) *</label>
             <input v-model.number="form.amount" type="number" placeholder="0" min="1"
               @blur="validateAmount"
-              :class="['w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-300 focus:border-teal-400 transition',
+              :class="['w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:border-emerald-400 transition',
                 fe.amount ? 'border-red-400! bg-red-50!' : '']" />
             <span v-if="fe.amount" class="text-red-500 text-[10px] mt-0.5 block">{{ fe.amount }}</span>
           </div>
@@ -78,7 +78,7 @@
           <div>
             <label class="block text-xs font-medium text-gray-600 mb-1.5">פירוט</label>
             <textarea v-model="form.description" rows="3" placeholder="תיאור מפורט..." maxlength="500"
-              :class="['w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-300 focus:border-teal-400 transition resize-none',
+              :class="['w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:border-emerald-400 transition resize-none',
                 form.description.length > 500 ? 'border-red-400! bg-red-50!' : '']"></textarea>
             <div class="flex justify-end mt-0.5">
               <span :class="['text-[10px]', form.description.length > 480 ? 'text-orange-500' : 'text-gray-400']">{{ form.description.length }}/500</span>
@@ -94,7 +94,7 @@
           <button @click="$emit('close')"
             class="px-4 py-2 text-sm text-gray-500 hover:text-gray-700 transition">ביטול</button>
           <button @click="submit" :disabled="!canSubmit || submitting"
-            class="px-6 py-2.5 bg-teal-500 text-white text-sm font-medium rounded-xl hover:bg-teal-600 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center gap-2">
+            class="px-6 py-2.5 bg-emerald-700 text-white text-sm font-medium rounded-xl hover:bg-emerald-800 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center gap-2">
             <svg v-if="submitting" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>

@@ -6,6 +6,7 @@
 import { computed } from 'vue'
 import { Line } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, PointElement, Filler, Tooltip, Legend } from 'chart.js'
+import { tooltipConfig, axisConfig, legendConfig, COLORS, hebrewLabelCallback } from '../utils/chartDefaults'
 
 ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Filler, Tooltip, Legend)
 
@@ -17,8 +18,8 @@ const chartData = computed(() => ({
     {
       label: 'נטו חודשי',
       data: props.data.data.map(d => d.net),
-      borderColor: '#0D9488',
-      backgroundColor: 'rgba(13,148,136,0.1)',
+      borderColor: COLORS.primary,
+      backgroundColor: COLORS.primaryLight,
       tension: 0.4,
       fill: true,
       pointRadius: 0,
@@ -28,8 +29,8 @@ const chartData = computed(() => ({
     {
       label: 'מצטבר',
       data: props.data.data.map(d => d.cumulative),
-      borderColor: '#22c55e',
-      backgroundColor: 'rgba(34,197,94,0.05)',
+      borderColor: COLORS.green,
+      backgroundColor: COLORS.greenFill,
       tension: 0.4,
       fill: false,
       pointRadius: 0,
@@ -45,26 +46,15 @@ const chartOptions = {
   maintainAspectRatio: false,
   interaction: { mode: 'index', intersect: false },
   plugins: {
-    legend: { position: 'top', rtl: true, labels: { font: { size: 11 }, usePointStyle: true, pointStyle: 'circle', padding: 12 } },
+    legend: { ...legendConfig, labels: { ...legendConfig.labels, padding: 12 } },
     tooltip: {
-      rtl: true,
-      backgroundColor: 'rgba(255,255,255,0.95)',
-      titleColor: '#1a1a2e',
-      bodyColor: '#374151',
-      borderColor: '#e5e7eb',
-      borderWidth: 1,
-      cornerRadius: 12,
-      padding: 10,
-      callbacks: { label: ctx => ` ${ctx.dataset.label}: ${Number(ctx.raw).toLocaleString('he-IL')}` },
+      ...tooltipConfig,
+      callbacks: { label: hebrewLabelCallback() },
     },
   },
   scales: {
-    x: { grid: { display: false }, ticks: { font: { size: 10 }, color: '#9ca3af', maxRotation: 45 } },
-    y: {
-      grid: { color: '#f3f4f6', drawBorder: false },
-      ticks: { font: { size: 10 }, color: '#9ca3af', callback: v => v.toLocaleString('he-IL') },
-      border: { display: false },
-    },
+    x: { ...axisConfig.x, ticks: { ...axisConfig.x.ticks, maxRotation: 45 } },
+    y: { ...axisConfig.y },
   },
 }
 </script>

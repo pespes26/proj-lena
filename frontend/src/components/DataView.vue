@@ -8,7 +8,7 @@
     </div>
 
     <div v-if="error" class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl mb-6 text-sm">{{ error }}</div>
-    <div v-if="success" class="bg-teal-50 border border-teal-200 text-teal-700 px-4 py-3 rounded-xl mb-6 text-sm flex items-center gap-2">
+    <div v-if="success" class="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-xl mb-6 text-sm flex items-center gap-2">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
       {{ success }}
     </div>
@@ -29,11 +29,11 @@
               @click="$refs.fileInput.click()"
               :class="[
                 'border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all duration-200',
-                dragActive ? 'border-teal-400 bg-teal-50' : 'border-gray-200 hover:border-teal-300 hover:bg-gray-50'
+                dragActive ? 'border-emerald-400 bg-emerald-50' : 'border-gray-200 hover:border-emerald-300 hover:bg-gray-50'
               ]"
             >
-              <div class="w-16 h-16 mx-auto mb-4 bg-teal-50 rounded-2xl flex items-center justify-center">
-                <svg class="w-8 h-8 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <div class="w-16 h-16 mx-auto mb-4 bg-emerald-50 rounded-2xl flex items-center justify-center">
+                <svg class="w-8 h-8 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
                 </svg>
               </div>
@@ -61,7 +61,7 @@
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
                 <button @click="upload" :disabled="uploading"
-                  class="px-4 py-2 bg-teal-500 text-white text-sm font-medium rounded-xl hover:bg-teal-600 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center gap-2">
+                  class="px-4 py-2 bg-emerald-700 text-white text-sm font-medium rounded-xl hover:bg-emerald-800 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center gap-2">
                   <svg v-if="uploading" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
                   <span>{{ uploading ? 'מעלה...' : 'העלה קובץ' }}</span>
                 </button>
@@ -102,8 +102,8 @@
           <template v-else-if="status.exists">
             <div class="space-y-4">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-teal-50 rounded-xl flex items-center justify-center">
-                  <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center">
+                  <svg class="w-5 h-5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                 </div>
                 <div>
                   <div class="text-sm font-medium text-gray-700">קובץ פעיל</div>
@@ -130,7 +130,7 @@
                 <div class="text-xs text-gray-400 mb-2">פרויקטים בקובץ:</div>
                 <div class="flex flex-wrap gap-1.5">
                   <span v-for="p in status.projects" :key="p"
-                    class="bg-teal-50 text-teal-700 text-[11px] font-medium px-2.5 py-1 rounded-lg">
+                    class="bg-emerald-50 text-emerald-800 text-[11px] font-medium px-2.5 py-1 rounded-lg">
                     {{ p }}
                   </span>
                 </div>
@@ -151,11 +151,11 @@
           <h3 class="font-semibold text-gray-700 mb-3">מבנה נדרש</h3>
           <div class="space-y-2 text-xs text-gray-500">
             <div class="flex items-start gap-2">
-              <span class="text-teal-500 mt-0.5">&#x25CF;</span>
+              <span class="text-emerald-700 mt-0.5">&#x25CF;</span>
               <span>לשונית <strong>"פרוייקטים מנרב IFM"</strong> — נתוני P&L לכל פרויקט לפי חודש</span>
             </div>
             <div class="flex items-start gap-2">
-              <span class="text-teal-500 mt-0.5">&#x25CF;</span>
+              <span class="text-emerald-700 mt-0.5">&#x25CF;</span>
               <span>לשונית <strong>"ריכוז"</strong> — תזרים מזומנים מצטבר</span>
             </div>
           </div>

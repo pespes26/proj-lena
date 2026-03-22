@@ -6,6 +6,7 @@
 import { computed } from 'vue'
 import { Bar } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js'
+import { tooltipConfig, axisConfig, COLORS } from '../utils/chartDefaults'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend)
 
@@ -28,15 +29,13 @@ const chartOptions = {
   plugins: {
     legend: { display: false },
     tooltip: {
-      rtl: true, backgroundColor: 'rgba(255,255,255,0.95)', titleColor: '#1a1a2e', bodyColor: '#374151',
-      borderColor: '#e5e7eb', borderWidth: 1, cornerRadius: 12, padding: 10,
+      ...tooltipConfig,
       callbacks: { label: ctx => ` נטו: ${Number(ctx.raw).toLocaleString('he-IL')}` },
     },
   },
   scales: {
-    x: { grid: { display: false }, ticks: { font: { size: 10 }, color: '#9ca3af' } },
-    y: { grid: { color: '#f3f4f6', drawBorder: false }, border: { display: false },
-      ticks: { font: { size: 10 }, color: '#9ca3af', callback: v => v.toLocaleString('he-IL') } },
+    x: { ...axisConfig.x },
+    y: { ...axisConfig.y },
   },
 }
 </script>

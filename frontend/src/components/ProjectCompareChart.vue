@@ -6,6 +6,7 @@
 import { computed } from 'vue'
 import { Bar } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js'
+import { tooltipConfig, axisConfig, legendConfig, COLORS, absLabelCallback } from '../utils/chartDefaults'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
@@ -23,7 +24,7 @@ const chartData = computed(() => {
       datasets: [{
         label: 'רווח תפעולי',
         data: names.map(n => props.summaries[n].total_operating_profit),
-        backgroundColor: names.map(n => props.summaries[n].total_operating_profit >= 0 ? '#0D9488' : '#ef4444'),
+        backgroundColor: names.map(n => props.summaries[n].total_operating_profit >= 0 ? COLORS.primary : COLORS.red),
         borderRadius: 8,
         barPercentage: 0.5,
       }],
@@ -37,7 +38,7 @@ const chartData = computed(() => {
       {
         label: 'הכנסות',
         data: names.map(n => props.summaries[n].total_revenue),
-        backgroundColor: '#0D9488',
+        backgroundColor: COLORS.primary,
         borderRadius: stacked ? 0 : 6,
         barPercentage: stacked ? 0.5 : 0.7,
         stack: stacked ? 'combined' : undefined,
@@ -45,7 +46,7 @@ const chartData = computed(() => {
       {
         label: 'הוצאות תפעול',
         data: names.map(n => -props.summaries[n].total_op_expenses),
-        backgroundColor: '#fbbf24',
+        backgroundColor: COLORS.amber,
         borderRadius: stacked ? 0 : 6,
         barPercentage: stacked ? 0.5 : 0.7,
         stack: stacked ? 'combined' : undefined,
@@ -53,7 +54,7 @@ const chartData = computed(() => {
       {
         label: 'הוצאות שכר',
         data: names.map(n => -props.summaries[n].total_salary_expenses),
-        backgroundColor: '#f97316',
+        backgroundColor: COLORS.orange,
         borderRadius: stacked ? 0 : 6,
         barPercentage: stacked ? 0.5 : 0.7,
         stack: stacked ? 'combined' : undefined,
@@ -67,33 +68,24 @@ const chartOptions = computed(() => ({
   maintainAspectRatio: false,
   plugins: {
     legend: {
-      position: 'top',
-      rtl: true,
-      labels: { font: { family: 'Segoe UI, Arial', size: 11 }, padding: 16, usePointStyle: true, pointStyle: 'rectRounded' },
+      ...legendConfig,
+      labels: { ...legendConfig.labels, pointStyle: 'rectRounded' },
     },
     tooltip: {
-      rtl: true,
-      backgroundColor: '#1a1a2e',
-      cornerRadius: 12,
-      padding: 12,
-      titleFont: { family: 'Segoe UI, Arial' },
-      bodyFont: { family: 'Segoe UI, Arial' },
-      callbacks: {
-        label: ctx => `${ctx.dataset.label}: ${Math.abs(Number(ctx.raw)).toLocaleString('he-IL')}`,
-      },
+      ...tooltipConfig,
+      callbacks: { label: absLabelCallback() },
     },
   },
   scales: {
     x: {
+      ...axisConfig.x,
       stacked: props.mode === 'stacked',
-      grid: { display: false },
-      ticks: { font: { family: 'Segoe UI, Arial', size: 11 } },
     },
     y: {
+      ...axisConfig.y,
       stacked: props.mode === 'stacked',
-      grid: { color: '#f3f4f6' },
       ticks: {
-        font: { family: 'Segoe UI, Arial', size: 11 },
+        ...axisConfig.y.ticks,
         callback: v => Math.abs(v).toLocaleString('he-IL'),
       },
     },

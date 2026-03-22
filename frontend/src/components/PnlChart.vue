@@ -6,6 +6,7 @@
 import { computed } from 'vue'
 import { Line } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, PointElement, Filler, Title, Tooltip, Legend } from 'chart.js'
+import { tooltipConfig, axisConfig, legendConfig, COLORS, hebrewLabelCallback } from '../utils/chartDefaults'
 
 ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Filler, Title, Tooltip, Legend)
 
@@ -23,11 +24,11 @@ const chartData = computed(() => ({
     {
       label: 'הכנסה צפויה',
       data: props.data.map(m => m.revenue),
-      borderColor: '#0D9488',
-      backgroundColor: isArea.value ? 'rgba(13,148,136,0.15)' : 'rgba(13,148,136,0.08)',
+      borderColor: COLORS.primary,
+      backgroundColor: isArea.value ? COLORS.primaryLight : COLORS.primaryFill,
       tension: 0.4,
       fill: isArea.value,
-      pointBackgroundColor: '#0D9488',
+      pointBackgroundColor: COLORS.primary,
       pointBorderColor: '#fff',
       pointBorderWidth: 2,
       pointRadius: isArea.value ? 0 : 5,
@@ -37,11 +38,11 @@ const chartData = computed(() => ({
     {
       label: 'הוצאות תפעול',
       data: props.data.map(m => m.op_expenses),
-      borderColor: '#fbbf24',
-      backgroundColor: isArea.value ? 'rgba(251,191,36,0.1)' : 'rgba(251,191,36,0.06)',
+      borderColor: COLORS.amber,
+      backgroundColor: isArea.value ? COLORS.amberLight : 'rgba(251,191,36,0.06)',
       tension: 0.4,
       fill: isArea.value,
-      pointBackgroundColor: '#fbbf24',
+      pointBackgroundColor: COLORS.amber,
       pointBorderColor: '#fff',
       pointBorderWidth: 2,
       pointRadius: isArea.value ? 0 : 5,
@@ -52,11 +53,11 @@ const chartData = computed(() => ({
     {
       label: 'רווח תפעולי',
       data: props.data.map(m => m.operating_profit),
-      borderColor: '#22c55e',
-      backgroundColor: isArea.value ? 'rgba(34,197,94,0.1)' : 'rgba(34,197,94,0.06)',
+      borderColor: COLORS.green,
+      backgroundColor: isArea.value ? COLORS.greenLight : COLORS.greenFill,
       tension: 0.4,
       fill: isArea.value,
-      pointBackgroundColor: props.data.map(m => m.operating_profit >= 0 ? '#22c55e' : '#ef4444'),
+      pointBackgroundColor: props.data.map(m => m.operating_profit >= 0 ? COLORS.green : COLORS.red),
       pointBorderColor: '#fff',
       pointBorderWidth: 2,
       pointRadius: isArea.value ? 0 : 5,
@@ -72,46 +73,15 @@ const chartOptions = computed(() => ({
   interaction: { mode: 'index', intersect: false },
   plugins: {
     title: { display: false },
-    legend: {
-      position: 'top',
-      rtl: true,
-      labels: {
-        font: { family: 'Segoe UI, Arial', size: 11 },
-        usePointStyle: true,
-        pointStyle: 'circle',
-        padding: 16,
-      },
-    },
+    legend: { ...legendConfig },
     tooltip: {
-      rtl: true,
-      backgroundColor: 'rgba(255,255,255,0.95)',
-      titleColor: '#1a1a2e',
-      bodyColor: '#374151',
-      borderColor: '#e5e7eb',
-      borderWidth: 1,
-      cornerRadius: 12,
-      padding: 12,
-      boxPadding: 4,
-      usePointStyle: true,
-      callbacks: {
-        label: ctx => ` ${ctx.dataset.label}: ${Number(ctx.raw).toLocaleString('he-IL')}`,
-      },
+      ...tooltipConfig,
+      callbacks: { label: hebrewLabelCallback() },
     },
   },
   scales: {
-    x: {
-      grid: { display: false },
-      ticks: { font: { family: 'Segoe UI, Arial', size: 11 }, color: '#9ca3af' },
-    },
-    y: {
-      grid: { color: '#f3f4f6', drawBorder: false },
-      ticks: {
-        font: { family: 'Segoe UI, Arial', size: 11 },
-        color: '#9ca3af',
-        callback: v => v.toLocaleString('he-IL'),
-      },
-      border: { display: false },
-    },
+    x: { ...axisConfig.x },
+    y: { ...axisConfig.y },
   },
 }))
 </script>

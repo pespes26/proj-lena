@@ -2,7 +2,7 @@
   <div>
     <div class="flex items-center justify-between mb-6">
       <div>
-        <h2 class="text-xl font-bold text-gray-800">תזרים מזומנים</h2>
+        <h2 class="text-2xl font-bold text-gray-900">תזרים מזומנים</h2>
         <p class="text-sm text-gray-400 mt-1">סקירת תזרים כלל הפרויקטים</p>
       </div>
     </div>
@@ -12,29 +12,29 @@
 
     <template v-if="cfData">
       <!-- KPI Cards -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div class="ios-card p-5">
-          <div class="text-xs text-gray-400 mb-2">סך הכנסות תקופתי</div>
-          <div class="text-2xl font-bold text-gray-800">{{ fmt(totalRevenue) }}</div>
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+        <div class="ios-card p-6">
+          <div class="text-sm text-gray-500 font-medium mb-2">סך הכנסות תקופתי</div>
+          <div class="text-3xl font-bold text-gray-900">{{ fmt(totalRevenue) }}</div>
         </div>
-        <div class="ios-card p-5">
-          <div class="text-xs text-gray-400 mb-2">סך הוצאות תקופתי</div>
-          <div class="text-2xl font-bold text-gray-800">{{ fmt(totalExpenses) }}</div>
+        <div class="ios-card p-6">
+          <div class="text-sm text-gray-500 font-medium mb-2">סך הוצאות תקופתי</div>
+          <div class="text-3xl font-bold text-gray-900">{{ fmt(totalExpenses) }}</div>
         </div>
-        <div class="ios-card p-5">
-          <div class="text-xs text-gray-400 mb-2">נטו תקופתי</div>
-          <div class="text-2xl font-bold" :class="totalNet >= 0 ? 'text-green-600' : 'text-red-500'">{{ fmt(totalNet) }}</div>
+        <div class="ios-card p-6">
+          <div class="text-sm text-gray-500 font-medium mb-2">נטו תקופתי</div>
+          <div class="text-3xl font-bold" :class="totalNet >= 0 ? 'text-green-600' : 'text-red-500'">{{ fmt(totalNet) }}</div>
         </div>
-        <div class="ios-card p-5">
-          <div class="text-xs text-gray-400 mb-2">יתרה מצטברת</div>
-          <div class="text-2xl font-bold" :class="lastCumulative >= 0 ? 'text-green-600' : 'text-red-500'">{{ fmt(lastCumulative) }}</div>
+        <div class="ios-card p-6">
+          <div class="text-sm text-gray-500 font-medium mb-2">יתרה מצטברת</div>
+          <div class="text-3xl font-bold" :class="lastCumulative >= 0 ? 'text-green-600' : 'text-red-500'">{{ fmt(lastCumulative) }}</div>
         </div>
       </div>
 
       <!-- Row 1: Main chart + view toggle -->
       <div class="ios-card p-6 mb-6">
         <div class="flex items-center justify-between mb-5">
-          <h3 class="font-semibold text-gray-700">תזרים מזומנים</h3>
+          <h3 class="text-lg font-bold text-gray-900">תזרים מזומנים</h3>
           <div class="flex bg-gray-100 rounded-xl p-1 gap-0.5">
             <button v-for="v in views" :key="v.id"
               @click="activeView = v.id"
@@ -59,13 +59,13 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
         <!-- Per-project stacked bar -->
         <div class="ios-card p-6">
-          <h3 class="font-semibold text-gray-700 mb-4">השוואת פרויקטים — נטו</h3>
+          <h3 class="text-lg font-bold text-gray-900 mb-4">השוואת פרויקטים — נטו</h3>
           <ProjectNetChart :data="cfData" />
         </div>
 
         <!-- Per-project totals cards -->
         <div class="ios-card p-6">
-          <h3 class="font-semibold text-gray-700 mb-4">סיכום לפי פרויקט</h3>
+          <h3 class="text-lg font-bold text-gray-900 mb-4">סיכום לפי פרויקט</h3>
           <div class="space-y-3">
             <div v-for="(months, pname) in cfData.projects" :key="pname"
               class="bg-gray-50 rounded-xl p-4">
@@ -77,7 +77,7 @@
                 </span>
               </div>
               <div class="flex h-2 rounded-full overflow-hidden bg-gray-200">
-                <div class="bg-teal-400 transition-all"
+                <div class="bg-emerald-500 transition-all"
                   :style="{ width: projectRevenuePercent(months) + '%' }"></div>
                 <div class="bg-amber-400 transition-all"
                   :style="{ width: projectExpensePercent(months) + '%' }"></div>
@@ -96,7 +96,7 @@
         <!-- Monthly + Cumulative table -->
         <div class="ios-card overflow-hidden">
           <div class="px-6 py-4 border-b border-gray-100">
-            <h3 class="font-semibold text-gray-700">תזרים חודשי ומצטבר</h3>
+            <h3 class="text-lg font-bold text-gray-900">תזרים חודשי ומצטבר</h3>
           </div>
           <div class="overflow-y-auto max-h-[400px]">
             <table class="w-full text-sm">
@@ -130,7 +130,7 @@
         <!-- Per-project detail table -->
         <div class="ios-card overflow-hidden">
           <div class="px-6 py-4 border-b border-gray-100">
-            <h3 class="font-semibold text-gray-700">פירוט נטו לפי פרויקט</h3>
+            <h3 class="text-lg font-bold text-gray-900">פירוט נטו לפי פרויקט</h3>
           </div>
           <div class="overflow-auto max-h-[400px]">
             <table class="w-full text-sm whitespace-nowrap">

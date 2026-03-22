@@ -6,6 +6,7 @@
 import { computed } from 'vue'
 import { Line } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, PointElement, Filler, Tooltip } from 'chart.js'
+import { tooltipConfig, axisConfig, COLORS, hebrewLabelCallback } from '../utils/chartDefaults'
 
 ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Filler, Tooltip)
 
@@ -17,19 +18,19 @@ const chartData = computed(() => ({
     {
       label: 'מצטבר',
       data: props.data.cumulative.map(m => m.value),
-      borderColor: '#0D9488',
-      backgroundColor: 'rgba(13,148,136,0.12)',
+      borderColor: COLORS.primary,
+      backgroundColor: COLORS.primaryLight,
       tension: 0.4,
       fill: true,
       pointRadius: 0,
       pointHoverRadius: 5,
-      pointHoverBackgroundColor: '#0D9488',
+      pointHoverBackgroundColor: COLORS.primary,
       borderWidth: 2.5,
     },
     {
       label: 'חודשי',
       data: props.data.monthly_net.map(m => m.value),
-      borderColor: '#a3e635',
+      borderColor: COLORS.lime,
       backgroundColor: 'transparent',
       tension: 0.4,
       fill: false,
@@ -48,23 +49,16 @@ const chartOptions = {
   plugins: {
     legend: { display: false },
     tooltip: {
-      rtl: true,
-      backgroundColor: 'rgba(255,255,255,0.95)',
-      titleColor: '#1a1a2e',
-      bodyColor: '#374151',
-      borderColor: '#e5e7eb',
-      borderWidth: 1,
-      cornerRadius: 10,
+      ...tooltipConfig,
       padding: 8,
-      callbacks: { label: ctx => ` ${ctx.dataset.label}: ${Number(ctx.raw).toLocaleString('he-IL')}` },
+      callbacks: { label: hebrewLabelCallback() },
     },
   },
   scales: {
     x: { display: false },
     y: {
-      grid: { color: '#f3f4f6', drawBorder: false },
-      ticks: { font: { size: 9 }, color: '#9ca3af', callback: v => v.toLocaleString('he-IL'), maxTicksLimit: 5 },
-      border: { display: false },
+      ...axisConfig.y,
+      ticks: { ...axisConfig.y.ticks, font: { size: 9 }, maxTicksLimit: 5 },
     },
   },
 }
