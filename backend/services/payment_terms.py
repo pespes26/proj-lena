@@ -8,6 +8,8 @@ def extract_shotef_days(term_type):
         return 0
     if 'שוטף+90' in term_type:
         return 90
+    if 'שוטף+75' in term_type:
+        return 75
     if 'שוטף+60' in term_type:
         return 60
     if 'שוטף+45' in term_type:
@@ -69,27 +71,17 @@ def calc_revenue_for_month(form_data, target_cal_month):
             if target_cal_month == start_month:
                 total += round(term_amount)
 
-        elif term_type == 'מזומן':
-            # Cash: spread evenly across project duration
-            monthly_amount = term_amount / project_months
-            if start_month <= target_cal_month <= end_month:
-                total += round(monthly_amount)
+        elif term_type == 'פעימות תשלום':
+            # Milestones handled separately
+            pass
 
         else:
-            # שוטף+X: invoices issued each month, payment after delay
+            # שוטף+X: invoice issued at project END, payment = end of end_month + X days
             x_days = extract_shotef_days(term_type)
-            monthly_invoice = term_amount / project_months
-
-            # For each invoice month, check if payment lands in target month
-            for inv_month in range(start_month, end_month + 1):
-                # Determine year of invoice month
-                inv_year = start_year
-                if inv_month < start_month:
-                    inv_year += 1
-
-                pay_month, _pay_year = shotef_payment_month(inv_month, inv_year, x_days)
-                if pay_month == target_cal_month:
-                    total += round(monthly_invoice)
+            inv_year = start_year if end_month >= start_month else start_year + 1
+            pay_month, _pay_year = shotef_payment_month(end_month, inv_year, x_days)
+            if pay_month == target_cal_month:
+                total += round(term_amount)
 
     return total
 

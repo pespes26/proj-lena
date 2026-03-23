@@ -36,50 +36,36 @@
 
           <!-- Step 1: Project Details -->
           <div v-if="step === 0" class="space-y-6">
-            <!-- Project name field (only for new projects) -->
-            <div v-if="newProject">
-              <label class="block text-sm font-medium text-gray-700 mb-2">שם פרויקט *</label>
-              <input v-model="form.project_name" type="text" placeholder="שם הפרויקט"
-                @blur="vf('project_name', form.project_name, { required: true, minLen: 2 })"
-                :class="['w-full bg-gray-50/70 border border-transparent rounded-lg px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-gray-300 focus:ring-0 transition', fc('project_name')]" />
-              <span v-if="fe.project_name" class="text-red-500 text-xs mt-0.5 block">{{ fe.project_name }}</span>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-              <div>
+            <!-- Project name + Priority ID + Recurring toggle -->
+            <div class="flex flex-col sm:flex-row gap-4 sm:gap-3 sm:items-end">
+              <div v-if="newProject" class="flex-[15]">
+                <label class="block text-sm font-medium text-gray-700 mb-2">שם פרויקט *</label>
+                <input v-model="form.project_name" type="text" placeholder="שם הפרויקט"
+                  @blur="vf('project_name', form.project_name, { required: true, minLen: 2 })"
+                  :class="['w-full bg-gray-50/70 border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-gray-400 focus:ring-0 transition', fc('project_name')]" />
+                <span v-if="fe.project_name" class="text-red-500 text-xs mt-0.5 block">{{ fe.project_name }}</span>
+              </div>
+              <div class="flex-[4]">
                 <label class="block text-sm font-medium text-gray-700 mb-2">מספר Priority *</label>
                 <input v-model="form.priority_id" type="text" placeholder="P-1001"
                   @blur="vf('priority_id', form.priority_id, { required: true, minLen: 2 })"
                   :class="['w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-emerald-300 transition', fc('priority_id')]" />
                 <span v-if="fe.priority_id" class="text-red-500 text-xs mt-0.5 block">{{ fe.priority_id }}</span>
               </div>
+            </div>
+            <!-- Start date + End date -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">תאריך התחלה *</label>
                 <DatePicker v-model="form.start_date"
-                  :input-class="'w-full bg-gray-50/70 border rounded-lg px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-gray-300 focus:ring-0 transition ' + (fe.start_date ? 'border-red-400 bg-red-50' : 'border-gray-200')" />
+                  :input-class="'w-full bg-gray-50/70 border rounded-lg px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-gray-400 focus:ring-0 transition ' + (fe.start_date ? 'border-red-400 bg-red-50' : 'border-gray-200')" />
                 <span v-if="fe.start_date" class="text-red-500 text-xs mt-0.5 block">{{ fe.start_date }}</span>
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">צפי סיום פרויקט *</label>
                 <DatePicker v-model="form.expected_end_date" :min-date="form.start_date"
-                  :input-class="'w-full bg-gray-50/70 border rounded-lg px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-gray-300 focus:ring-0 transition ' + (fe.expected_end_date ? 'border-red-400 bg-red-50' : 'border-gray-200')" />
+                  :input-class="'w-full bg-gray-50/70 border rounded-lg px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-gray-400 focus:ring-0 transition ' + (fe.expected_end_date ? 'border-red-400 bg-red-50' : 'border-gray-200')" />
                 <span v-if="fe.expected_end_date" class="text-red-500 text-xs mt-0.5 block">{{ fe.expected_end_date }}</span>
-              </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">ח.פ / מספר עוסק מורשה</label>
-                <input v-model="form.company_id" type="text" placeholder="51-123456-7"
-                  :class="['w-full bg-gray-50/70 border border-transparent rounded-lg px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-gray-300 focus:ring-0 transition font-mono']" />
-              </div>
-              <div class="flex items-end pb-1">
-                <label class="flex items-center gap-3 cursor-pointer">
-                  <div class="relative">
-                    <input type="checkbox" v-model="form.is_recurring" class="sr-only peer" />
-                    <div class="w-10 h-5 bg-gray-200 rounded-full peer-checked:bg-emerald-500 transition"></div>
-                    <div class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform peer-checked:translate-x-5"></div>
-                  </div>
-                  <span class="text-sm font-medium text-gray-700">פרויקט מחזורי</span>
-                </label>
               </div>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
@@ -87,21 +73,21 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2">שם מנהל פרויקט *</label>
                 <input v-model="form.manager" type="text" placeholder="שם מלא"
                   @blur="vf('manager', form.manager, { required: true, minLen: 2 })"
-                  :class="['w-full bg-gray-50/70 border border-transparent rounded-lg px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-gray-300 focus:ring-0 transition', fc('manager')]" />
+                  :class="['w-full bg-gray-50/70 border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-gray-400 focus:ring-0 transition', fc('manager')]" />
                 <span v-if="fe.manager" class="text-red-500 text-xs mt-0.5 block">{{ fe.manager }}</span>
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">שם המזמין *</label>
                 <input v-model="form.client" type="text" placeholder="שם החברה/לקוח"
                   @blur="vf('client', form.client, { required: true, minLen: 2 })"
-                  :class="['w-full bg-gray-50/70 border border-transparent rounded-lg px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-gray-300 focus:ring-0 transition', fc('client')]" />
+                  :class="['w-full bg-gray-50/70 border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-gray-400 focus:ring-0 transition', fc('client')]" />
                 <span v-if="fe.client" class="text-red-500 text-xs mt-0.5 block">{{ fe.client }}</span>
               </div>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">תחום</label>
-                <select v-model="form.area" class="w-full bg-gray-50/70 border border-transparent rounded-lg px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-gray-300 focus:ring-0 transition">
+                <select v-model="form.area" class="w-full bg-gray-50/70 border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-gray-400 focus:ring-0 transition">
                   <option value="מסחרי פרטי">מסחרי פרטי</option>
                   <option value="פרוייקטים">פרוייקטים</option>
                   <option value="מטה">מטה</option>
@@ -109,14 +95,15 @@
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">ציר</label>
-                <select v-model="form.axis" class="w-full bg-gray-50/70 border border-transparent rounded-lg px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-gray-300 focus:ring-0 transition">
-                  <option value="FM">FM</option>
+                <select v-model="form.axis" class="w-full bg-gray-50/70 border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-gray-400 focus:ring-0 transition">
+                  <option value="לוגי גרופ">לוגי גרופ</option>
+                  <option value="מנרב I-FM">מנרב I-FM</option>
                   <option value="אחר">אחר</option>
                 </select>
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">סטטוס</label>
-                <select v-model="form.status" class="w-full bg-gray-50/70 border border-transparent rounded-lg px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-gray-300 focus:ring-0 transition">
+                <select v-model="form.status" class="w-full bg-gray-50/70 border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-gray-400 focus:ring-0 transition">
                   <option value="active">פעיל</option>
                   <option value="on-hold">מושהה</option>
                   <option value="completed">הושלם</option>
@@ -127,7 +114,7 @@
               <label class="block text-sm font-medium text-gray-700 mb-2">תיאור פרויקט *</label>
               <textarea v-model="form.description" rows="3" placeholder="תיאור כללי של הפרויקט..."
                 @blur="vf('description', form.description, { required: true, minLen: 5 })"
-                :class="['w-full bg-gray-50/70 border border-transparent rounded-lg px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-gray-300 focus:ring-0 transition resize-none', fc('description')]"></textarea>
+                :class="['w-full bg-gray-50/70 border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-gray-400 focus:ring-0 transition resize-none', fc('description')]"></textarea>
               <div class="flex justify-between mt-0.5">
                 <span v-if="fe.description" class="text-red-500 text-xs">{{ fe.description }}</span>
                 <span v-else></span>
@@ -140,9 +127,9 @@
           <div v-if="step === 1" class="space-y-6">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">סך הכנסות הפרויקט (₪) *</label>
-              <input v-model.number="form.total_revenue" type="number" placeholder="0" min="1"
+              <input :value="fmtNum(form.total_revenue)" @input="onNumInput(form, 'total_revenue', $event)" type="text" inputmode="numeric" placeholder="0"
                 @blur="vf('total_revenue', form.total_revenue, { required: true, positive: true, max: 999999999 })"
-                :class="['w-full bg-gray-50/70 border border-transparent rounded-lg px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-gray-300 focus:ring-0 transition', fc('total_revenue')]" />
+                :class="['w-full bg-gray-50/70 border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-gray-400 focus:ring-0 transition', fc('total_revenue')]" />
               <span v-if="fe.total_revenue" class="text-red-500 text-xs mt-0.5 block">{{ fe.total_revenue }}</span>
             </div>
 
@@ -156,31 +143,70 @@
               </div>
               <div class="space-y-2">
                 <div v-for="(term, i) in form.revenue_payment_terms" :key="i"
-                  class="flex flex-wrap items-center gap-2 bg-gray-50/50 rounded-lg border border-gray-100 px-3 py-2.5">
-                  <select v-model="term.type" class="flex-1 bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-gray-400 focus:ring-0">
-                    <option value="מזומן">מזומן</option>
-                    <option value="מקדמה">מקדמה</option>
-                    <option value="שוטף+0">שוטף+0</option>
-                    <option value="שוטף+30">שוטף+30</option>
-                    <option value="שוטף+45">שוטף+45</option>
-                    <option value="שוטף+60">שוטף+60</option>
-                    <option value="שוטף+90">שוטף+90</option>
-                  </select>
-                  <div class="flex items-center gap-1">
-                    <input v-model.number="term.percent" @input="clampPaymentTerm(i)" type="number" min="0" max="100" placeholder="0"
-                      class="w-16 bg-white border border-gray-200 rounded-lg px-2 py-2 text-xs text-center focus:outline-none focus:border-gray-400 focus:ring-0" />
-                    <span class="text-xs text-gray-400">%</span>
+                  class="bg-gray-50/50 rounded-lg border border-gray-100 px-3 py-2.5 space-y-2">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <select v-model="term.type" class="flex-1 bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-gray-400 focus:ring-0">
+                      <option value="מקדמה">מקדמה</option>
+                      <option value="שוטף+0">שוטף+0</option>
+                      <option value="שוטף+30">שוטף+30</option>
+                      <option value="שוטף+45">שוטף+45</option>
+                      <option value="שוטף+60">שוטף+60</option>
+                      <option value="שוטף+75">שוטף+75</option>
+                      <option value="שוטף+90">שוטף+90</option>
+                      <option value="פעימות תשלום">פעימות תשלום</option>
+                    </select>
+                    <div v-if="term.type !== 'פעימות תשלום'" class="flex items-center gap-1">
+                      <input v-model.number="term.percent" @input="clampPaymentTerm(i)" type="number" min="0" max="100" placeholder="0"
+                        class="w-16 bg-white border border-gray-200 rounded-lg px-2 py-2 text-xs text-center focus:outline-none focus:border-gray-400 focus:ring-0" />
+                      <span class="text-xs text-gray-400">%</span>
+                    </div>
+                    <div v-if="term.type !== 'פעימות תשלום'" class="flex items-center gap-1">
+                      <input :value="fmtNum(form.total_revenue ? Math.round(form.total_revenue * (term.percent || 0) / 100) : 0)"
+                        @input="updateTermAmount(i, $event)" type="text" inputmode="numeric" placeholder="0"
+                        class="w-24 bg-white border border-gray-200 rounded-lg px-2 py-2 text-xs text-center focus:outline-none focus:border-gray-400 focus:ring-0" />
+                      <span class="text-xs text-gray-400">₪</span>
+                    </div>
+                    <button v-if="form.revenue_payment_terms.length > 1" @click="form.revenue_payment_terms.splice(i, 1)"
+                      class="p-1 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
                   </div>
-                  <div class="flex items-center gap-1">
-                    <input :value="form.total_revenue ? Math.round(form.total_revenue * (term.percent || 0) / 100) : 0"
-                      @input="updateTermAmount(i, $event)" type="number" min="0" placeholder="0"
-                      class="w-24 bg-white border border-gray-200 rounded-lg px-2 py-2 text-xs text-center focus:outline-none focus:border-gray-400 focus:ring-0" />
-                    <span class="text-xs text-gray-400">₪</span>
+                  <!-- Milestones sub-section when פעימות תשלום is selected -->
+                  <div v-if="term.type === 'פעימות תשלום'" class="space-y-2 pr-2 border-r-2 border-emerald-200">
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs text-gray-400">פעימות</span>
+                      <span v-if="form.payment_milestones.length" class="text-xs font-bold"
+                        :class="milestonesTotal <= 100 ? 'text-emerald-600' : 'text-red-500'">
+                        {{ milestonesTotal }}%
+                      </span>
+                    </div>
+                    <div v-for="(ms, mi) in form.payment_milestones" :key="mi"
+                      class="flex flex-wrap items-center gap-2 bg-white rounded-lg border border-gray-100 px-2 py-2">
+                      <div class="flex items-center gap-1">
+                        <input v-model.number="ms.percent" @input="syncMilestoneFromPercent(mi)" type="number" min="0" max="100" placeholder="%"
+                          class="w-14 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none focus:border-gray-400 focus:ring-0" />
+                        <span class="text-xs text-gray-400">%</span>
+                      </div>
+                      <div class="flex items-center gap-1">
+                        <input :value="fmtNum(ms.amount)" @input="e => { ms.amount = parseNum(e.target.value); syncMilestoneFromAmount(mi) }" type="text" inputmode="numeric" placeholder="סכום"
+                          class="w-24 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none focus:border-gray-400 focus:ring-0" />
+                        <span class="text-xs text-gray-400">₪</span>
+                      </div>
+                      <DatePicker v-model="ms.date" :min-date="form.start_date"
+                        :input-class="'w-28 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-gray-400 focus:ring-0'" />
+                      <input v-model="ms.description" type="text" placeholder="תיאור"
+                        class="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-gray-400 focus:ring-0 min-w-[80px]" />
+                      <button @click="form.payment_milestones.splice(mi, 1)"
+                        class="p-1 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                      </button>
+                    </div>
+                    <button @click="form.payment_milestones.push({ percent: 0, amount: 0, date: '', description: '' })"
+                      class="w-full py-1.5 border border-dashed border-gray-200 rounded-lg text-xs text-gray-500 hover:bg-gray-50 transition flex items-center justify-center gap-1">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                      הוסף פעימה
+                    </button>
                   </div>
-                  <button v-if="form.revenue_payment_terms.length > 1" @click="form.revenue_payment_terms.splice(i, 1)"
-                    class="p-1 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                  </button>
                 </div>
                 <button @click="form.revenue_payment_terms.push({ type: 'שוטף+30', percent: 0 })"
                   class="w-full py-2 border border-dashed border-gray-200 rounded-xl text-xs text-gray-500 hover:bg-gray-50 transition flex items-center justify-center gap-1">
@@ -190,48 +216,15 @@
               </div>
             </div>
 
-            <!-- Payment milestones -->
+            <!-- Revenue forecast table -->
             <div>
               <div class="flex items-center justify-between mb-2">
-                <label class="text-xs font-medium text-gray-600">פעימות תשלום</label>
-                <span v-if="form.payment_milestones.length" class="text-xs font-bold"
-                  :class="milestonesTotal <= 100 ? 'text-emerald-700' : 'text-red-500'">
-                  סה"כ: {{ milestonesTotal }}%
-                </span>
-              </div>
-              <div class="space-y-2">
-                <div v-for="(ms, i) in form.payment_milestones" :key="i"
-                  class="flex flex-wrap items-center gap-2 bg-gray-50/50 rounded-lg border border-gray-100 px-3 py-2.5">
-                  <div class="flex items-center gap-1">
-                    <input v-model.number="ms.percent" @input="syncMilestoneFromPercent(i)" type="number" min="0" max="100" placeholder="%"
-                      class="w-14 bg-white border border-gray-200 rounded-lg px-2 py-2 text-xs text-center focus:outline-none focus:border-gray-400 focus:ring-0" />
-                    <span class="text-xs text-gray-400">%</span>
-                  </div>
-                  <div class="flex items-center gap-1">
-                    <input v-model.number="ms.amount" @input="syncMilestoneFromAmount(i)" type="number" min="0" placeholder="סכום"
-                      class="w-24 bg-white border border-gray-200 rounded-lg px-2 py-2 text-xs text-center focus:outline-none focus:border-gray-400 focus:ring-0" />
-                    <span class="text-xs text-gray-400">₪</span>
-                  </div>
-                  <DatePicker v-model="ms.date" :min-date="form.start_date"
-                    :input-class="'w-28 bg-white border border-gray-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:border-gray-400 focus:ring-0'" />
-                  <input v-model="ms.description" type="text" placeholder="תיאור"
-                    class="flex-1 bg-white border border-gray-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:border-gray-400 focus:ring-0" />
-                  <button @click="form.payment_milestones.splice(i, 1)"
-                    class="p-1 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                  </button>
+                <label class="text-xs font-medium text-gray-600">צפי הכנסות חודשי</label>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-gray-400">סה"כ: {{ manualForecastTotal.toLocaleString('he-IL') }} ₪</span>
+                  <span class="text-xs" :class="manualForecastPct === 100 ? 'text-emerald-600 font-bold' : manualForecastPct > 100 ? 'text-red-500 font-bold' : 'text-gray-400'">({{ manualForecastPct }}%)</span>
                 </div>
-                <button @click="form.payment_milestones.push({ percent: 0, amount: 0, date: '', description: '' })"
-                  class="w-full py-2 border border-dashed border-gray-200 rounded-xl text-xs text-gray-500 hover:bg-gray-50 transition flex items-center justify-center gap-1">
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                  הוסף פעימת תשלום
-                </button>
               </div>
-            </div>
-
-            <!-- Revenue forecast table (auto-computed) -->
-            <div>
-              <label class="text-xs font-medium text-gray-600 mb-2 block">תחזית כניסת הכנסות לפי תנאי תשלום</label>
               <div class="bg-gray-50/50 rounded-xl overflow-x-auto">
                 <table class="w-full text-xs min-w-[600px]">
                   <thead>
@@ -240,7 +233,24 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <!-- Cash inflow per month (auto-computed from payment terms) -->
+                    <!-- Editable amount row -->
+                    <tr>
+                      <td v-for="m in 12" :key="m" class="px-0.5 py-1">
+                        <input type="number" min="0"
+                          :value="revenueAmountForMonth(m)"
+                          @input="setRevenueAmount(m, $event.target.value)"
+                          class="w-full bg-white border border-gray-200 rounded px-1 py-1.5 text-xs text-center focus:outline-none focus:border-emerald-400 focus:ring-0"
+                          :class="revenueAmountForMonth(m) > 0 ? 'text-emerald-700 font-medium' : 'text-gray-300'"
+                          placeholder="-" />
+                      </td>
+                    </tr>
+                    <!-- Percentage row (auto-computed) -->
+                    <tr class="bg-gray-50/50">
+                      <td v-for="m in 12" :key="m" class="px-1 py-1 text-center text-xs text-gray-400">
+                        {{ form.revenue_forecast[m] ? Math.round(form.revenue_forecast[m]) + '%' : '-' }}
+                      </td>
+                    </tr>
+                    <!-- Cash inflow per month (from payment terms) -->
                     <tr class="bg-emerald-50/50">
                       <td v-for="m in 12" :key="m" class="px-1 py-2 text-center text-xs font-medium"
                         :class="cashInflowForMonth(m) > 0 ? 'text-emerald-700' : 'text-gray-300'">
@@ -250,10 +260,10 @@
                   </tbody>
                 </table>
                 <!-- Legend -->
-                <div class="flex items-center gap-4 px-3 py-2 border-t border-gray-200 text-xs text-gray-400">
+                <div class="flex flex-wrap items-center gap-3 px-3 py-2 border-t border-gray-200 text-xs text-gray-400">
+                  <div class="flex items-center gap-1"><span class="w-2 h-2 rounded bg-white border border-gray-300"></span> סכום הכנסה (עריכה)</div>
+                  <div class="flex items-center gap-1"><span class="w-2 h-2 rounded bg-gray-100"></span> אחוז מסה"כ</div>
                   <div class="flex items-center gap-1"><span class="w-2 h-2 rounded bg-emerald-200"></span> כניסת תשלום בפועל</div>
-                  <div class="text-gray-300">•</div>
-                  <div>מקדמה: חודש התחלה · מזומן: פרוס על תקופת הפרויקט · שוטף+X: סוף חודש חשבונית + X ימים</div>
                 </div>
               </div>
             </div>
@@ -261,43 +271,18 @@
 
           <!-- Step 3: Expenses -->
           <div v-if="step === 2" class="space-y-6">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">סה"כ תקציב הוצאות (ש"ח) *</label>
-                <input v-model.number="form.total_budget" type="number" placeholder="0" min="1"
-                  @blur="vf('total_budget', form.total_budget, { required: true, positive: true })"
-                  :class="['w-full bg-gray-50/70 border border-transparent rounded-lg px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-gray-300 focus:ring-0 transition', fc('total_budget')]" />
-                <span v-if="fe.total_budget" class="text-red-500 text-xs mt-0.5 block">{{ fe.total_budget }}</span>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">תנאי תשלום הוצאות</label>
-                <div class="flex gap-2">
-                  <select v-model="form.payment_terms_expense.type" class="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300 transition">
-                    <option value="מזומן">מזומן</option>
-                    <option value="מקדמה">מקדמה</option>
-                    <option value="שוטף+0">שוטף+0</option>
-                    <option value="שוטף+30">שוטף+30</option>
-                    <option value="שוטף+45">שוטף+45</option>
-                    <option value="שוטף+60">שוטף+60</option>
-                    <option value="שוטף+90">שוטף+90</option>
-                  </select>
-                  <input v-model="form.payment_terms_expense.notes" type="text" placeholder="הערות"
-                    class="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300 transition" />
-                </div>
-              </div>
-            </div>
 
             <!-- Expense categories accordion -->
             <div class="space-y-2">
               <div class="text-xs font-medium text-gray-500 mb-1">קטגוריות התחייבות לספקים</div>
 
-              <!-- קבלני משנה -->
+              <!-- ספקים -->
               <div class="border border-gray-100 rounded-xl overflow-hidden">
                 <button @click="toggleCategory('subcontractors')"
                   class="w-full flex items-center justify-between px-4 py-3 bg-transparent hover:bg-gray-50 transition text-sm font-medium text-gray-700">
                   <div class="flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                    קבלני משנה
+                    ספקים
                     <span v-if="form.subcontractors.length" class="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">{{ form.subcontractors.length }}</span>
                   </div>
                   <div class="flex items-center gap-3">
@@ -309,29 +294,101 @@
                   <div v-for="(sub, i) in form.subcontractors" :key="i"
                     class="bg-gray-50/50 rounded-lg border border-gray-100 p-3 space-y-2">
                     <div class="flex items-center justify-between mb-1">
-                      <span class="text-xs font-medium text-gray-500">קבלן {{ i + 1 }}</span>
+                      <span class="text-xs font-medium text-gray-500">ספק {{ i + 1 }}</span>
                       <button @click="form.subcontractors.splice(i, 1)"
                         class="p-1 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                       </button>
                     </div>
-                    <div class="grid grid-cols-2 gap-2">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <div>
-                        <label class="block text-xs text-gray-400 mb-1">שם קבלן</label>
-                        <input v-model="sub.name" type="text" placeholder="שם הקבלן"
+                        <label class="block text-xs text-gray-400 mb-1">שם ספק</label>
+                        <input v-model="sub.name" type="text" placeholder="שם הספק"
                           @blur="vf(`sub_name_${i}`, sub.name, { required: true, minLen: 2 })"
                           :class="['w-full bg-white border border-gray-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:border-gray-400 focus:ring-0', fc(`sub_name_${i}`)]" />
                         <span v-if="fe[`sub_name_${i}`]" class="text-red-500 text-xs">{{ fe[`sub_name_${i}`] }}</span>
                       </div>
                       <div>
-                        <label class="block text-xs text-gray-400 mb-1">התחייבות לספק (ש"ח)</label>
-                        <input v-model.number="sub.monthly_amount" type="number" placeholder="0" min="1"
-                          @blur="vf(`sub_amount_${i}`, sub.monthly_amount, { required: true, positive: true })"
+                        <label class="block text-xs text-gray-400 mb-1">סה"כ התחייבות (ש"ח)</label>
+                        <input :value="fmtNum(sub.total_amount)" @input="onNumInput(sub, 'total_amount', $event)" type="text" inputmode="numeric" placeholder="0"
+                          @blur="vf(`sub_amount_${i}`, sub.total_amount, { required: true, positive: true })"
                           :class="['w-full bg-white border border-gray-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:border-gray-400 focus:ring-0', fc(`sub_amount_${i}`)]" />
                         <span v-if="fe[`sub_amount_${i}`]" class="text-red-500 text-xs">{{ fe[`sub_amount_${i}`] }}</span>
                       </div>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <!-- פרטי ספק -->
+                    <div class="border border-gray-100 rounded-lg overflow-hidden">
+                      <button @click="sub._showDetails = !sub._showDetails" type="button"
+                        class="w-full flex items-center justify-between px-3 py-2 bg-gray-50/50 hover:bg-gray-100/50 transition text-xs font-medium text-gray-500">
+                        <span>פרטי ספק</span>
+                        <svg class="w-3.5 h-3.5 text-gray-400 transition-transform duration-200" :class="sub._showDetails ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                      </button>
+                      <div v-if="sub._showDetails" class="p-3 space-y-2">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          <div>
+                            <label class="block text-xs text-gray-400 mb-1">מספר ח.פ / ת"ז</label>
+                            <input v-model="sub.tax_id" type="text" placeholder="ח.פ / ת.ז"
+                              class="w-full bg-white border border-gray-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:border-gray-400 focus:ring-0" />
+                          </div>
+                          <div>
+                            <label class="block text-xs text-gray-400 mb-1">סוג ספק</label>
+                            <select v-model="sub.vendor_type" class="w-full bg-white border border-gray-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:border-gray-400 focus:ring-0">
+                              <option value="">בחר...</option>
+                              <option value="חברה בע״מ">חברה בע״מ</option>
+                              <option value="עוסק מורשה">עוסק מורשה</option>
+                              <option value="עוסק פטור">עוסק פטור</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          <div>
+                            <label class="block text-xs text-gray-400 mb-1">שם איש קשר</label>
+                            <input v-model="sub.contact_name" type="text" placeholder="שם איש קשר"
+                              class="w-full bg-white border border-gray-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:border-gray-400 focus:ring-0" />
+                          </div>
+                          <div>
+                            <label class="block text-xs text-gray-400 mb-1">תפקיד</label>
+                            <input v-model="sub.contact_role" type="text" placeholder="תפקיד"
+                              class="w-full bg-white border border-gray-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:border-gray-400 focus:ring-0" />
+                          </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          <div>
+                            <label class="block text-xs text-gray-400 mb-1">טלפון</label>
+                            <input v-model="sub.phone" type="tel" placeholder="050-0000000" dir="ltr"
+                              class="w-full bg-white border border-gray-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:border-gray-400 focus:ring-0" />
+                          </div>
+                          <div>
+                            <label class="block text-xs text-gray-400 mb-1">דוא"ל</label>
+                            <input v-model="sub.email" type="email" placeholder="email@example.com" dir="ltr"
+                              class="w-full bg-white border border-gray-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:border-gray-400 focus:ring-0" />
+                          </div>
+                        </div>
+                        <div>
+                          <label class="block text-xs text-gray-400 mb-1">כתובת מלאה</label>
+                          <input v-model="sub.address" type="text" placeholder="כתובת"
+                            class="w-full bg-white border border-gray-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:border-gray-400 focus:ring-0" />
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          <div>
+                            <label class="block text-xs text-gray-400 mb-1">איש קשר הנה"ח</label>
+                            <input v-model="sub.accounting_contact" type="text" placeholder="שם"
+                              class="w-full bg-white border border-gray-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:border-gray-400 focus:ring-0" />
+                          </div>
+                          <div>
+                            <label class="block text-xs text-gray-400 mb-1">טלפון הנה"ח</label>
+                            <input v-model="sub.accounting_phone" type="tel" placeholder="050-0000000" dir="ltr"
+                              class="w-full bg-white border border-gray-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:border-gray-400 focus:ring-0" />
+                          </div>
+                        </div>
+                        <div>
+                          <label class="block text-xs text-gray-400 mb-1">מייל הנה"ח</label>
+                          <input v-model="sub.accounting_email" type="email" placeholder="accounting@example.com" dir="ltr"
+                            class="w-full bg-white border border-gray-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:border-gray-400 focus:ring-0" />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <div>
                         <label class="block text-xs text-gray-400 mb-1">תאריך התחלה</label>
                         <DatePicker v-model="sub.start_date" :min-date="form.start_date"
@@ -342,22 +399,42 @@
                         <DatePicker v-model="sub.end_date" :min-date="form.start_date"
                           input-class="w-full bg-white border border-gray-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:border-gray-400 focus:ring-0" />
                       </div>
-                      <div>
-                        <label class="block text-xs text-gray-400 mb-1">תנאי תשלום</label>
-                        <select v-model="sub.payment_terms"
-                          class="w-full bg-white border border-gray-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:border-gray-400 focus:ring-0">
-                          <option value="מזומן">מזומן</option>
-                          <option value="מקדמה">מקדמה</option>
-                          <option value="שוטף+0">שוטף+0</option>
-                          <option value="שוטף+30">שוטף+30</option>
-                          <option value="שוטף+45">שוטף+45</option>
-                          <option value="שוטף+60">שוטף+60</option>
-                          <option value="שוטף+90">שוטף+90</option>
-                        </select>
+                    </div>
+                    <!-- Payment terms array (like revenue) -->
+                    <div>
+                      <label class="block text-xs text-gray-400 mb-1">תנאי תשלום</label>
+                      <div class="space-y-1.5">
+                        <div v-for="(term, ti) in sub.payment_terms" :key="ti" class="flex items-center gap-2 flex-wrap">
+                          <select v-model="term.type" class="bg-white border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-gray-400 focus:ring-0 flex-1 min-w-[100px]">
+                            <option value="מקדמה">מקדמה</option>
+                            <option value="שוטף+0">שוטף+0</option>
+                            <option value="שוטף+30">שוטף+30</option>
+                            <option value="שוטף+45">שוטף+45</option>
+                            <option value="שוטף+60">שוטף+60</option>
+                            <option value="שוטף+75">שוטף+75</option>
+                            <option value="שוטף+90">שוטף+90</option>
+                          </select>
+                          <div class="flex items-center gap-1">
+                            <input v-model.number="term.percent" type="number" min="0" max="100" class="w-16 bg-white border border-gray-200 rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none focus:border-gray-400 focus:ring-0" />
+                            <span class="text-xs text-gray-400">%</span>
+                          </div>
+                          <span v-if="sub.total_amount && term.percent" class="text-xs text-gray-400">{{ Math.round(sub.total_amount * term.percent / 100).toLocaleString('he-IL') }} ₪</span>
+                          <button @click="sub.payment_terms.splice(ti, 1)" v-if="sub.payment_terms.length > 1"
+                            class="text-red-400 hover:text-red-600 transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                          </button>
+                        </div>
+                      </div>
+                      <div class="flex items-center justify-between mt-1.5">
+                        <button @click="sub.payment_terms.push({ type: 'שוטף+30', percent: 0 })"
+                          class="text-xs text-emerald-600 hover:text-emerald-800 transition">+ הוסף שורת תשלום</button>
+                        <span class="text-xs" :class="subTermsTotal(sub) === 100 ? 'text-emerald-600' : 'text-red-500'">
+                          סה"כ: {{ subTermsTotal(sub) }}%
+                        </span>
                       </div>
                     </div>
-                    <div class="col-span-2">
-                      <label class="block text-xs text-gray-500 mb-1">חוזה קבלן</label>
+                    <div>
+                      <label class="block text-xs text-gray-500 mb-1">חוזה ספק</label>
                       <div class="flex items-center gap-2">
                         <label class="flex-1 flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition text-xs">
                           <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13"/></svg>
@@ -374,7 +451,7 @@
                   <button @click="addSubcontractor"
                     class="w-full py-2.5 border border-dashed border-gray-200 rounded-xl text-sm text-emerald-700 font-medium hover:bg-emerald-50 transition flex items-center justify-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                    הוספת קבלן משנה חדש
+                    הוספת ספק חדש
                   </button>
                 </div>
               </div>
@@ -442,7 +519,7 @@
                         </div>
                         <div>
                           <label class="block text-xs text-gray-400 mb-1">התחייבות לספק (₪)</label>
-                          <input v-model.number="line.monthly_amount" type="number" placeholder="0" min="1"
+                          <input :value="fmtNum(line.monthly_amount)" @input="onNumInput(line, 'monthly_amount', $event)" type="text" inputmode="numeric" placeholder="0"
                             @blur="vf(`mp_amount_${i}`, line.monthly_amount, { required: true, positive: true })"
                             :class="['w-full bg-white border border-gray-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:border-gray-400 focus:ring-0', fc(`mp_amount_${i}`)]" />
                           <span v-if="fe[`mp_amount_${i}`]" class="text-red-500 text-xs">{{ fe[`mp_amount_${i}`] }}</span>
@@ -498,8 +575,8 @@
                     <!-- Empty state -->
                     <div v-if="!form['expense_lines_' + cat.key]?.length" class="text-center py-6">
                       <div class="text-2xl mb-1 opacity-40">📋</div>
-                      <div class="text-xs text-gray-400">אין ספקים בקטגוריה זו</div>
-                      <div class="text-xs text-gray-300 mt-0.5">לחץ למטה להוספת ספק</div>
+                      <div class="text-xs text-gray-400">אין {{ cat.label }} בקטגוריה זו</div>
+                      <div class="text-xs text-gray-300 mt-0.5">לחץ למטה להוספה</div>
                     </div>
                     <!-- Supplier cards -->
                     <div v-for="(line, i) in form['expense_lines_' + cat.key]" :key="i"
@@ -520,7 +597,7 @@
                         </div>
                         <div>
                           <label class="block text-xs text-gray-400 mb-1">התחייבות לספק (₪)</label>
-                          <input v-model.number="line.monthly_amount" type="number" placeholder="0" min="1"
+                          <input :value="fmtNum(line.monthly_amount)" @input="onNumInput(line, 'monthly_amount', $event)" type="text" inputmode="numeric" placeholder="0"
                             @blur="vf(`${cat.key}_amount_${i}`, line.monthly_amount, { required: true, positive: true })"
                             :class="['w-full bg-white border border-gray-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:border-gray-400 focus:ring-0', fc(`${cat.key}_amount_${i}`)]" />
                           <span v-if="fe[`${cat.key}_amount_${i}`]" class="text-red-500 text-xs">{{ fe[`${cat.key}_amount_${i}`] }}</span>
@@ -541,53 +618,71 @@
                           <label class="block text-xs text-gray-400 mb-1">תנאי תשלום</label>
                           <select v-model="line.payment_terms"
                             class="w-full bg-white border border-gray-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:border-gray-400 focus:ring-0">
-                            <option value="מזומן">מזומן</option>
                             <option value="מקדמה">מקדמה</option>
                             <option value="שוטף+0">שוטף+0</option>
                             <option value="שוטף+30">שוטף+30</option>
                             <option value="שוטף+45">שוטף+45</option>
                             <option value="שוטף+60">שוטף+60</option>
+                            <option value="שוטף+75">שוטף+75</option>
                             <option value="שוטף+90">שוטף+90</option>
+                            <option value="פעימות תשלום">פעימות תשלום</option>
                           </select>
                         </div>
+                      </div>
+                      <!-- Expense milestones when פעימות תשלום is selected -->
+                      <div v-if="line.payment_terms === 'פעימות תשלום'" class="space-y-2 pr-2 border-r-2 border-emerald-200">
+                        <div class="flex items-center justify-between">
+                          <span class="text-xs text-gray-400">פעימות</span>
+                          <span v-if="line.milestones?.length" class="text-xs font-bold"
+                            :class="lineMilestonesTotal(line) <= 100 ? 'text-emerald-600' : 'text-red-500'">
+                            {{ lineMilestonesTotal(line) }}%
+                          </span>
+                        </div>
+                        <div v-for="(ms, mi) in (line.milestones || [])" :key="mi"
+                          class="flex flex-wrap items-center gap-2 bg-white rounded-lg border border-gray-100 px-2 py-2">
+                          <div class="flex items-center gap-1">
+                            <input v-model.number="ms.percent" @input="syncLineMilestoneFromPercent(line, mi)" type="number" min="0" max="100" placeholder="%"
+                              class="w-14 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none focus:border-gray-400 focus:ring-0" />
+                            <span class="text-xs text-gray-400">%</span>
+                          </div>
+                          <div class="flex items-center gap-1">
+                            <input :value="fmtNum(ms.amount)" @input="e => { ms.amount = parseNum(e.target.value); syncLineMilestoneFromAmount(line, mi) }" type="text" inputmode="numeric" placeholder="סכום"
+                              class="w-24 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none focus:border-gray-400 focus:ring-0" />
+                            <span class="text-xs text-gray-400">₪</span>
+                          </div>
+                          <DatePicker v-model="ms.date" :min-date="form.start_date"
+                            :input-class="'w-28 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-gray-400 focus:ring-0'" />
+                          <input v-model="ms.description" type="text" placeholder="תיאור"
+                            class="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-gray-400 focus:ring-0 min-w-[80px]" />
+                          <button @click="line.milestones.splice(mi, 1)"
+                            class="p-1 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                          </button>
+                        </div>
+                        <button @click="if(!line.milestones) line.milestones = []; line.milestones.push({ percent: 0, amount: 0, date: '', description: '' })"
+                          class="w-full py-1.5 border border-dashed border-gray-200 rounded-lg text-xs text-gray-500 hover:bg-gray-50 transition flex items-center justify-center gap-1">
+                          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                          הוסף פעימה
+                        </button>
                       </div>
                     </div>
                     <button @click="addSupplierLine(cat.key)"
                       class="w-full py-2.5 border border-dashed border-gray-200 rounded-xl text-xs text-gray-500 font-medium hover:bg-gray-50 hover:border-gray-400 transition flex items-center justify-center gap-1.5">
                       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                      הוסף ספק
+                      הוסף {{ cat.label }}
                     </button>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Budget utilization progress bar -->
-            <div v-if="form.total_budget" class="space-y-1.5">
-              <div class="flex items-center justify-between">
-                <span class="text-xs text-gray-500">ניצול תקציב</span>
-                <span class="text-xs font-bold" :class="budgetUtilization > 100 ? 'text-red-500' : budgetUtilization > 80 ? 'text-orange-500' : 'text-emerald-700'">
-                  {{ budgetUtilization.toFixed(0) }}%
-                </span>
-              </div>
-              <div class="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
-                <div class="h-full rounded-full transition-all duration-500"
-                  :class="budgetUtilization > 100 ? 'bg-red-500' : budgetUtilization > 80 ? 'bg-orange-400' : 'bg-emerald-700'"
-                  :style="{ width: Math.min(budgetUtilization, 100) + '%' }"></div>
-              </div>
-            </div>
-
             <!-- Total summary -->
             <div class="bg-gray-50/50 rounded-lg border border-gray-100 px-4 py-3">
               <div class="flex items-center justify-between">
-                <span class="text-xs text-gray-500">סה"כ התחייבויות חודשיות:</span>
-                <span class="text-sm font-bold" :class="form.total_budget && totalMonthlyExpenses > form.total_budget ? 'text-red-500' : 'text-gray-700'">
+                <span class="text-xs text-gray-500">סה"כ התחייבויות:</span>
+                <span class="text-sm font-bold text-gray-700">
                   {{ totalMonthlyExpenses.toLocaleString('he-IL') }} ₪
                 </span>
-              </div>
-              <div v-if="form.total_budget" class="flex items-center justify-between mt-1">
-                <span class="text-xs text-gray-400">תקציב מאושר:</span>
-                <span class="text-xs text-gray-400">{{ form.total_budget.toLocaleString('he-IL') }} ₪</span>
               </div>
             </div>
           </div>
@@ -606,7 +701,6 @@
                 <div><span class="text-gray-400">תאריך התחלה: </span><span class="font-medium text-gray-800">{{ form.start_date }}</span></div>
                 <div><span class="text-gray-400">צפי סיום: </span><span class="font-medium text-gray-800">{{ form.expected_end_date }}</span></div>
                 <div v-if="form.company_id"><span class="text-gray-400">ח.פ: </span><span class="font-medium text-gray-800 font-mono">{{ form.company_id }}</span></div>
-                <div v-if="form.is_recurring"><span class="text-gray-400">סוג: </span><span class="font-medium text-emerald-700">פרויקט מחזורי</span></div>
                 <div><span class="text-gray-400">מנהל פרויקט: </span><span class="font-medium text-gray-800">{{ form.manager }}</span></div>
                 <div><span class="text-gray-400">מזמין: </span><span class="font-medium text-gray-800">{{ form.client }}</span></div>
                 <div><span class="text-gray-400">תחום: </span><span class="font-medium text-gray-800">{{ form.area }}</span></div>
@@ -679,19 +773,18 @@
                 <button @click="step = 2" class="text-xs text-emerald-700 hover:text-emerald-800 font-medium">עריכה</button>
               </div>
               <div class="grid grid-cols-2 gap-x-8 gap-y-2 text-sm mb-4">
-                <div><span class="text-gray-400">תקציב הוצאות: </span><span class="font-bold text-gray-800">{{ form.total_budget ? form.total_budget.toLocaleString('he-IL') : '0' }} ₪</span></div>
-                <div><span class="text-gray-400">תנאי תשלום: </span><span class="font-medium text-gray-800">{{ form.payment_terms_expense?.type || '-' }}</span></div>
+                <div><span class="text-gray-400">סה"כ הוצאות: </span><span class="font-bold text-gray-800">{{ totalMonthlyExpenses.toLocaleString('he-IL') }} ₪</span></div>
               </div>
               <!-- Subcontractors -->
               <div v-if="form.subcontractors?.length" class="mb-3">
                 <div class="text-xs text-gray-400 mb-2 flex items-center gap-1.5">
-                  <span class="w-2 h-2 rounded-full bg-emerald-500"></span> קבלני משנה ({{ form.subcontractors.length }})
+                  <span class="w-2 h-2 rounded-full bg-emerald-500"></span> ספקים ({{ form.subcontractors.length }})
                 </div>
                 <div class="space-y-1">
                   <div v-for="(sub, i) in form.subcontractors" :key="i"
                     class="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-gray-100 text-xs">
                     <span class="font-medium text-gray-700">{{ sub.name || 'ללא שם' }}</span>
-                    <span class="text-gray-500">{{ (sub.monthly_amount || 0).toLocaleString('he-IL') }} ₪/חודש</span>
+                    <span class="text-gray-500">{{ (sub.total_amount || 0).toLocaleString('he-IL') }} ₪</span>
                   </div>
                 </div>
               </div>
@@ -713,7 +806,7 @@
               <!-- Total -->
               <div class="flex items-center justify-between pt-3 mt-3 border-t border-gray-200 text-sm">
                 <span class="text-gray-500">סה"כ התחייבויות:</span>
-                <span class="font-bold" :class="form.total_budget && totalMonthlyExpenses > form.total_budget ? 'text-red-500' : 'text-gray-800'">
+                <span class="font-bold text-gray-800">
                   {{ totalMonthlyExpenses.toLocaleString('he-IL') }} ₪
                 </span>
               </div>
@@ -815,6 +908,30 @@
 import { ref, reactive, computed, watch } from 'vue'
 import { getProjectForm, saveProjectForm, getAttendanceByProject } from '../services/api'
 import DatePicker from './DatePicker.vue'
+
+// Format number with commas for display
+function fmtNum(val) {
+  if (val === null || val === undefined || val === '' || val === 0) return ''
+  return Number(val).toLocaleString('he-IL')
+}
+// Parse formatted string back to number
+function parseNum(str) {
+  const cleaned = String(str).replace(/[,\s]/g, '')
+  const num = parseFloat(cleaned)
+  return isNaN(num) ? 0 : num
+}
+// Handle formatted number input: updates the reactive property
+function onNumInput(obj, key, event) {
+  const raw = parseNum(event.target.value)
+  obj[key] = raw
+  // Reformat the display value
+  const el = event.target
+  const pos = el.selectionStart
+  const oldLen = el.value.length
+  el.value = raw ? raw.toLocaleString('he-IL') : ''
+  const newLen = el.value.length
+  el.setSelectionRange(pos + newLen - oldLen, pos + newLen - oldLen)
+}
 
 const props = defineProps({
   show: Boolean,
@@ -948,12 +1065,11 @@ function validateStep1() {
 
 function validateStep2() {
   const errs = []
-  errs.push(vf('total_budget', form.total_budget, { required: true, positive: true }))
   // subcontractors
   form.subcontractors.forEach((sub, i) => {
-    if (sub.name || sub.monthly_amount) {
+    if (sub.name || sub.total_amount) {
       errs.push(vf(`sub_name_${i}`, sub.name, { required: true, minLen: 2 }))
-      errs.push(vf(`sub_amount_${i}`, sub.monthly_amount, { required: true, positive: true }))
+      errs.push(vf(`sub_amount_${i}`, sub.total_amount, { required: true, positive: true }))
       if (sub.start_date && sub.end_date && sub.end_date < sub.start_date) {
         fe[`sub_end_${i}`] = 'תאריך סיום חייב להיות אחרי ההתחלה'
         errs.push('err')
@@ -1034,6 +1150,32 @@ function shotefPaymentMonth(invoiceMonth, invoiceYear, xDays) {
   return paymentDate.getMonth() + 1 // 1-based
 }
 
+// Revenue forecast helpers: amount ↔ percentage conversion
+function revenueAmountForMonth(m) {
+  const pct = Number(form.revenue_forecast[m]) || 0
+  if (!pct || !form.total_revenue) return 0
+  return Math.round(form.total_revenue * pct / 100)
+}
+
+function setRevenueAmount(m, rawValue) {
+  const amount = Number(rawValue) || 0
+  if (!form.total_revenue || form.total_revenue <= 0) {
+    form.revenue_forecast[m] = 0
+    return
+  }
+  form.revenue_forecast[m] = Math.round((amount / form.total_revenue) * 10000) / 100
+}
+
+const manualForecastTotal = computed(() => {
+  let total = 0
+  for (let m = 1; m <= 12; m++) total += revenueAmountForMonth(m)
+  return total
+})
+
+const manualForecastPct = computed(() => {
+  return Math.round(Object.values(form.revenue_forecast).reduce((a, v) => a + (Number(v) || 0), 0))
+})
+
 // Calculate actual cash inflow per month based on שוטף+ logic
 function cashInflowForMonth(targetMonth) {
   if (!form.total_revenue) return 0
@@ -1052,21 +1194,15 @@ function cashInflowForMonth(targetMonth) {
 
     if (term.type === 'מקדמה') {
       if (targetMonth === sm) total += Math.round(termAmount)
-    } else if (term.type === 'מזומן') {
-      const monthlyAmount = termAmount / projectMonths
-      if (targetMonth >= sm && targetMonth <= em) {
-        total += Math.round(monthlyAmount)
-      }
+    } else if (term.type === 'פעימות תשלום') {
+      // Milestones handled separately
     } else {
-      // שוטף+X: invoices each month, payment = end of invoice month + X days
+      // שוטף+X: invoice at project END, payment = end of end_month + X days
       const xDays = extractShotefDays(term.type)
-      const monthlyInvoice = termAmount / projectMonths
-      for (let invM = sm; invM <= em; invM++) {
-        const invYear = invM < sm ? startYear + 1 : startYear
-        const payMonth = shotefPaymentMonth(invM, invYear, xDays)
-        if (payMonth === targetMonth) {
-          total += Math.round(monthlyInvoice)
-        }
+      const invYear = em < sm ? startYear + 1 : startYear
+      const payMonth = shotefPaymentMonth(em, invYear, xDays)
+      if (payMonth === targetMonth) {
+        total += Math.round(termAmount)
       }
     }
   }
@@ -1075,7 +1211,7 @@ function cashInflowForMonth(targetMonth) {
 
 const totalMonthlyExpenses = computed(() => {
   let total = 0
-  for (const sub of form.subcontractors) total += Number(sub.monthly_amount) || 0
+  for (const sub of form.subcontractors) total += Number(sub.total_amount) || 0
   for (const cat of ['manpower', 'equipment', 'insurance', 'consultants', 'financing', 'other']) {
     for (const line of form['expense_lines_' + cat] || []) total += Number(line.monthly_amount) || 0
   }
@@ -1083,8 +1219,13 @@ const totalMonthlyExpenses = computed(() => {
 })
 
 const subcontractorsTotal = computed(() => {
-  return form.subcontractors.reduce((sum, sub) => sum + (Number(sub.monthly_amount) || 0), 0)
+  return form.subcontractors.reduce((sum, sub) => sum + (Number(sub.total_amount) || 0), 0)
 })
+
+function subTermsTotal(sub) {
+  if (!Array.isArray(sub.payment_terms)) return 0
+  return sub.payment_terms.reduce((sum, t) => sum + (Number(t.percent) || 0), 0)
+}
 
 function categoryTotal(catKey) {
   return (form['expense_lines_' + catKey] || []).reduce((sum, line) => sum + (Number(line.monthly_amount) || 0), 0)
@@ -1100,7 +1241,17 @@ function toggleCategory(key) {
 }
 
 function addSubcontractor() {
-  form.subcontractors.push({ name: '', start_date: form.start_date || '', end_date: form.expected_end_date || '', payment_terms: 'שוטף+30', monthly_amount: null, contract_filename: '' })
+  form.subcontractors.push({
+    name: '', total_amount: null,
+    start_date: form.start_date || '', end_date: form.expected_end_date || '',
+    payment_terms: [{ type: 'שוטף+30', percent: 100 }],
+    contract_filename: '',
+    // Vendor details
+    tax_id: '', vendor_type: '', contact_name: '', contact_role: '',
+    phone: '', email: '', address: '',
+    accounting_contact: '', accounting_phone: '', accounting_email: '',
+    _showDetails: false,
+  })
 }
 
 function addExpenseLine(cat) {
@@ -1108,18 +1259,24 @@ function addExpenseLine(cat) {
 }
 
 function addSupplierLine(cat) {
+  const vendorFields = {
+    tax_id: '', vendor_type: '', contact_name: '', contact_role: '',
+    phone: '', email: '', address: '',
+    accounting_contact: '', accounting_phone: '', accounting_email: '',
+    _showDetails: false,
+  }
   // Insurance: default to project end date with שוטף+0 (one-time payment at end)
   if (cat === 'insurance') {
     form['expense_lines_' + cat].push({
       name: '', monthly_amount: null,
       start_date: form.expected_end_date || '', end_date: form.expected_end_date || '',
-      payment_terms: 'שוטף+0'
+      payment_terms: 'שוטף+0', ...vendorFields
     })
   } else {
     form['expense_lines_' + cat].push({
       name: '', monthly_amount: null,
       start_date: form.start_date || '', end_date: form.expected_end_date || '',
-      payment_terms: 'שוטף+30'
+      payment_terms: 'שוטף+30', ...vendorFields
     })
   }
 }
@@ -1167,7 +1324,7 @@ function validateAll() {
   if (milestonesTotal.value > 100) emptyFields.push('פעימות תשלום (מעל 100%)')
 
   // Step 2 fields
-  if (!form.total_budget || form.total_budget <= 0) emptyFields.push('סך תקציב הוצאות')
+  // total_budget is now auto-calculated, no validation needed
 
   // Also run existing validation for field-level errors
   validateStep0()
@@ -1196,18 +1353,24 @@ function clampPaymentTerm(index) {
   let current = Number(form.revenue_payment_terms[index].percent) || 0
   if (current < 0) current = 0
   if (current > 100) current = 100
+  // Don't let total exceed 100%
   const othersTotal = form.revenue_payment_terms
     .filter((_, i) => i !== index)
     .reduce((a, t) => a + (Number(t.percent) || 0), 0)
-  form.revenue_payment_terms[index].percent = Math.min(current, Math.max(0, 100 - othersTotal))
+  const max = Math.max(0, 100 - othersTotal)
+  form.revenue_payment_terms[index].percent = Math.min(current, max)
 }
 
 function updateTermAmount(index, event) {
-  const amount = Number(event.target.value) || 0
+  const amount = parseNum(event.target.value)
   if (!form.total_revenue || form.total_revenue <= 0) return
-  const percent = Math.round((amount / form.total_revenue) * 100)
-  form.revenue_payment_terms[index].percent = Math.max(0, Math.min(100, percent))
-  clampPaymentTerm(index)
+  const percent = Math.round((amount / form.total_revenue) * 10000) / 100
+  // Don't let total exceed 100%
+  const othersTotal = form.revenue_payment_terms
+    .filter((_, i) => i !== index)
+    .reduce((a, t) => a + (Number(t.percent) || 0), 0)
+  const max = Math.max(0, 100 - othersTotal)
+  form.revenue_payment_terms[index].percent = Math.min(Math.max(0, percent), max)
 }
 
 const milestonesTotal = computed(() =>
@@ -1229,6 +1392,29 @@ function syncMilestoneFromAmount(i) {
   if (amt < 0) amt = 0
   ms.amount = amt
   ms.percent = form.total_revenue ? Math.round((amt / form.total_revenue) * 100 * 10) / 10 : 0
+}
+
+// Expense line milestone helpers
+function lineMilestonesTotal(line) {
+  if (!line.milestones) return 0
+  return line.milestones.reduce((sum, m) => sum + (Number(m.percent) || 0), 0)
+}
+
+function syncLineMilestoneFromPercent(line, i) {
+  const ms = line.milestones[i]
+  let pct = Number(ms.percent) || 0
+  if (pct < 0) pct = 0
+  if (pct > 100) pct = 100
+  ms.percent = pct
+  ms.amount = line.monthly_amount ? Math.round(line.monthly_amount * pct / 100) : 0
+}
+
+function syncLineMilestoneFromAmount(line, i) {
+  const ms = line.milestones[i]
+  let amt = Number(ms.amount) || 0
+  if (amt < 0) amt = 0
+  ms.amount = amt
+  ms.percent = line.monthly_amount ? Math.round((amt / line.monthly_amount) * 1000) / 10 : 0
 }
 
 async function save() {

@@ -85,14 +85,17 @@ onMounted(async () => {
         })
       }
 
-      // Months with no revenue
-      const zeroRevenueMonths = project.months.filter(m => m.revenue === 0)
-      if (zeroRevenueMonths.length > 6) {
+      // Months with no revenue (only within project date range)
+      const startMonth = project.meta?.start_month || 1
+      const endMonth = project.meta?.end_month || 12
+      const projectMonths = project.months.filter(m => m.month >= startMonth && m.month <= endMonth)
+      const zeroRevenueMonths = projectMonths.filter(m => m.revenue === 0)
+      if (zeroRevenueMonths.length > 0 && zeroRevenueMonths.length >= projectMonths.length / 2) {
         alerts.value.push({
           project: name,
           severity: 'medium',
-          message: `${zeroRevenueMonths.length} חודשים ללא הכנסה`,
-          detail: 'ייתכן שיש בעיה בגביה או בלוח זמנים',
+          message: `${zeroRevenueMonths.length} חודשים ללא הכנסה (מתוך ${projectMonths.length} חודשי פרויקט)`,
+          detail: `חודשים: ${zeroRevenueMonths.map(m => m.month).join(', ')}`,
         })
       }
     }

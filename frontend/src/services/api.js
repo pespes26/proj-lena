@@ -63,6 +63,14 @@ export const uploadSubcontractorContract = (project, subIndex, file) => {
   return api.post(`/project-form/${encodeURIComponent(project)}/upload-contract?sub_index=${subIndex}`, f, { headers: { 'Content-Type': 'multipart/form-data' } }).then(r => r.data)
 }
 
+// Auth & Users
+export const getProfile = () => api.get('/auth/profile').then(r => r.data)
+export const updateProfile = (data) => api.put('/auth/profile', data).then(r => r.data)
+export const changePassword = (data) => api.put('/auth/password', data).then(r => r.data)
+export const getUsers = () => api.get('/auth/users').then(r => r.data.users)
+export const createUser = (data) => api.post('/auth/users', data).then(r => r.data)
+export const deleteUser = (username) => api.delete(`/auth/users/${encodeURIComponent(username)}`).then(r => r.data)
+
 export const formatNumber = (val) => {
   if (val == null) return '-'
   return Number(val).toLocaleString('he-IL', { maximumFractionDigits: 0 })

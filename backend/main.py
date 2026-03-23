@@ -7,7 +7,7 @@ from routers import projects, cashflow, dashboard, data, reports, project_form, 
 
 ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
 
-app = FastAPI(title="סנג'ר - P&L & Cash Flow")
+app = FastAPI(title="Logfi - P&L & Cash Flow")
 
 app.add_middleware(
     CORSMiddleware,

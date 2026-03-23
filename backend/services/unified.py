@@ -17,28 +17,7 @@ def load_unified_projects():
     """Load all projects from both Excel and form. Form data takes priority."""
     form_data = load_form_data()
 
-    try:
-        excel_pnl = load_pnl()
-    except Exception:
-        excel_pnl = {}
-
     result = {}
-
-    for name, pnl_data in excel_pnl.items():
-        if name in form_data:
-            result[name] = {
-                'pnl': form_to_pnl(form_data[name]),
-                'source': form_data[name].get('source', 'form'),
-                'status': form_data[name].get('status', 'active'),
-                'last_updated': form_data[name].get('last_updated', ''),
-            }
-        else:
-            result[name] = {
-                'pnl': pnl_data,
-                'source': 'excel',
-                'status': 'active',
-                'last_updated': '',
-            }
 
     for name, fdata in form_data.items():
         if name not in result:
