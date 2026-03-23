@@ -42,8 +42,11 @@ SETUP_SECRET = os.environ.get("SETUP_SECRET", "")
 
 @router.post("/api/auth/setup")
 def setup_user(req: LoginRequest, secret: str = Query("")):
-    """One-time user creation endpoint. Requires SETUP_SECRET env var."""
-    if not SETUP_SECRET or secret != SETUP_SECRET:
+    """One-time user creation. Allowed if: no users exist yet, OR secret matches."""
+    users = load_json(USERS_FILE, [])
+    no_users_yet = len(users) == 0
+    secret_valid = SETUP_SECRET and secret == SETUP_SECRET
+    if not no_users_yet and not secret_valid:
         raise HTTPException(status_code=403, detail="אין הרשאה")
 
     users = load_json(USERS_FILE, [])
