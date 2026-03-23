@@ -1,6 +1,6 @@
 import os
 from datetime import datetime, timedelta
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 from jose import jwt
 import bcrypt
@@ -41,7 +41,7 @@ SETUP_SECRET = os.environ.get("SETUP_SECRET", "")
 
 
 @router.post("/api/auth/setup")
-def setup_user(req: LoginRequest, secret: str = ""):
+def setup_user(req: LoginRequest, secret: str = Query("")):
     """One-time user creation endpoint. Requires SETUP_SECRET env var."""
     if not SETUP_SECRET or secret != SETUP_SECRET:
         raise HTTPException(status_code=403, detail="אין הרשאה")
