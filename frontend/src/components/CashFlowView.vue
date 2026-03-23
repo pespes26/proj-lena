@@ -13,21 +13,21 @@
     <template v-if="cfData">
       <!-- KPI Cards -->
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
-        <div class="ios-card p-6">
+        <div class="ios-card p-4 sm:p-6">
           <div class="text-sm text-gray-500 font-medium mb-2">סך הכנסות תקופתי</div>
-          <div class="text-3xl font-bold text-gray-900">{{ fmt(totalRevenue) }}</div>
+          <div class="text-xl sm:text-3xl font-bold text-gray-900">{{ fmt(totalRevenue) }}</div>
         </div>
-        <div class="ios-card p-6">
+        <div class="ios-card p-4 sm:p-6">
           <div class="text-sm text-gray-500 font-medium mb-2">סך הוצאות תקופתי</div>
-          <div class="text-3xl font-bold text-gray-900">{{ fmt(totalExpenses) }}</div>
+          <div class="text-xl sm:text-3xl font-bold text-gray-900">{{ fmt(totalExpenses) }}</div>
         </div>
-        <div class="ios-card p-6">
+        <div class="ios-card p-4 sm:p-6">
           <div class="text-sm text-gray-500 font-medium mb-2">נטו תקופתי</div>
-          <div class="text-3xl font-bold" :class="totalNet >= 0 ? 'text-green-600' : 'text-red-500'">{{ fmt(totalNet) }}</div>
+          <div class="text-xl sm:text-3xl font-bold" :class="totalNet >= 0 ? 'text-green-600' : 'text-red-500'">{{ fmt(totalNet) }}</div>
         </div>
-        <div class="ios-card p-6">
+        <div class="ios-card p-4 sm:p-6">
           <div class="text-sm text-gray-500 font-medium mb-2">יתרה מצטברת</div>
-          <div class="text-3xl font-bold" :class="lastCumulative >= 0 ? 'text-green-600' : 'text-red-500'">{{ fmt(lastCumulative) }}</div>
+          <div class="text-xl sm:text-3xl font-bold" :class="lastCumulative >= 0 ? 'text-green-600' : 'text-red-500'">{{ fmt(lastCumulative) }}</div>
         </div>
       </div>
 
@@ -35,7 +35,7 @@
       <div class="ios-card p-6 mb-6">
         <div class="flex items-center justify-between mb-5">
           <h3 class="text-lg font-bold text-gray-900">תזרים מזומנים</h3>
-          <div class="flex bg-gray-100 rounded-xl p-1 gap-0.5">
+          <div class="flex flex-wrap bg-gray-100 rounded-xl p-1 gap-0.5">
             <button v-for="v in views" :key="v.id"
               @click="activeView = v.id"
               :class="['px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
@@ -98,8 +98,8 @@
           <div class="px-6 py-4 border-b border-gray-100">
             <h3 class="text-lg font-bold text-gray-900">תזרים חודשי ומצטבר</h3>
           </div>
-          <div class="overflow-y-auto max-h-[400px]">
-            <table class="w-full text-sm">
+          <div class="overflow-x-auto overflow-y-auto max-h-[400px]">
+            <table class="w-full min-w-[500px] text-sm">
               <thead class="sticky top-0 bg-gray-50">
                 <tr>
                   <th class="px-4 py-3 text-right font-medium text-gray-500">חודש</th>
@@ -132,8 +132,8 @@
           <div class="px-6 py-4 border-b border-gray-100">
             <h3 class="text-lg font-bold text-gray-900">פירוט נטו לפי פרויקט</h3>
           </div>
-          <div class="overflow-auto max-h-[400px]">
-            <table class="w-full text-sm whitespace-nowrap">
+          <div class="overflow-x-auto overflow-y-auto max-h-[400px]">
+            <table class="w-full min-w-[600px] text-sm whitespace-nowrap">
               <thead class="sticky top-0 bg-gray-50">
                 <tr>
                   <th class="px-3 py-3 text-right font-medium text-gray-500 sticky right-0 bg-gray-50 z-10">חודש</th>

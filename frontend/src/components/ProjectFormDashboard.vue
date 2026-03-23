@@ -38,25 +38,25 @@
     </div>
 
     <!-- KPI Cards -->
-    <div class="grid grid-cols-4 gap-4 mb-8">
-      <div class="bg-white rounded-2xl border border-gray-200 p-5">
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-8">
+      <div class="bg-white rounded-2xl border border-gray-200 p-3 sm:p-5">
         <div class="text-xs text-gray-400 mb-1">סך הכנסות</div>
-        <div class="text-2xl font-bold text-gray-800">{{ fmt(totalRevenue) }}</div>
+        <div class="text-lg sm:text-2xl font-bold text-gray-800">{{ fmt(totalRevenue) }}</div>
         <div class="text-[10px] text-gray-400 mt-1">₪</div>
       </div>
-      <div class="bg-white rounded-2xl border border-gray-200 p-5">
+      <div class="bg-white rounded-2xl border border-gray-200 p-3 sm:p-5">
         <div class="text-xs text-gray-400 mb-1">סך הוצאות</div>
-        <div class="text-2xl font-bold text-orange-600">{{ fmt(totalExpenses) }}</div>
+        <div class="text-lg sm:text-2xl font-bold text-orange-600">{{ fmt(totalExpenses) }}</div>
         <div class="text-[10px] text-gray-400 mt-1">₪</div>
       </div>
-      <div class="bg-white rounded-2xl border border-gray-200 p-5">
+      <div class="bg-white rounded-2xl border border-gray-200 p-3 sm:p-5">
         <div class="text-xs text-gray-400 mb-1">רווח צפוי</div>
-        <div class="text-2xl font-bold" :class="profit >= 0 ? 'text-emerald-700' : 'text-red-500'">{{ fmt(profit) }}</div>
+        <div class="text-lg sm:text-2xl font-bold" :class="profit >= 0 ? 'text-emerald-700' : 'text-red-500'">{{ fmt(profit) }}</div>
         <div class="text-[10px] text-gray-400 mt-1">₪</div>
       </div>
-      <div class="bg-white rounded-2xl border border-gray-200 p-5">
+      <div class="bg-white rounded-2xl border border-gray-200 p-3 sm:p-5">
         <div class="text-xs text-gray-400 mb-1">מרווח צפוי</div>
-        <div class="text-2xl font-bold" :class="margin >= 20 ? 'text-emerald-700' : margin >= 0 ? 'text-orange-500' : 'text-red-500'">{{ margin.toFixed(1) }}%</div>
+        <div class="text-lg sm:text-2xl font-bold" :class="margin >= 20 ? 'text-emerald-700' : margin >= 0 ? 'text-orange-500' : 'text-red-500'">{{ margin.toFixed(1) }}%</div>
         <div class="w-full bg-gray-200 rounded-full h-1.5 mt-2">
           <div class="h-full rounded-full transition-all" :class="margin >= 20 ? 'bg-emerald-700' : margin >= 0 ? 'bg-orange-400' : 'bg-red-500'"
             :style="{ width: Math.min(Math.max(margin, 0), 100) + '%' }"></div>
@@ -65,7 +65,7 @@
     </div>
 
     <!-- Payment Terms + Revenue Chart -->
-    <div class="grid grid-cols-3 gap-6 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-8">
       <!-- Payment Terms -->
       <div class="bg-white rounded-2xl border border-gray-200 p-5">
         <h3 class="text-sm font-bold text-gray-700 mb-4">תנאי תשלום הכנסה</h3>
@@ -89,7 +89,7 @@
       </div>
 
       <!-- Revenue Forecast Chart -->
-      <div class="col-span-2 bg-white rounded-2xl border border-gray-200 p-5">
+      <div class="sm:col-span-2 bg-white rounded-2xl border border-gray-200 p-5">
         <h3 class="text-sm font-bold text-gray-700 mb-4">תחזית הכנסות חודשית</h3>
         <div class="h-48">
           <Bar v-if="revenueChartData" :data="revenueChartData" :options="barOptions" />
@@ -102,7 +102,7 @@
     </div>
 
     <!-- Expenses Section -->
-    <div class="grid grid-cols-3 gap-6 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-8">
       <!-- Expense Breakdown Doughnut -->
       <div class="bg-white rounded-2xl border border-gray-200 p-5">
         <h3 class="text-sm font-bold text-gray-700 mb-4">פילוח הוצאות</h3>
@@ -122,7 +122,7 @@
       </div>
 
       <!-- Suppliers list -->
-      <div class="col-span-2 bg-white rounded-2xl border border-gray-200 p-5">
+      <div class="sm:col-span-2 bg-white rounded-2xl border border-gray-200 p-5">
         <h3 class="text-sm font-bold text-gray-700 mb-4">ספקים וקבלנים</h3>
         <div v-if="allSuppliers.length" class="space-y-2 max-h-80 overflow-y-auto">
           <div v-for="(sup, i) in allSuppliers" :key="i"
@@ -141,6 +141,51 @@
           </div>
         </div>
         <div v-else class="text-xs text-gray-400 text-center py-10">לא הוגדרו ספקים</div>
+      </div>
+    </div>
+
+    <!-- Monthly Expense Breakdown -->
+    <div class="bg-white rounded-2xl border border-gray-200 p-5 mb-8">
+      <h3 class="text-sm font-bold text-gray-700 mb-4">פירוט הוצאות חודשי</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[600px] text-xs" dir="rtl">
+          <thead>
+            <tr class="border-b border-gray-200">
+              <th class="text-right py-2 px-2 font-medium text-gray-500 sticky right-0 bg-white">קטגוריה / ספק</th>
+              <th v-for="m in activeMonths" :key="m" class="text-center py-2 px-1.5 font-medium text-gray-400 min-w-[60px]">{{ monthName(m) }}</th>
+              <th class="text-center py-2 px-2 font-bold text-gray-600">סה"כ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template v-for="cat in monthlyBreakdown" :key="cat.key">
+              <!-- Category header row -->
+              <tr class="bg-gray-50/70">
+                <td class="py-2 px-2 font-bold text-gray-700 sticky right-0 bg-gray-50/70">{{ cat.label }}</td>
+                <td v-for="m in activeMonths" :key="m" class="text-center py-2 px-1.5 font-bold text-gray-700">
+                  {{ cat.monthlyTotals[m] ? fmt(cat.monthlyTotals[m]) : '-' }}
+                </td>
+                <td class="text-center py-2 px-2 font-bold text-emerald-700">{{ fmt(cat.grandTotal) }}</td>
+              </tr>
+              <!-- Individual line items -->
+              <tr v-for="(line, li) in cat.lines" :key="li" class="border-b border-gray-50 hover:bg-gray-50/50">
+                <td class="py-1.5 px-2 pr-6 text-gray-500 sticky right-0 bg-white">{{ line.name || 'ללא שם' }}</td>
+                <td v-for="m in activeMonths" :key="m" class="text-center py-1.5 px-1.5"
+                  :class="line.months[m] ? 'text-gray-700' : 'text-gray-200'">
+                  {{ line.months[m] ? fmt(line.months[m]) : '-' }}
+                </td>
+                <td class="text-center py-1.5 px-2 font-medium text-gray-600">{{ fmt(line.total) }}</td>
+              </tr>
+            </template>
+            <!-- Grand total row -->
+            <tr class="border-t-2 border-gray-300 bg-gray-100">
+              <td class="py-2.5 px-2 font-bold text-gray-800 sticky right-0 bg-gray-100">סה"כ הוצאות</td>
+              <td v-for="m in activeMonths" :key="m" class="text-center py-2.5 px-1.5 font-bold text-gray-800">
+                {{ grandMonthlyTotal(m) ? fmt(grandMonthlyTotal(m)) : '-' }}
+              </td>
+              <td class="text-center py-2.5 px-2 font-bold text-red-600 text-sm">{{ fmt(grandTotal) }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -180,14 +225,23 @@ const formatDate = (d) => {
   return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : d
 }
 
-// שוטף+ offset
-function shotafOffset(type) {
-  if (type === 'מזומן' || type === 'מקדמה') return 0
-  if (type === 'שוטף+30') return 1
-  if (type === 'שוטף+45') return 2
-  if (type === 'שוטף+60') return 2
-  if (type === 'שוטף+90') return 3
+// Extract X days from שוטף+X
+function extractShotefDays(type) {
+  if (!type) return 0
+  if (type.includes('שוטף+90')) return 90
+  if (type.includes('שוטף+60')) return 60
+  if (type.includes('שוטף+45')) return 45
+  if (type.includes('שוטף+30')) return 30
+  if (type.includes('שוטף+0') || type === 'שוטף') return 0
   return 0
+}
+
+// Calculate payment month: end of invoice month + X days
+function shotefPaymentMonth(invoiceMonth, invoiceYear, xDays) {
+  const lastDay = new Date(invoiceYear, invoiceMonth, 0).getDate()
+  const endOfMonth = new Date(invoiceYear, invoiceMonth - 1, lastDay)
+  const paymentDate = new Date(endOfMonth.getTime() + xDays * 86400000)
+  return paymentDate.getMonth() + 1
 }
 
 const paymentTerms = computed(() => formData.value?.revenue_payment_terms || [])
@@ -213,9 +267,10 @@ function monthlyRevenue(m) {
   return Math.round(formData.value.total_revenue * pct / 100)
 }
 
-// Cash inflow per month (שוטף+)
+// Cash inflow per month (שוטף+X: end of invoice month + X days)
 function cashInflow(targetMonth) {
   if (!formData.value?.total_revenue) return 0
+  const startYear = formData.value.start_date ? parseInt(formData.value.start_date.split('-')[0]) || 2026 : 2026
   let total = 0
   for (let m = 1; m <= 12; m++) {
     const rev = monthlyRevenue(m)
@@ -223,8 +278,19 @@ function cashInflow(targetMonth) {
     for (const term of paymentTerms.value) {
       const pct = Number(term.percent) || 0
       if (!pct) continue
-      if (m + shotafOffset(term.type) === targetMonth) {
-        total += Math.round(rev * pct / 100)
+      const termType = term.type
+      if (termType === 'מקדמה' || termType === 'מזומן') {
+        // מקדמה/מזומן: no delay, same month
+        if (m === targetMonth) {
+          total += Math.round(rev * pct / 100)
+        }
+      } else {
+        // שוטף+X: end of invoice month + X days
+        const xDays = extractShotefDays(termType)
+        const payMonth = shotefPaymentMonth(m, startYear, xDays)
+        if (payMonth === targetMonth) {
+          total += Math.round(rev * pct / 100)
+        }
       }
     }
   }
@@ -267,6 +333,78 @@ const allSuppliers = computed(() => {
     }
   }
   return list
+})
+
+// Month helpers
+const hebrewMonths = { 1: 'ינואר', 2: 'פברואר', 3: 'מרץ', 4: 'אפריל', 5: 'מאי', 6: 'יוני', 7: 'יולי', 8: 'אוגוסט', 9: 'ספטמבר', 10: 'אוקטובר', 11: 'נובמבר', 12: 'דצמבר' }
+function monthName(m) { return hebrewMonths[m] || m }
+
+function parseMonth(dateStr) {
+  if (!dateStr) return null
+  const parts = dateStr.split('-')
+  return parts.length >= 2 ? parseInt(parts[1]) : null
+}
+
+// Active project months (start to end)
+const activeMonths = computed(() => {
+  if (!formData.value) return []
+  const sm = parseMonth(formData.value.start_date) || 1
+  const em = parseMonth(formData.value.expected_end_date) || 12
+  const result = []
+  for (let m = sm; m <= em; m++) result.push(m)
+  return result
+})
+
+// Monthly expense breakdown by category
+const monthlyBreakdown = computed(() => {
+  if (!formData.value) return []
+  const result = []
+
+  // Subcontractors
+  const subLines = (formData.value.subcontractors || []).map(sub => {
+    const sm = parseMonth(sub.start_date) || parseMonth(formData.value.start_date) || 1
+    const em = parseMonth(sub.end_date) || parseMonth(formData.value.expected_end_date) || 12
+    const amount = Number(sub.monthly_amount) || 0
+    const months = {}
+    let total = 0
+    for (let m = sm; m <= em; m++) { months[m] = amount; total += amount }
+    return { name: sub.name, months, total }
+  })
+  if (subLines.length) {
+    const monthlyTotals = {}; let grandTotal = 0
+    for (const line of subLines) { for (const [m, v] of Object.entries(line.months)) { monthlyTotals[m] = (monthlyTotals[m] || 0) + v }; grandTotal += line.total }
+    result.push({ key: 'subcontractors', label: 'קבלני משנה', lines: subLines, monthlyTotals, grandTotal })
+  }
+
+  // Other categories
+  for (const def of categoryDefs.slice(1)) { // skip subcontractors
+    const lines = (formData.value['expense_lines_' + def.key] || []).map(line => {
+      const sm = parseMonth(line.start_date) || line.start_month || parseMonth(formData.value.start_date) || 1
+      const em = parseMonth(line.end_date) || line.end_month || parseMonth(formData.value.expected_end_date) || 12
+      const amount = Number(line.monthly_amount) || 0
+      const months = {}
+      let total = 0
+      for (let m = sm; m <= em; m++) { months[m] = amount; total += amount }
+      return { name: line.name, months, total }
+    })
+    if (lines.length) {
+      const monthlyTotals = {}; let grandTotal = 0
+      for (const line of lines) { for (const [m, v] of Object.entries(line.months)) { monthlyTotals[m] = (monthlyTotals[m] || 0) + v }; grandTotal += line.total }
+      result.push({ key: def.key, label: def.label, lines, monthlyTotals, grandTotal })
+    }
+  }
+
+  return result
+})
+
+function grandMonthlyTotal(m) {
+  let total = 0
+  for (const cat of monthlyBreakdown.value) { total += cat.monthlyTotals[m] || 0 }
+  return total
+}
+
+const grandTotal = computed(() => {
+  return monthlyBreakdown.value.reduce((sum, cat) => sum + cat.grandTotal, 0)
 })
 
 // Charts

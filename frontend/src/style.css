@@ -81,6 +81,14 @@ body {
   100% { transform: translateY(0) scale(1); opacity: 1; }
 }
 
+/* Mobile menu slide-down transition */
+.slide-down-enter-active { animation: slide-down-in 0.2s ease-out; }
+.slide-down-leave-active { animation: slide-down-in 0.15s ease-in reverse; }
+@keyframes slide-down-in {
+  0% { opacity: 0; transform: translateY(-8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
 /* Print styles for PDF export */
 @media print {
   body { background: white !important; }

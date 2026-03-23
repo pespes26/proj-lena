@@ -5,13 +5,32 @@ const api = axios.create({
   timeout: 10000,
 })
 
+// Attach JWT token to every request
+api.interceptors.request.use(config => {
+  const token = localStorage.getItem('token')
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+})
+
+// Handle errors + auto-logout on 401
 api.interceptors.response.use(
   res => res,
   err => {
+    if (err.response?.status === 401 && localStorage.getItem('token')) {
+      // Token expired — clear and reload to show login
+      localStorage.removeItem('token')
+      window.location.reload()
+      return new Promise(() => {}) // prevent further handling
+    }
     const msg = err.response?.data?.detail || 'שגיאה בתקשורת עם השרת'
     return Promise.reject(new Error(msg))
   }
 )
+
+export const login = (username, password) =>
+  api.post('/auth/login', { username, password }).then(r => r.data)
 
 export const getProjects = () => api.get('/projects').then(r => r.data.projects)
 export const getProjectsDetail = () => api.get('/projects').then(r => r.data.projects_detail)
@@ -39,6 +58,10 @@ export const uploadAttendance = (file, hourlyRate) => {
 export const getAttendanceByProject = (project) => api.get('/attendance/by-project', { params: { project } }).then(r => r.data)
 export const saveProjectActuals = (project, data) => api.post(`/project-form/${encodeURIComponent(project)}/actuals`, data).then(r => r.data)
 export const importExcelProject = (project) => api.post(`/import-excel-project/${encodeURIComponent(project)}`).then(r => r.data)
+export const uploadSubcontractorContract = (project, subIndex, file) => {
+  const f = new FormData(); f.append('file', file)
+  return api.post(`/project-form/${encodeURIComponent(project)}/upload-contract?sub_index=${subIndex}`, f, { headers: { 'Content-Type': 'multipart/form-data' } }).then(r => r.data)
+}
 
 export const formatNumber = (val) => {
   if (val == null) return '-'

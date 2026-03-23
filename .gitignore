@@ -10,6 +10,17 @@ data.xlsx
 attendance_data.json
 projects_data.json
 reports_data.json
+users.json
+
+# Build output
+frontend/dist/
+
+# Environment
+.env
+
+# Backups & contracts
+backups/
+contracts/
 
 # IDE
 .vscode/

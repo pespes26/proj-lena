@@ -11,7 +11,7 @@
 
     <template v-else>
       <!-- Project header with tabs -->
-      <div class="flex items-start justify-between mb-6">
+      <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-6 gap-4">
         <div>
           <div class="flex items-center gap-3 mb-1">
             <h2 class="text-2xl font-bold text-gray-800">{{ selectedProject }}</h2>
@@ -49,27 +49,27 @@
             </button>
           </div>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 flex-wrap">
           <button v-if="projectSource === 'excel'" @click="doImportExcel" :disabled="importingExcel"
             class="px-4 py-2.5 bg-amber-50 text-amber-700 text-sm font-medium rounded-xl border border-amber-200 hover:bg-amber-100 disabled:opacity-50 transition flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
             </svg>
-            {{ importingExcel ? 'מייבא...' : 'ייבא מ-Excel' }}
+            <span class="hidden sm:inline">{{ importingExcel ? 'מייבא...' : 'ייבא מ-Excel' }}</span>
           </button>
           <button @click="showProjectForm = true"
             class="px-4 py-2.5 bg-white text-gray-700 text-sm font-medium rounded-xl border border-gray-200 hover:bg-gray-50 transition flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
             </svg>
-            ערוך טופס
+            <span class="hidden sm:inline">ערוך טופס</span>
           </button>
           <button @click="showReportModal = true"
             class="px-4 py-2.5 bg-emerald-800 text-white text-sm font-medium rounded-xl hover:bg-emerald-900 transition flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
             </svg>
-            דיווח נקודתי
+            <span class="hidden sm:inline">דיווח נקודתי</span>
           </button>
         </div>
       </div>
@@ -128,7 +128,7 @@
       <!-- Project info card row -->
       <div class="flex items-start justify-between mb-8">
         <div></div>
-        <div class="bg-white rounded-2xl px-5 py-3 shadow-sm border border-gray-100 flex items-center gap-4">
+        <div class="bg-white rounded-2xl px-5 py-3 shadow-sm border border-gray-100 grid grid-cols-2 gap-3 sm:flex sm:items-center sm:gap-4">
           <div class="flex items-center gap-2">
             <div class="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
               <svg class="w-4 h-4 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -140,7 +140,7 @@
               <div class="text-sm font-semibold font-mono text-emerald-700">{{ pnlData.meta?.priority_id || '-' }}</div>
             </div>
           </div>
-          <div class="w-px h-8 bg-gray-200"></div>
+          <div class="hidden sm:block w-px h-8 bg-gray-200"></div>
           <div class="flex items-center gap-2">
             <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
               <svg class="w-4 h-4 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -152,12 +152,12 @@
               <div class="text-sm font-semibold text-gray-700">{{ pnlData.meta?.manager || '-' }}</div>
             </div>
           </div>
-          <div class="w-px h-8 bg-gray-200"></div>
+          <div class="hidden sm:block w-px h-8 bg-gray-200"></div>
           <div>
             <div class="text-[10px] text-gray-400">תחום</div>
             <div class="text-sm font-medium text-gray-600">{{ pnlData.meta?.area || '-' }}</div>
           </div>
-          <div class="w-px h-8 bg-gray-200"></div>
+          <div class="hidden sm:block w-px h-8 bg-gray-200"></div>
           <div>
             <div class="text-[10px] text-gray-400">ציר</div>
             <div class="text-sm font-medium text-gray-600">{{ pnlData.meta?.axis || '-' }}</div>
@@ -167,27 +167,27 @@
 
       <!-- KPI Cards -->
       <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-        <div class="ios-card p-5">
+        <div class="ios-card p-3 sm:p-5">
           <div class="text-xs text-gray-400 mb-2">הכנסות שנתיות</div>
-          <div class="text-2xl font-bold text-gray-800">{{ fmt(pnlData.summary.total_revenue) }}</div>
+          <div class="text-lg sm:text-2xl font-bold text-gray-800">{{ fmt(pnlData.summary.total_revenue) }}</div>
         </div>
-        <div class="ios-card p-5">
+        <div class="ios-card p-3 sm:p-5">
           <div class="text-xs text-gray-400 mb-2">הוצאות תפעול</div>
-          <div class="text-2xl font-bold text-gray-800">{{ fmt(pnlData.summary.total_op_expenses) }}</div>
+          <div class="text-lg sm:text-2xl font-bold text-gray-800">{{ fmt(pnlData.summary.total_op_expenses) }}</div>
         </div>
-        <div class="ios-card p-5">
+        <div class="ios-card p-3 sm:p-5">
           <div class="text-xs text-gray-400 mb-2">הוצאות שכר</div>
-          <div class="text-2xl font-bold text-gray-800">{{ fmt(pnlData.summary.total_salary_expenses) }}</div>
+          <div class="text-lg sm:text-2xl font-bold text-gray-800">{{ fmt(pnlData.summary.total_salary_expenses) }}</div>
         </div>
-        <div class="ios-card p-5">
+        <div class="ios-card p-3 sm:p-5">
           <div class="text-xs text-gray-400 mb-2">רווח תפעולי</div>
-          <div class="text-2xl font-bold" :class="pnlData.summary.total_operating_profit >= 0 ? 'text-green-600' : 'text-red-500'">
+          <div class="text-lg sm:text-2xl font-bold" :class="pnlData.summary.total_operating_profit >= 0 ? 'text-green-600' : 'text-red-500'">
             {{ fmt(pnlData.summary.total_operating_profit) }}
           </div>
         </div>
-        <div class="ios-card p-5">
+        <div class="ios-card p-3 sm:p-5">
           <div class="text-xs text-gray-400 mb-2">מרווח תפעולי</div>
-          <div class="text-2xl font-bold"
+          <div class="text-lg sm:text-2xl font-bold"
             :class="pnlData.summary.margin != null && pnlData.summary.margin >= 20 ? 'text-emerald-700' : 'text-orange-500'">
             {{ pnlData.summary.margin != null ? pnlData.summary.margin + '%' : '-' }}
           </div>
@@ -202,7 +202,7 @@
       <!-- Charts row: P&L + Cashflow side by side -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
         <!-- P&L Area Chart -->
-        <div class="ios-card p-6">
+        <div class="ios-card p-4 sm:p-6">
           <div class="flex items-center justify-between mb-4">
             <h3 class="font-semibold text-gray-700">הכנסות והוצאות</h3>
             <div class="flex bg-gray-100 rounded-xl p-1 gap-0.5">
@@ -220,7 +220,7 @@
         </div>
 
         <!-- Profit chart (bar) -->
-        <div class="ios-card p-6">
+        <div class="ios-card p-4 sm:p-6">
           <div class="flex items-center justify-between mb-4">
             <h3 class="font-semibold text-gray-700">רווח תפעולי חודשי</h3>
           </div>
@@ -231,14 +231,14 @@
       <!-- Second charts row: Cashflow + Expense breakdown -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
         <!-- Project cashflow -->
-        <div class="ios-card p-6">
+        <div class="ios-card p-4 sm:p-6">
           <h3 class="font-semibold text-gray-700 mb-4">תזרים מזומנים — פרויקט</h3>
           <div v-if="!cashflowData" class="text-center py-12 text-gray-300 text-sm">טוען...</div>
           <ProjectCashflowChart v-else :data="cashflowData" />
         </div>
 
         <!-- Expense pie/doughnut -->
-        <div class="ios-card p-6">
+        <div class="ios-card p-4 sm:p-6">
           <h3 class="font-semibold text-gray-700 mb-4">פילוח הוצאות</h3>
           <ExpenseBreakdown :summary="pnlData.summary" />
         </div>
@@ -251,7 +251,7 @@
           <span class="text-[10px] text-gray-400">לחץ על שורה לפירוט הוצאות</span>
         </div>
         <div class="overflow-x-auto">
-          <table class="w-full text-sm">
+          <table class="w-full text-sm min-w-[700px]">
             <thead>
               <tr class="bg-gray-50/50">
                 <th class="px-4 py-3.5 text-right font-medium text-gray-500 w-8"></th>
@@ -262,7 +262,7 @@
                 <th class="px-4 py-3.5 text-right font-medium text-gray-500">הוצאות שכר</th>
                 <th class="px-4 py-3.5 text-right font-medium text-gray-500">רווח תפעולי</th>
                 <th class="px-4 py-3.5 text-right font-medium text-gray-500">מרווח</th>
-                <th class="px-4 py-3.5 text-right font-medium text-gray-500">הערות</th>
+                <th class="hidden sm:table-cell px-4 py-3.5 text-right font-medium text-gray-500">הערות</th>
               </tr>
             </thead>
             <tbody>
@@ -293,7 +293,7 @@
                     </span>
                     <span v-else class="text-gray-300">-</span>
                   </td>
-                  <td class="px-4 py-3 text-gray-400 text-xs max-w-[180px] truncate">{{ m.notes }}</td>
+                  <td class="hidden sm:table-cell px-4 py-3 text-gray-400 text-xs max-w-[180px] truncate">{{ m.notes }}</td>
                 </tr>
                 <!-- Drill-down row -->
                 <tr v-if="expandedMonth === m.month" class="bg-emerald-50/30">
@@ -305,14 +305,14 @@
                           <div class="w-2 h-2 rounded-full bg-amber-400"></div>
                           <span class="text-xs font-semibold text-gray-600">הוצאות תפעול — {{ fmt(m.op_expenses) }}</span>
                         </div>
-                        <div v-if="breakdown.op_components?.length" class="space-y-2">
-                          <div v-for="(comp, i) in breakdown.op_components" :key="i"
+                        <div v-if="breakdownForMonth(m.month).op_components?.length" class="space-y-2">
+                          <div v-for="(comp, i) in breakdownForMonth(m.month).op_components" :key="i"
                             class="flex items-center justify-between">
                             <span class="text-xs text-gray-500">{{ comp.name }}</span>
                             <span class="text-xs font-medium text-gray-700">{{ comp.amount != null ? fmt(comp.amount) : 'משתנה' }}</span>
                           </div>
                         </div>
-                        <div v-else class="text-xs text-gray-400">אין פירוט זמין</div>
+                        <div v-else class="text-xs text-gray-400">אין הוצאות בחודש זה</div>
                       </div>
 
                       <!-- Salary breakdown -->
@@ -321,8 +321,8 @@
                           <div class="w-2 h-2 rounded-full bg-orange-400"></div>
                           <span class="text-xs font-semibold text-gray-600">הוצאות שכר — {{ fmt(m.salary_expenses) }}</span>
                         </div>
-                        <div v-if="breakdown.salary_components?.length" class="space-y-2">
-                          <div v-for="(comp, i) in breakdown.salary_components" :key="i"
+                        <div v-if="breakdownForMonth(m.month).salary_components?.length" class="space-y-2">
+                          <div v-for="(comp, i) in breakdownForMonth(m.month).salary_components" :key="i"
                             class="flex items-center justify-between">
                             <span class="text-xs text-gray-500">{{ comp.name }}</span>
                             <span class="text-xs font-medium text-gray-700">{{ fmt(comp.amount) }}</span>
@@ -332,13 +332,13 @@
                       </div>
 
                       <!-- Milestones (for project-based like עמיגור) -->
-                      <div v-if="breakdown.milestones?.length" class="md:col-span-2 bg-white rounded-xl p-4 border border-gray-100">
+                      <div v-if="breakdownForMonth(m.month).milestones?.length" class="md:col-span-2 bg-white rounded-xl p-4 border border-gray-100">
                         <div class="flex items-center gap-2 mb-3">
                           <div class="w-2 h-2 rounded-full bg-purple-400"></div>
                           <span class="text-xs font-semibold text-gray-600">פעימות תשלום</span>
                         </div>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                          <div v-for="(ms, i) in breakdown.milestones" :key="i"
+                          <div v-for="(ms, i) in breakdownForMonth(m.month).milestones" :key="i"
                             class="bg-gray-50 rounded-lg p-3">
                             <div class="text-xs font-medium text-gray-700 mb-1">{{ ms.name }}</div>
                             <div class="flex justify-between text-[10px]">
@@ -370,7 +370,7 @@
                     {{ pnlData.summary.margin }}%
                   </span>
                 </td>
-                <td></td>
+                <td class="hidden sm:table-cell"></td>
               </tr>
             </tfoot>
           </table>
@@ -474,7 +474,53 @@ async function loadReports() {
   try { reports.value = await getReports(selectedProject.value) } catch {}
 }
 
-const breakdown = computed(() => pnlData.value?.expense_breakdown || {})
+const formDataForBreakdown = ref(null)
+
+function parseMonthFromDate(dateStr) {
+  if (!dateStr) return null
+  const parts = dateStr.split('-')
+  return parts.length >= 2 ? parseInt(parts[1]) : null
+}
+
+// Build expense breakdown for a specific month
+function breakdownForMonth(month) {
+  const excelBreakdown = pnlData.value?.expense_breakdown || {}
+  // If Excel breakdown has data, use it (static, not month-aware)
+  if (excelBreakdown.op_components?.length || excelBreakdown.salary_components?.length) {
+    return excelBreakdown
+  }
+  // Build from form data, filtered by month
+  const fd = formDataForBreakdown.value
+  if (!fd) return {}
+
+  const opComponents = []
+  // Subcontractors
+  for (const sub of fd.subcontractors || []) {
+    if (!sub.monthly_amount) continue
+    const sm = parseMonthFromDate(sub.start_date) || parseMonthFromDate(fd.start_date) || 1
+    const em = parseMonthFromDate(sub.end_date) || parseMonthFromDate(fd.expected_end_date) || 12
+    if (month >= sm && month <= em) {
+      opComponents.push({ name: sub.name || 'קבלן משנה', amount: sub.monthly_amount })
+    }
+  }
+  // Expense lines by category
+  const catLabels = { manpower: 'כוח אדם', equipment: 'ציוד', insurance: 'ביטוח', consultants: 'יועצים', financing: 'מימון', other: 'אחר' }
+  for (const cat of ['manpower', 'equipment', 'insurance', 'consultants', 'financing', 'other']) {
+    for (const line of fd['expense_lines_' + cat] || []) {
+      if (!line.monthly_amount) continue
+      const sm = parseMonthFromDate(line.start_date) || line.start_month || parseMonthFromDate(fd.start_date) || 1
+      const em = parseMonthFromDate(line.end_date) || line.end_month || parseMonthFromDate(fd.expected_end_date) || 12
+      if (month >= sm && month <= em) {
+        opComponents.push({ name: (line.name || catLabels[cat]) + ` (${catLabels[cat]})`, amount: line.monthly_amount })
+      }
+    }
+  }
+
+  return { op_components: opComponents, salary_components: [] }
+}
+
+// For backward compat (static breakdown)
+const breakdown = computed(() => breakdownForMonth(expandedMonth.value || 1))
 
 function toggleDrilldown(month) {
   expandedMonth.value = expandedMonth.value === month ? null : month
@@ -504,6 +550,7 @@ async function loadPnl() {
     const data = await getPnl(selectedProject.value)
     pnlData.value = data[selectedProject.value]
     getProjectCashflow(selectedProject.value).then(d => { cashflowData.value = d }).catch(() => {})
+    getProjectForm(selectedProject.value).then(d => { formDataForBreakdown.value = d }).catch(() => { formDataForBreakdown.value = null })
     loadReports()
   } catch (e) {
     error.value = e.message

@@ -20,7 +20,7 @@
         <div
           @dragover.prevent="dragActive = true" @dragleave.prevent="dragActive = false" @drop.prevent="onDrop"
           @click="$refs.fileInput.click()"
-          :class="['border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all',
+          :class="['border-2 border-dashed rounded-2xl p-6 sm:p-10 text-center cursor-pointer transition-all',
             dragActive ? 'border-emerald-400 bg-emerald-50' : 'border-gray-200 hover:border-emerald-300 hover:bg-gray-50']">
           <div class="w-14 h-14 mx-auto mb-3 bg-emerald-50 rounded-2xl flex items-center justify-center">
             <svg class="w-7 h-7 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">

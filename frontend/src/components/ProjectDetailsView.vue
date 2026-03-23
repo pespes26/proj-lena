@@ -10,7 +10,7 @@
     <!-- Header with edit + export buttons -->
     <div class="flex items-center justify-between">
       <h3 class="text-lg font-bold text-gray-800 print-title">פרטי פרויקט — {{ project }}</h3>
-      <div class="flex items-center gap-2 no-print">
+      <div class="flex flex-wrap items-center gap-2 no-print">
         <button @click="exportPDF" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 border border-gray-200 rounded-lg hover:bg-gray-50 transition flex items-center gap-2">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -27,9 +27,9 @@
     </div>
 
     <!-- Project Info -->
-    <div class="bg-white rounded-xl border border-gray-100 p-6">
+    <div class="bg-white rounded-xl border border-gray-100 p-4 sm:p-6">
       <h4 class="text-sm font-bold text-gray-700 mb-4">מידע כללי</h4>
-      <div class="grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-4 sm:gap-x-8 gap-y-4">
         <div v-if="formData.project_name">
           <div class="text-xs text-gray-400 mb-1">שם פרויקט</div>
           <div class="text-sm font-medium text-gray-800">{{ formData.project_name }}</div>
@@ -70,9 +70,9 @@
     </div>
 
     <!-- Revenue -->
-    <div class="bg-white rounded-xl border border-gray-100 p-6">
+    <div class="bg-white rounded-xl border border-gray-100 p-4 sm:p-6">
       <h4 class="text-sm font-bold text-gray-700 mb-4">הכנסות</h4>
-      <div class="grid grid-cols-2 gap-x-8 gap-y-3 mb-5">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 sm:gap-x-8 gap-y-3 mb-5">
         <div>
           <div class="text-xs text-gray-400 mb-1">סך הכנסות</div>
           <div class="text-xl font-bold text-gray-800">{{ (formData.total_revenue || 0).toLocaleString('he-IL') }} ₪</div>
@@ -124,9 +124,9 @@
     </div>
 
     <!-- Expenses -->
-    <div class="bg-white rounded-xl border border-gray-100 p-6">
+    <div class="bg-white rounded-xl border border-gray-100 p-4 sm:p-6">
       <h4 class="text-sm font-bold text-gray-700 mb-4">הוצאות</h4>
-      <div class="grid grid-cols-2 gap-x-8 gap-y-3 mb-5">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 sm:gap-x-8 gap-y-3 mb-5">
         <div>
           <div class="text-xs text-gray-400 mb-1">תקציב הוצאות</div>
           <div class="text-xl font-bold text-gray-800">{{ (formData.total_budget || 0).toLocaleString('he-IL') }} ₪</div>
@@ -199,7 +199,7 @@
     </div>
 
     <!-- Attendance summary -->
-    <div v-if="formData.manpower_attendance_summary" class="bg-white rounded-xl border border-gray-100 p-6">
+    <div v-if="formData.manpower_attendance_summary" class="bg-white rounded-xl border border-gray-100 p-4 sm:p-6">
       <h4 class="text-sm font-bold text-gray-700 mb-4">נוכחות (מנוכחות)</h4>
       <div class="grid grid-cols-3 gap-4">
         <div class="bg-purple-50 rounded-lg p-4 text-center">

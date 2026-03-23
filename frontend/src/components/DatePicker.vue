@@ -14,7 +14,7 @@
         dir="ltr"
       />
       <button type="button" @click="showCalendar = !showCalendar"
-        class="absolute left-2 top-1/2 -translate-y-1/2 p-0.5 text-gray-400 hover:text-gray-600 transition">
+        class="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 text-gray-400 hover:text-gray-600 transition">
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
         </svg>
@@ -54,8 +54,10 @@
             <button v-if="day"
               type="button"
               @click="selectDay(day)"
+              :disabled="isBeforeMin(day)"
               :class="[
                 'w-full aspect-square rounded-lg text-xs transition flex items-center justify-center',
+                isBeforeMin(day) ? 'text-gray-200 cursor-not-allowed' :
                 isSelected(day) ? 'bg-emerald-700 text-white font-bold' :
                 isToday(day) ? 'bg-emerald-50 text-emerald-800 font-semibold ring-1 ring-emerald-300' :
                 day.outside ? 'text-gray-300' :
@@ -85,7 +87,8 @@ import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 const props = defineProps({
   modelValue: { type: String, default: '' },
   placeholder: { type: String, default: 'dd/mm/yyyy' },
-  inputClass: { type: String, default: '' }
+  inputClass: { type: String, default: '' },
+  minDate: { type: String, default: '' }
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -147,8 +150,9 @@ function onInput(e) {
   if (match) {
     const [, dd, mm, yyyy] = match
     const day = parseInt(dd), month = parseInt(mm), year = parseInt(yyyy)
-    if (isValidDate(day, month, year)) {
-      emit('update:modelValue', `${yyyy}-${mm}-${dd}`)
+    const dateStr = `${yyyy}-${mm}-${dd}`
+    if (isValidDate(day, month, year) && (!props.minDate || dateStr >= props.minDate)) {
+      emit('update:modelValue', dateStr)
       viewMonth.value = month - 1
       viewYear.value = year
       invalidDate.value = false
@@ -161,7 +165,14 @@ function onInput(e) {
   }
 }
 
+function isBeforeMin(day) {
+  if (!props.minDate) return false
+  const dayStr = `${day.year}-${String(day.month + 1).padStart(2, '0')}-${String(day.date).padStart(2, '0')}`
+  return dayStr < props.minDate
+}
+
 function selectDay(day) {
+  if (isBeforeMin(day)) return
   const m = String(day.month + 1).padStart(2, '0')
   const d = String(day.date).padStart(2, '0')
   const y = day.year
@@ -248,6 +259,10 @@ const calendarDays = computed(() => {
 })
 
 // Position calendar near the input
+function onScrollOrResize() {
+  if (showCalendar.value) updatePosition()
+}
+
 watch(showCalendar, async (val) => {
   if (val) {
     // Set view to current value or today
@@ -260,17 +275,45 @@ watch(showCalendar, async (val) => {
     }
     await nextTick()
     updatePosition()
+    window.addEventListener('scroll', onScrollOrResize, true)
+    window.addEventListener('resize', onScrollOrResize)
+  } else {
+    window.removeEventListener('scroll', onScrollOrResize, true)
+    window.removeEventListener('resize', onScrollOrResize)
   }
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', onScrollOrResize, true)
+  window.removeEventListener('resize', onScrollOrResize)
 })
 
 function updatePosition() {
   if (!wrapper.value) return
   const rect = wrapper.value.getBoundingClientRect()
+  const calHeight = 340
+  const calWidth = 280
   const spaceBelow = window.innerHeight - rect.bottom
-  const top = spaceBelow > 320 ? rect.bottom + 4 : rect.top - 320
+  const spaceAbove = rect.top
+
+  let top, left
+  if (spaceBelow >= calHeight) {
+    top = rect.bottom + 6
+  } else if (spaceAbove >= calHeight) {
+    top = rect.top - calHeight - 6
+  } else {
+    top = Math.max(8, (window.innerHeight - calHeight) / 2)
+  }
+
+  left = rect.left
+  if (left + calWidth > window.innerWidth - 8) {
+    left = window.innerWidth - calWidth - 8
+  }
+  if (left < 8) left = 8
+
   calendarPosition.value = {
-    top: Math.max(4, top) + 'px',
-    left: Math.min(rect.left, window.innerWidth - 290) + 'px'
+    top: top + 'px',
+    left: left + 'px'
   }
 }
 </script>

@@ -5,7 +5,7 @@
       <div class="absolute inset-0 bg-black/40" @click="$emit('close')"></div>
 
       <!-- Modal -->
-      <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
+      <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-2 sm:mx-4 overflow-hidden">
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <div>
@@ -25,7 +25,7 @@
           <!-- Type -->
           <div>
             <label class="block text-xs font-medium text-gray-600 mb-2">סוג דיווח</label>
-            <div class="grid grid-cols-4 gap-2">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
               <button v-for="t in types" :key="t.id" @click="form.type = t.id"
                 :class="[
                   'px-3 py-2.5 rounded-xl text-xs font-medium border transition-all text-center',

@@ -5,14 +5,14 @@
 
     <template v-if="data">
       <!-- Hero KPI -->
-      <div class="bg-white rounded-xl p-8 mb-8">
+      <div class="bg-white rounded-xl p-4 sm:p-8 mb-8">
         <div class="mb-6">
           <div class="text-xs text-gray-400 mb-1">הכנסה כוללת</div>
-          <div class="text-5xl font-extrabold tracking-tight text-gray-900">{{ fmt(data.total_revenue) }}</div>
+          <div class="text-3xl sm:text-5xl font-extrabold tracking-tight text-gray-900">{{ fmt(data.total_revenue) }}</div>
           <div class="text-xs text-gray-400 mt-1">אלפי ש"ח — שנתי</div>
         </div>
 
-        <div class="flex items-baseline gap-10 flex-wrap">
+        <div class="grid grid-cols-2 sm:flex sm:items-baseline gap-4 sm:gap-10 flex-wrap">
           <div>
             <div class="text-xs text-gray-400 mb-0.5">הוצאות</div>
             <div class="text-xl font-semibold text-gray-900">{{ fmt(data.total_expenses) }}</div>
@@ -44,7 +44,7 @@
       </div>
 
       <!-- Chart Section -->
-      <div class="bg-white rounded-xl p-8 mb-8">
+      <div class="bg-white rounded-xl p-4 sm:p-8 mb-8">
         <div class="flex items-center justify-between mb-6">
           <span class="section-label">תזרים כספי</span>
           <div class="flex items-center gap-1">
@@ -65,29 +65,30 @@
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Project Table -->
         <div class="lg:col-span-2 bg-white rounded-xl overflow-hidden">
-          <div class="px-8 pt-6 pb-4">
+          <div class="px-3 sm:px-8 pt-6 pb-4">
             <span class="section-label">פרויקטים</span>
           </div>
-          <table class="w-full text-sm">
+          <div class="overflow-x-auto">
+          <table class="w-full text-sm min-w-[600px]">
             <thead>
               <tr>
-                <th class="px-8 pb-3 text-right text-xs uppercase tracking-wide text-gray-400 font-medium">פרויקט</th>
-                <th class="px-4 pb-3 text-right text-xs uppercase tracking-wide text-gray-400 font-medium">מנהל</th>
+                <th class="px-3 sm:px-8 pb-3 text-right text-xs uppercase tracking-wide text-gray-400 font-medium">פרויקט</th>
+                <th class="hidden sm:table-cell px-4 pb-3 text-right text-xs uppercase tracking-wide text-gray-400 font-medium">מנהל</th>
                 <th class="px-4 pb-3 text-right text-xs uppercase tracking-wide text-gray-400 font-medium">הכנסות</th>
                 <th class="px-4 pb-3 text-right text-xs uppercase tracking-wide text-gray-400 font-medium">הוצאות</th>
                 <th class="px-4 pb-3 text-right text-xs uppercase tracking-wide text-gray-400 font-medium">רווח</th>
                 <th class="px-4 pb-3 text-right text-xs uppercase tracking-wide text-gray-400 font-medium">מרווח</th>
-                <th class="px-8 pb-3 text-right text-xs uppercase tracking-wide text-gray-400 font-medium w-28">יחס</th>
+                <th class="hidden sm:table-cell px-3 sm:px-8 pb-3 text-right text-xs uppercase tracking-wide text-gray-400 font-medium w-28">יחס</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(summary, name) in data.project_summaries" :key="name"
                 class="border-t border-gray-100 hover:bg-gray-50/60 transition-colors">
-                <td class="px-8 py-4">
+                <td class="px-3 sm:px-8 py-4">
                   <div class="font-medium text-gray-800">{{ name }}</div>
                   <div class="text-xs text-gray-400 font-mono">{{ priorityIds[name] }}</div>
                 </td>
-                <td class="px-4 py-4 text-gray-500 text-xs">{{ managers[name] || '-' }}</td>
+                <td class="hidden sm:table-cell px-4 py-4 text-gray-500 text-xs">{{ managers[name] || '-' }}</td>
                 <td class="px-4 py-4 text-gray-700">{{ fmt(summary.total_revenue) }}</td>
                 <td class="px-4 py-4 text-gray-700">{{ fmt(summary.total_op_expenses + summary.total_salary_expenses) }}</td>
                 <td class="px-4 py-4 font-semibold" :class="summary.total_operating_profit >= 0 ? 'text-gray-900' : 'text-red-500'">
@@ -100,7 +101,7 @@
                   </span>
                   <span v-else class="text-gray-300">-</span>
                 </td>
-                <td class="px-8 py-4">
+                <td class="hidden sm:table-cell px-3 sm:px-8 py-4">
                   <div class="flex h-[2px] rounded-full overflow-hidden bg-gray-200">
                     <div class="bg-emerald-600 transition-all" :style="{ width: getRevenueRatio(summary) + '%' }"></div>
                     <div class="bg-gray-400 transition-all" :style="{ width: getExpenseRatio(summary) + '%' }"></div>
@@ -109,12 +110,13 @@
               </tr>
             </tbody>
           </table>
+          </div>
         </div>
 
         <!-- Sidebar -->
         <div class="space-y-8">
           <!-- Financial Health -->
-          <div class="bg-white rounded-xl p-6">
+          <div class="bg-white rounded-xl p-4 sm:p-6">
             <span class="section-label">בריאות פיננסית</span>
             <div class="mt-5 space-y-5">
               <div>
@@ -164,7 +166,7 @@
           </div>
 
           <!-- Expense Breakdown -->
-          <div class="bg-white rounded-xl p-6">
+          <div class="bg-white rounded-xl p-4 sm:p-6">
             <span class="section-label">פילוח הוצאות</span>
             <div class="mt-5">
               <ExpenseBreakdown :summary="totalSummary" />
