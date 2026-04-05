@@ -1,88 +1,105 @@
 <template>
   <Teleport to="body">
-    <div v-if="show" class="fixed inset-0 z-[80] flex items-center justify-center" dir="rtl">
-      <div class="absolute inset-0 bg-black/40" @click="$emit('close')"></div>
-      <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+    <div v-if="show" class="ui-modal-layer" dir="rtl">
+      <div class="ui-modal-backdrop" @click="$emit('close')"></div>
+      <div class="ui-modal-card ed-fade-up" style="max-width: 36rem;">
         <!-- Header -->
-        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h2 class="text-lg font-bold text-gray-800">פרטי משתמש</h2>
-          <button @click="$emit('close')" class="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-          </button>
-        </div>
+        <header class="px-7 pt-6 pb-4">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <div class="ed-eyebrow mb-1">פרופיל אישי</div>
+              <h2 class="font-sans font-semibold text-ink leading-none" style="font-size: clamp(1.75rem, 3vw, 2.25rem);">פרטי משתמש</h2>
+            </div>
+            <button @click="$emit('close')" class="text-ink-muted hover:text-accent transition-colors" aria-label="סגור">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="square" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          <hr class="ed-rule mt-4" />
+        </header>
 
         <!-- Content -->
-        <div class="px-6 py-5 space-y-6">
+        <div class="flex-1 overflow-y-auto px-7 py-5 space-y-8">
           <!-- Avatar -->
           <div class="flex flex-col items-center gap-3">
             <div class="relative group cursor-pointer" @click="$refs.avatarInput.click()">
-              <div class="w-24 h-24 rounded-full bg-emerald-100 flex items-center justify-center overflow-hidden border-4 border-white shadow-lg">
-                <img v-if="form.avatar" :src="form.avatar" class="w-full h-full object-cover" />
-                <span v-else class="text-emerald-800 font-bold text-2xl">{{ initials }}</span>
+              <div class="w-28 h-28 bg-paper-light border border-rule-strong flex items-center justify-center overflow-hidden">
+                <img v-if="form.avatar" :src="form.avatar" class="w-full h-full object-cover" alt="" />
+                <span v-else class="font-sans font-semibold text-3xl text-ink">{{ initials }}</span>
               </div>
-              <div class="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              <div class="absolute inset-0 bg-ink/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                <span class="font-sans text-paper text-sm">שינוי תמונה</span>
               </div>
             </div>
             <input ref="avatarInput" type="file" accept="image/*" class="hidden" @change="onAvatarChange" />
-            <span class="text-xs text-gray-400">לחץ לשינוי תמונה</span>
+            <span class="ed-eyebrow">לחץ לשינוי תמונה</span>
           </div>
 
           <!-- Fields -->
-          <div class="space-y-4">
+          <div class="space-y-6">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1.5">שם משתמש</label>
-              <input :value="form.username" disabled class="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-500 cursor-not-allowed" />
+              <label class="ed-label">שם משתמש</label>
+              <input :value="form.username" disabled class="ed-input" style="color: var(--ink-faint); border-bottom-style: dashed;" />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1.5">שם מלא</label>
-              <input v-model="form.full_name" type="text" placeholder="השם המלא שלך" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300 transition" />
+              <label class="ed-label">שם מלא</label>
+              <input v-model="form.full_name" type="text" placeholder="השם המלא שלך" class="ed-input" />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1.5">אימייל</label>
-              <input v-model="form.email" type="email" placeholder="email@example.com" dir="ltr" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300 transition text-left" />
+              <label class="ed-label">אימייל</label>
+              <input v-model="form.email" type="email" placeholder="name@example.com" dir="ltr" class="ed-input" />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1.5">תפקיד</label>
-              <input v-model="form.role" type="text" placeholder="מנהל / צופה" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300 transition" />
+              <label class="ed-label">הרשאה</label>
+              <div class="font-display text-ink pt-2.5 pb-2.5 border-b border-rule-strong" style="border-bottom-style: dashed;">
+                {{ roleLabels[form.role] || form.role }}
+              </div>
+              <p class="font-sans text-ink-faint text-xs mt-1.5">שינוי הרשאה מתבצע רק דרך הגדרות מערכת</p>
             </div>
           </div>
 
           <!-- Change password -->
-          <div class="border-t border-gray-100 pt-5">
-            <button @click="showPasswordSection = !showPasswordSection" class="text-sm font-medium text-emerald-600 hover:text-emerald-700 transition">
-              {{ showPasswordSection ? 'ביטול שינוי סיסמה' : 'שינוי סיסמה' }}
+          <div class="border-t border-rule pt-6">
+            <button @click="showPasswordSection = !showPasswordSection" class="ed-link text-sm">
+              {{ showPasswordSection ? 'ביטול שינוי סיסמה ←' : 'שינוי סיסמה →' }}
             </button>
-            <div v-if="showPasswordSection" class="mt-4 space-y-3">
+            <div v-if="showPasswordSection" class="mt-5 space-y-5 ed-fade-up">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1.5">סיסמה נוכחית</label>
-                <input v-model="passwords.current" type="password" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300 transition" />
+                <label class="ed-label">סיסמה נוכחית</label>
+                <input v-model="passwords.current" type="password" class="ed-input" />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1.5">סיסמה חדשה</label>
-                <input v-model="passwords.new_password" type="password" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300 transition" />
+                <label class="ed-label">סיסמה חדשה</label>
+                <input v-model="passwords.new_password" type="password" class="ed-input" />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1.5">אישור סיסמה חדשה</label>
-                <input v-model="passwords.confirm" type="password" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300 transition" />
+                <label class="ed-label">אישור סיסמה חדשה</label>
+                <input v-model="passwords.confirm" type="password" class="ed-input" />
               </div>
-              <button @click="handleChangePassword" :disabled="saving" class="w-full py-2.5 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 disabled:opacity-50 transition">
-                שנה סיסמה
+              <button @click="handleChangePassword" :disabled="saving" class="ed-btn ed-btn-primary">
+                שנה סיסמה →
               </button>
             </div>
           </div>
 
           <!-- Messages -->
-          <div v-if="message" :class="['text-sm px-4 py-2.5 rounded-lg', messageType === 'success' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600']">{{ message }}</div>
+          <p
+            v-if="message"
+            class="font-sans text-sm"
+            :class="messageType === 'success' ? 'ed-tone-positive' : 'ed-tone-negative'"
+          >
+            {{ message }}
+          </p>
         </div>
 
         <!-- Footer -->
-        <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-3">
-          <button @click="$emit('close')" class="px-5 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition">ביטול</button>
-          <button @click="handleSave" :disabled="saving" class="px-5 py-2.5 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 disabled:opacity-50 transition">
-            {{ saving ? 'שומר...' : 'שמירה' }}
+        <footer class="px-7 py-5 border-t border-rule-strong flex justify-between gap-4">
+          <button @click="$emit('close')" class="ed-link text-sm">ביטול</button>
+          <button @click="handleSave" :disabled="saving" class="ed-btn ed-btn-primary">
+            {{ saving ? 'שומר…' : 'שמירה' }} →
           </button>
-        </div>
+        </footer>
       </div>
     </div>
   </Teleport>
@@ -90,11 +107,14 @@
 
 <script setup>
 import { ref, reactive, computed, watch } from 'vue'
-import { getProfile, updateProfile, changePassword } from '../services/api'
+import { getProfile, updateProfile } from '../services/api'
+import { auth } from '../firebase'
+import { updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth'
 
 const props = defineProps({ show: Boolean })
-const emit = defineEmits(['close'])
+defineEmits(['close'])
 
+const roleLabels = { admin: 'מנהל מערכת', economist: 'כלכלנית', viewer: 'צופה מלא', project_manager: 'מנהל פרויקט' }
 const form = reactive({ username: '', full_name: '', email: '', role: '', avatar: '' })
 const passwords = reactive({ current: '', new_password: '', confirm: '' })
 const showPasswordSection = ref(false)
@@ -145,7 +165,10 @@ async function handleChangePassword() {
   }
   saving.value = true; message.value = ''
   try {
-    await changePassword({ current_password: passwords.current, new_password: passwords.new_password })
+    const user = auth.currentUser
+    const credential = EmailAuthProvider.credential(user.email, passwords.current)
+    await reauthenticateWithCredential(user, credential)
+    await updatePassword(user, passwords.new_password)
     message.value = 'הסיסמה שונתה בהצלחה'; messageType.value = 'success'
     showPasswordSection.value = false
     passwords.current = ''; passwords.new_password = ''; passwords.confirm = ''

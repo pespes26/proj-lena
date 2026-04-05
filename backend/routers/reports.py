@@ -2,10 +2,9 @@ from datetime import datetime
 from fastapi import APIRouter, Query, HTTPException, Depends
 from pydantic import BaseModel
 from typing import Optional
-from config import PROJECTS, REPORTS_FILE
-from storage import load_json, save_json
+from storage import load_reports_firestore, save_report_firestore
 from services.unified import load_form_data
-from auth import get_current_user
+from auth import get_current_user, require_editor
 
 router = APIRouter(dependencies=[Depends(get_current_user)])
 
@@ -22,24 +21,22 @@ class ReportCreate(BaseModel):
 @router.get("/api/reports")
 def get_reports(project: str = Query(None)):
     try:
-        reports = load_json(REPORTS_FILE, [])
+        reports = load_reports_firestore()
         if project:
-            reports = [r for r in reports if r['project'] == project]
+            reports = [r for r in reports if r.get('project') == project]
         return {"reports": reports}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"שגיאה בטעינת דיווחים: {str(e)}")
 
 
-@router.post("/api/reports")
+@router.post("/api/reports", dependencies=[Depends(require_editor)])
 def create_report(report: ReportCreate):
     try:
-        all_projects = list(PROJECTS.keys()) + list(load_form_data().keys())
+        all_projects = list(load_form_data().keys())
         if report.project not in all_projects:
             raise HTTPException(status_code=404, detail=f"פרויקט '{report.project}' לא נמצא")
 
-        reports = load_json(REPORTS_FILE, [])
         new_report = {
-            "id": len(reports) + 1,
             "project": report.project,
             "month": report.month,
             "type": report.type,
@@ -48,8 +45,7 @@ def create_report(report: ReportCreate):
             "description": report.description,
             "created_at": datetime.now().isoformat(),
         }
-        reports.append(new_report)
-        save_json(REPORTS_FILE, reports)
+        save_report_firestore(new_report)
         return {"report": new_report, "message": "הדיווח נשמר בהצלחה"}
     except HTTPException:
         raise

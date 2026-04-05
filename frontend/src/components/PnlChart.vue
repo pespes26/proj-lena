@@ -39,7 +39,7 @@ const chartData = computed(() => ({
       label: 'הוצאות תפעול',
       data: props.data.map(m => m.op_expenses),
       borderColor: COLORS.amber,
-      backgroundColor: isArea.value ? COLORS.amberLight : 'rgba(251,191,36,0.06)',
+      backgroundColor: isArea.value ? COLORS.amberLight : 'rgba(166,124,0,0.06)',
       tension: 0.4,
       fill: isArea.value,
       pointBackgroundColor: COLORS.amber,

@@ -1,17 +1,17 @@
 <template>
-  <div class="flex items-center gap-6">
+  <div class="flex items-center gap-8 flex-wrap">
     <div class="w-48 h-48 flex-shrink-0">
       <Doughnut :data="chartData" :options="chartOptions" />
     </div>
-    <div class="flex-1 space-y-3">
-      <div v-for="(item, i) in items" :key="i" class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <span class="w-3 h-3 rounded-full" :style="{ backgroundColor: item.color }"></span>
-          <span class="text-sm text-gray-600">{{ item.label }}</span>
+    <div class="flex-1 min-w-[180px] border-t border-rule">
+      <div v-for="(item, i) in items" :key="i" class="flex items-baseline justify-between py-3 border-b border-rule gap-4">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <span class="w-2 h-2 flex-shrink-0" :style="{ backgroundColor: item.color }"></span>
+          <span class="font-sans text-sm text-ink truncate">{{ item.label }}</span>
         </div>
-        <div class="text-left">
-          <span class="text-sm font-bold text-gray-800">{{ fmt(item.value) }}</span>
-          <span class="text-xs text-gray-400 mr-1">{{ item.percent }}%</span>
+        <div class="flex items-baseline gap-2 flex-shrink-0">
+          <bdi class="font-sans font-semibold text-ink ed-num">{{ fmt(item.value) }}</bdi>
+          <span class="ed-eyebrow ed-num" style="font-size: 0.625rem;">{{ item.percent }}%</span>
         </div>
       </div>
     </div>
@@ -45,9 +45,9 @@ const chartData = computed(() => ({
   datasets: [{
     data: items.value.map(i => i.value),
     backgroundColor: items.value.map(i => i.color),
-    borderWidth: 0,
-    cutout: '70%',
-    borderRadius: 4,
+    borderWidth: 2,
+    borderColor: COLORS.paperLight,
+    cutout: '64%',
   }],
 }))
 

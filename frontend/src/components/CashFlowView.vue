@@ -1,160 +1,166 @@
 <template>
   <div>
-    <div class="flex items-center justify-between mb-6">
-      <div>
-        <h2 class="text-2xl font-bold text-gray-900">תזרים מזומנים</h2>
-        <p class="text-sm text-gray-400 mt-1">סקירת תזרים כלל הפרויקטים</p>
-      </div>
-    </div>
+    <SectionHeader
+      eyebrow="תזרים"
+      :kicker="dateLabel"
+      title="תזרים מזומנים"
+      subtitle="סקירת תזרים מאוחדת של כלל פרויקטי הקבוצה · כניסות, יציאות, ויתרה מצטברת"
+    />
 
-    <div v-if="error" class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl mb-6 text-sm">{{ error }}</div>
-    <div v-if="loading" class="text-center py-20 text-gray-400">טוען נתונים...</div>
+    <p v-if="error" class="font-sans ed-tone-negative mb-6">{{ error }}</p>
+    <div v-if="loading" class="font-sans text-ink-muted py-20 text-center">טוען נתונים…</div>
 
     <template v-if="cfData">
-      <!-- KPI Cards -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
-        <div class="ios-card p-4 sm:p-6">
-          <div class="text-sm text-gray-500 font-medium mb-2">סך הכנסות תקופתי</div>
-          <div class="text-xl sm:text-3xl font-bold text-gray-900">{{ fmt(totalRevenue) }}</div>
+      <!-- KPI strip -->
+      <section class="ed-section ed-fade-up">
+        <div class="flex flex-wrap gap-y-8 ed-col-rule">
+          <div class="flex-1" style="min-width: 180px;">
+            <HeroNumber label="סך הכנסות" :value="totalRevenue" prefix="₪" size="md" />
+          </div>
+          <div class="flex-1" style="min-width: 180px;">
+            <HeroNumber label="סך הוצאות" :value="totalExpenses" prefix="₪" size="md" />
+          </div>
+          <div class="flex-1" style="min-width: 180px;">
+            <HeroNumber
+              label="נטו תקופתי"
+              :value="totalNet"
+              prefix="₪"
+              :tone="totalNet >= 0 ? 'positive' : 'negative'"
+              size="md"
+            />
+          </div>
+          <div class="flex-1" style="min-width: 180px;">
+            <HeroNumber
+              label="יתרה מצטברת"
+              :value="lastCumulative"
+              prefix="₪"
+              :tone="lastCumulative >= 0 ? 'positive' : 'negative'"
+              size="md"
+            />
+          </div>
         </div>
-        <div class="ios-card p-4 sm:p-6">
-          <div class="text-sm text-gray-500 font-medium mb-2">סך הוצאות תקופתי</div>
-          <div class="text-xl sm:text-3xl font-bold text-gray-900">{{ fmt(totalExpenses) }}</div>
-        </div>
-        <div class="ios-card p-4 sm:p-6">
-          <div class="text-sm text-gray-500 font-medium mb-2">נטו תקופתי</div>
-          <div class="text-xl sm:text-3xl font-bold" :class="totalNet >= 0 ? 'text-green-600' : 'text-red-500'">{{ fmt(totalNet) }}</div>
-        </div>
-        <div class="ios-card p-4 sm:p-6">
-          <div class="text-sm text-gray-500 font-medium mb-2">יתרה מצטברת</div>
-          <div class="text-xl sm:text-3xl font-bold" :class="lastCumulative >= 0 ? 'text-green-600' : 'text-red-500'">{{ fmt(lastCumulative) }}</div>
-        </div>
-      </div>
+      </section>
 
-      <!-- Row 1: Main chart + view toggle -->
-      <div class="ios-card p-6 mb-6">
-        <div class="flex items-center justify-between mb-5">
-          <h3 class="text-lg font-bold text-gray-900">תזרים מזומנים</h3>
-          <div class="flex flex-wrap bg-gray-100 rounded-xl p-1 gap-0.5">
-            <button v-for="v in views" :key="v.id"
+      <!-- Main chart -->
+      <RuledSection
+        eyebrow="תזרים"
+        title="התנהגות תזרים לאורך הזמן"
+      >
+        <template #actions>
+          <div class="flex gap-4">
+            <button
+              v-for="v in views"
+              :key="v.id"
               @click="activeView = v.id"
-              :class="['px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
-                activeView === v.id ? 'bg-white shadow-sm text-gray-700' : 'text-gray-500 hover:text-gray-600']">
+              class="ed-link text-sm"
+              :class="{ 'is-active': activeView === v.id }"
+            >
               {{ v.label }}
             </button>
           </div>
+        </template>
+        <div class="ui-chart-container ui-chart-container--md">
+          <CashFlowChart v-if="activeView === 'cumulative'" :data="cfData" />
+          <RevenueExpenseChart v-else-if="activeView === 'revexp'" :data="cfData" />
+          <MonthlyNetChart v-else-if="activeView === 'monthly'" :data="cfData" />
         </div>
+        <template #footnote>
+          <FootnoteSource label="מקור:" text="הנהלת חשבונות FM" :updated="updatedLabel" />
+        </template>
+      </RuledSection>
 
-        <!-- Cumulative area chart -->
-        <CashFlowChart v-if="activeView === 'cumulative'" :data="cfData" />
-
-        <!-- Revenue vs Expenses bars -->
-        <RevenueExpenseChart v-else-if="activeView === 'revexp'" :data="cfData" />
-
-        <!-- Monthly net waterfall -->
-        <MonthlyNetChart v-else-if="activeView === 'monthly'" :data="cfData" />
-      </div>
-
-      <!-- Row 2: Per-project comparison + breakdown -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
-        <!-- Per-project stacked bar -->
-        <div class="ios-card p-6">
-          <h3 class="text-lg font-bold text-gray-900 mb-4">השוואת פרויקטים — נטו</h3>
+      <!-- Per-project comparison (full-width chart) -->
+      <RuledSection eyebrow="השוואה חודשית" title="נטו לפי פרויקט">
+        <div class="ui-chart-container ui-chart-container--lg">
           <ProjectNetChart :data="cfData" />
         </div>
+      </RuledSection>
 
-        <!-- Per-project totals cards -->
-        <div class="ios-card p-6">
-          <h3 class="text-lg font-bold text-gray-900 mb-4">סיכום לפי פרויקט</h3>
-          <div class="space-y-3">
-            <div v-for="(months, pname) in cfData.projects" :key="pname"
-              class="bg-gray-50 rounded-xl p-4">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-sm font-medium text-gray-700">{{ pname }}</span>
-                <span class="text-sm font-bold"
-                  :class="projectTotal(months) >= 0 ? 'text-green-600' : 'text-red-500'">
-                  {{ fmt(projectTotal(months)) }}
-                </span>
-              </div>
-              <div class="flex h-2 rounded-full overflow-hidden bg-gray-200">
-                <div class="bg-emerald-500 transition-all"
-                  :style="{ width: projectRevenuePercent(months) + '%' }"></div>
-                <div class="bg-amber-400 transition-all"
-                  :style="{ width: projectExpensePercent(months) + '%' }"></div>
-              </div>
-              <div class="flex justify-between mt-1.5 text-[10px] text-gray-400">
-                <span>הכנסה: {{ fmt(projectRevSum(months)) }}</span>
-                <span>הוצאה: {{ fmt(projectExpSum(months)) }}</span>
-              </div>
+      <!-- Per-project breakdown (3-col card grid) -->
+      <RuledSection eyebrow="סיכום" title="סה״כ לפי פרויקט">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div
+            v-for="(months, pname) in cfData.projects"
+            :key="pname"
+            class="ui-mini-card"
+          >
+            <div class="flex items-baseline justify-between gap-3 mb-3">
+              <span class="font-sans font-semibold text-ink text-sm tracking-tight truncate">{{ pname }}</span>
+              <span
+                class="font-sans font-semibold text-base ed-num flex-shrink-0"
+                :class="projectTotal(months) >= 0 ? 'text-positive' : 'text-negative'"
+              >
+                <bdi>{{ fmt(projectTotal(months)) }}</bdi>
+              </span>
+            </div>
+            <div class="flex h-1.5 overflow-hidden bg-slate-100 rounded-full">
+              <div class="bg-accent transition-all" :style="{ width: projectRevenuePercent(months) + '%' }"></div>
+              <div class="bg-warning transition-all" :style="{ width: projectExpensePercent(months) + '%' }"></div>
+            </div>
+            <div class="flex justify-between mt-2 text-[11px] font-medium text-ink-muted">
+              <span>הכנסה <bdi class="ed-num font-semibold">{{ fmt(projectRevSum(months)) }}</bdi></span>
+              <span>הוצאה <bdi class="ed-num font-semibold">{{ fmt(projectExpSum(months)) }}</bdi></span>
             </div>
           </div>
         </div>
-      </div>
+      </RuledSection>
 
-      <!-- Row 3: Tables -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <!-- Monthly + Cumulative table -->
-        <div class="ios-card overflow-hidden">
-          <div class="px-6 py-4 border-b border-gray-100">
-            <h3 class="text-lg font-bold text-gray-900">תזרים חודשי ומצטבר</h3>
-          </div>
-          <div class="overflow-x-auto overflow-y-auto max-h-[400px]">
-            <table class="w-full min-w-[500px] text-sm">
-              <thead class="sticky top-0 bg-gray-50">
+      <!-- Tables -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 mt-2">
+        <RuledSection eyebrow="חודשי ומצטבר" title="פירוט חודשי">
+          <div class="max-h-[420px] overflow-y-auto">
+            <table class="ed-table">
+              <thead>
                 <tr>
-                  <th class="px-4 py-3 text-right font-medium text-gray-500">חודש</th>
-                  <th class="px-4 py-3 text-right font-medium text-gray-500">הכנסה</th>
-                  <th class="px-4 py-3 text-right font-medium text-gray-500">הוצאה</th>
-                  <th class="px-4 py-3 text-right font-medium text-gray-500">נטו</th>
-                  <th class="px-4 py-3 text-right font-medium text-gray-500">מצטבר</th>
+                  <th>חודש</th>
+                  <th class="num">הכנסה</th>
+                  <th class="num">הוצאה</th>
+                  <th class="num">נטו</th>
+                  <th class="num">מצטבר</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(m, i) in cfData.monthly_net" :key="i"
-                  class="border-t border-gray-50 hover:bg-gray-50/50 transition-colors">
-                  <td class="px-4 py-2.5 font-medium text-gray-700">{{ m.month }}</td>
-                  <td class="px-4 py-2.5 text-gray-600">{{ fmt(cfData.totals[i]?.revenue) }}</td>
-                  <td class="px-4 py-2.5 text-gray-600">{{ fmt(cfData.totals[i]?.expenses) }}</td>
-                  <td class="px-4 py-2.5 font-semibold" :class="m.value >= 0 ? 'text-green-600' : 'text-red-500'">
-                    {{ fmt(m.value) }}
+                <tr v-for="(m, i) in cfData.monthly_net" :key="i">
+                  <td>{{ m.month }}</td>
+                  <td class="num"><bdi class="ed-num">{{ fmt(cfData.totals[i]?.revenue) }}</bdi></td>
+                  <td class="num"><bdi class="ed-num">{{ fmt(cfData.totals[i]?.expenses) }}</bdi></td>
+                  <td class="num" :class="m.value >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'">
+                    <bdi class="ed-num">{{ fmt(m.value) }}</bdi>
                   </td>
-                  <td class="px-4 py-2.5 font-semibold" :class="cfData.cumulative[i].value >= 0 ? 'text-green-600' : 'text-red-500'">
-                    {{ fmt(cfData.cumulative[i].value) }}
+                  <td class="num" :class="cfData.cumulative[i].value >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'">
+                    <bdi class="ed-num">{{ fmt(cfData.cumulative[i].value) }}</bdi>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
-        </div>
+        </RuledSection>
 
-        <!-- Per-project detail table -->
-        <div class="ios-card overflow-hidden">
-          <div class="px-6 py-4 border-b border-gray-100">
-            <h3 class="text-lg font-bold text-gray-900">פירוט נטו לפי פרויקט</h3>
-          </div>
-          <div class="overflow-x-auto overflow-y-auto max-h-[400px]">
-            <table class="w-full min-w-[600px] text-sm whitespace-nowrap">
-              <thead class="sticky top-0 bg-gray-50">
+        <RuledSection eyebrow="מטריצת פרויקטים" title="נטו לפי פרויקט">
+          <div class="max-h-[420px] overflow-auto">
+            <table class="ed-table" style="min-width: 600px;">
+              <thead>
                 <tr>
-                  <th class="px-3 py-3 text-right font-medium text-gray-500 sticky right-0 bg-gray-50 z-10">חודש</th>
-                  <th v-for="pname in Object.keys(cfData.projects)" :key="pname"
-                    class="px-3 py-3 text-right font-medium text-gray-500">{{ pname }}</th>
+                  <th>חודש</th>
+                  <th v-for="pname in Object.keys(cfData.projects)" :key="pname" class="num">{{ pname }}</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(label, i) in cfData.month_labels" :key="label"
-                  class="border-t border-gray-50 hover:bg-gray-50/50 transition-colors">
-                  <td class="px-3 py-2.5 font-medium text-gray-700 sticky right-0 bg-white z-10">{{ label }}</td>
-                  <td v-for="pname in Object.keys(cfData.projects)" :key="pname"
-                    class="px-3 py-2.5 font-medium"
-                    :class="cfData.projects[pname][i].profit >= 0 ? 'text-green-600' : 'text-red-500'">
-                    {{ fmt(cfData.projects[pname][i].profit) }}
+                <tr v-for="(label, i) in cfData.month_labels" :key="label">
+                  <td>{{ label }}</td>
+                  <td
+                    v-for="pname in Object.keys(cfData.projects)"
+                    :key="pname"
+                    class="num"
+                    :class="cfData.projects[pname][i].profit >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'"
+                  >
+                    <bdi class="ed-num">{{ fmt(cfData.projects[pname][i].profit) }}</bdi>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
-        </div>
+        </RuledSection>
       </div>
     </template>
   </div>
@@ -167,6 +173,7 @@ import CashFlowChart from './CashFlowChart.vue'
 import RevenueExpenseChart from './RevenueExpenseChart.vue'
 import MonthlyNetChart from './MonthlyNetChart.vue'
 import ProjectNetChart from './ProjectNetChart.vue'
+import { SectionHeader, RuledSection, HeroNumber, FootnoteSource, currentHebrewDate } from './editorial'
 
 const cfData = ref(null)
 const loading = ref(true)
@@ -174,9 +181,15 @@ const error = ref(null)
 const fmt = formatNumber
 const activeView = ref('cumulative')
 
+const dateLabel = computed(() => currentHebrewDate())
+const updatedLabel = computed(() => {
+  const d = new Date()
+  return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`
+})
+
 const views = [
   { id: 'cumulative', label: 'מצטבר' },
-  { id: 'revexp', label: 'הכנסות/הוצאות' },
+  { id: 'revexp', label: 'הכנסות / הוצאות' },
   { id: 'monthly', label: 'נטו חודשי' },
 ]
 

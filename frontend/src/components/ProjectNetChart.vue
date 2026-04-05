@@ -1,18 +1,32 @@
 <template>
-  <Bar :data="chartData" :options="chartOptions" style="max-height: 280px;" />
+  <Bar :data="chartData" :options="chartOptions" style="height: 380px;" />
 </template>
 
 <script setup>
 import { computed } from 'vue'
 import { Bar } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js'
-import { tooltipConfig, axisConfig, legendConfig, COLORS, hebrewLabelCallback } from '../utils/chartDefaults'
+import { tooltipConfig, axisConfig, legendConfig, hebrewLabelCallback } from '../utils/chartDefaults'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend)
 
 const props = defineProps({ data: Object })
 
-const chartColors = [COLORS.primary, COLORS.green, COLORS.cyan, COLORS.purple]
+// Distinct 12-color palette — each project gets its own hue
+const PROJECT_PALETTE = [
+  '#059669', // emerald-600
+  '#2563eb', // blue-600
+  '#d97706', // amber-600
+  '#7c3aed', // violet-600
+  '#0891b2', // cyan-600
+  '#e11d48', // rose-600
+  '#0f172a', // slate-900
+  '#ea580c', // orange-600
+  '#4f46e5', // indigo-600
+  '#65a30d', // lime-600
+  '#db2777', // pink-600
+  '#0d9488', // teal-600
+]
 
 const chartData = computed(() => {
   const pnames = Object.keys(props.data.projects)
@@ -21,9 +35,14 @@ const chartData = computed(() => {
     datasets: pnames.map((name, idx) => ({
       label: name,
       data: props.data.projects[name].map(m => m.profit),
-      backgroundColor: chartColors[idx % chartColors.length] + 'cc',
-      borderRadius: 4,
-      barPercentage: 0.8,
+      backgroundColor: PROJECT_PALETTE[idx % PROJECT_PALETTE.length],
+      hoverBackgroundColor: PROJECT_PALETTE[idx % PROJECT_PALETTE.length],
+      borderColor: '#ffffff',
+      borderWidth: 1.5,
+      borderRadius: 3,
+      borderSkipped: false,
+      barPercentage: 0.82,
+      categoryPercentage: 0.78,
       stack: 'combined',
     })),
   }
@@ -32,15 +51,32 @@ const chartData = computed(() => {
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
+  interaction: { mode: 'index', intersect: false },
   plugins: {
-    legend: { ...legendConfig, labels: { ...legendConfig.labels, font: { size: 10 }, pointStyle: 'rectRounded', padding: 12 } },
+    legend: {
+      ...legendConfig,
+      position: 'bottom',
+      align: 'center',
+      labels: {
+        ...legendConfig.labels,
+        font: { family: legendConfig.labels.font.family, size: 11, weight: '500' },
+        pointStyle: 'rectRounded',
+        padding: 14,
+        boxWidth: 10,
+        boxHeight: 10,
+      },
+    },
     tooltip: {
       ...tooltipConfig,
       callbacks: { label: hebrewLabelCallback() },
     },
   },
   scales: {
-    x: { ...axisConfig.x, stacked: true, ticks: { ...axisConfig.x.ticks, font: { size: 9 }, maxRotation: 45 } },
+    x: {
+      ...axisConfig.x,
+      stacked: true,
+      ticks: { ...axisConfig.x.ticks, font: { family: axisConfig.x.ticks.font.family, size: 11, weight: '500' }, maxRotation: 0 },
+    },
     y: { ...axisConfig.y, stacked: true },
   },
 }

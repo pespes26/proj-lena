@@ -3,7 +3,7 @@ from datetime import datetime
 from fastapi import APIRouter, Query, HTTPException, UploadFile, File, Depends
 from config import CONTRACTS_DIR
 from services.unified import load_form_data, save_form_data, import_excel_to_form
-from auth import get_current_user
+from auth import get_current_user, require_editor, check_project_owner
 
 router = APIRouter(dependencies=[Depends(get_current_user)])
 
@@ -17,7 +17,7 @@ def get_project_form(project: str):
         raise HTTPException(status_code=500, detail=f"שגיאה בטעינת נתוני פרויקט: {str(e)}")
 
 
-@router.post("/api/project-form/{project}")
+@router.post("/api/project-form/{project}", dependencies=[Depends(require_editor)])
 def save_project_form(project: str, form_data: dict):
     try:
         all_data = load_form_data()
@@ -33,7 +33,7 @@ def save_project_form(project: str, form_data: dict):
         raise HTTPException(status_code=500, detail=f"שגיאה בשמירת נתוני פרויקט: {str(e)}")
 
 
-@router.post("/api/project-form/{project}/upload-contract")
+@router.post("/api/project-form/{project}/upload-contract", dependencies=[Depends(require_editor)])
 async def upload_contract(project: str, sub_index: int = Query(...), file: UploadFile = File(...)):
     try:
         contracts_dir = os.path.join(CONTRACTS_DIR, project)
@@ -56,7 +56,9 @@ async def upload_contract(project: str, sub_index: int = Query(...), file: Uploa
 
 
 @router.post("/api/project-form/{project}/actuals")
-def save_project_actuals(project: str, actuals_data: dict):
+def save_project_actuals(project: str, actuals_data: dict, user: dict = Depends(get_current_user)):
+    if not check_project_owner(project, user):
+        raise HTTPException(status_code=403, detail="אין הרשאה לעדכן פרויקט זה")
     try:
         all_data = load_form_data()
         if project not in all_data:
@@ -84,7 +86,7 @@ def save_project_actuals(project: str, actuals_data: dict):
         raise HTTPException(status_code=500, detail=f"שגיאה בשמירת ביצוע בפועל: {str(e)}")
 
 
-@router.post("/api/import-excel-project/{project}")
+@router.post("/api/import-excel-project/{project}", dependencies=[Depends(require_editor)])
 def import_excel_project(project: str):
     try:
         result = import_excel_to_form(project)

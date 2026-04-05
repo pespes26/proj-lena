@@ -1,16 +1,15 @@
 import datetime as dt
-from config import PROJECTS, PROJECT_META, EXPENSE_BREAKDOWN, PROJECTS_DATA_FILE
-from storage import load_json, save_json
-from services.excel_reader import load_pnl, load_cashflow
+from config import PROJECTS, PROJECT_META, EXPENSE_BREAKDOWN
+from storage import load_projects_firestore, save_all_projects_firestore, save_project_firestore
 from services.form_calculator import form_to_pnl, form_to_cashflow
 
 
 def load_form_data():
-    return load_json(PROJECTS_DATA_FILE, {})
+    return load_projects_firestore()
 
 
 def save_form_data(data):
-    save_json(PROJECTS_DATA_FILE, data)
+    save_all_projects_firestore(data)
 
 
 def load_unified_projects():
@@ -54,11 +53,28 @@ def load_unified_dashboard():
 
     margin = round((total_op_profit / total_revenue) * 100, 1) if total_revenue > 0 else None
 
+    # Cash position = final cumulative net (revenue - expenses) across all projects
+    cash_position = 0.0
     try:
-        cf = load_cashflow()
-        cash_position = cf['cumulative'][-1]['value'] if cf['cumulative'] else 0
+        form_data = load_form_data()
+        all_cashflows = []
+        max_months = 0
+        for name, fdata in form_data.items():
+            cf = form_to_cashflow(fdata)
+            pdata = cf.get('data', []) or []
+            all_cashflows.append(pdata)
+            if len(pdata) > max_months:
+                max_months = len(pdata)
+        cum = 0.0
+        for i in range(max_months):
+            month_net = 0.0
+            for pdata in all_cashflows:
+                if i < len(pdata):
+                    month_net += (pdata[i].get('revenue', 0) or 0) - (pdata[i].get('expenses', 0) or 0)
+            cum += month_net
+        cash_position = cum
     except Exception:
-        cash_position = 0
+        cash_position = 0.0
 
     return {
         'total_revenue': round(total_revenue, 2),

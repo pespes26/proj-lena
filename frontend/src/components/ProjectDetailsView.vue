@@ -1,227 +1,211 @@
 <template>
-  <div v-if="loading" class="text-center py-12 text-gray-400 text-sm">טוען פרטי פרויקט...</div>
-  <div v-else-if="!formData" class="text-center py-12">
-    <div class="text-gray-400 text-sm mb-3">לא נמצאו נתוני טופס לפרויקט זה</div>
-    <button @click="$emit('edit')" class="px-4 py-2 bg-emerald-800 text-white text-sm font-medium rounded-lg hover:bg-emerald-900 transition">
-      צור טופס פרויקט
-    </button>
+  <div v-if="loading" class="font-sans text-ink-muted text-center py-12">טוען פרטי פרויקט…</div>
+  <div v-else-if="!formData" class="ed-section text-center py-16">
+    <div class="ed-eyebrow mb-3">אין נתונים</div>
+    <p class="font-sans text-xl text-ink max-w-md mx-auto">לא נמצאו נתוני טופס לפרויקט זה.</p>
+    <button @click="$emit('edit')" class="ed-btn ed-btn-primary mt-6">צור טופס פרויקט →</button>
   </div>
-  <div v-else class="space-y-6">
-    <!-- Header with edit + export buttons -->
-    <div class="flex items-center justify-between">
-      <h3 class="text-lg font-bold text-gray-800 print-title">פרטי פרויקט — {{ project }}</h3>
-      <div class="flex flex-wrap items-center gap-2 no-print">
-        <button @click="exportPDF" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 border border-gray-200 rounded-lg hover:bg-gray-50 transition flex items-center gap-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-          </svg>
-          ייצוא PDF
-        </button>
-        <button @click="$emit('edit')" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 border border-gray-200 rounded-lg hover:bg-gray-50 transition flex items-center gap-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-          </svg>
-          ערוך טופס
-        </button>
-      </div>
-    </div>
-
-    <!-- Project Info -->
-    <div class="bg-white rounded-xl border border-gray-100 p-4 sm:p-6">
-      <h4 class="text-sm font-bold text-gray-700 mb-4">מידע כללי</h4>
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-4 sm:gap-x-8 gap-y-4">
-        <div v-if="formData.project_name">
-          <div class="text-xs text-gray-400 mb-1">שם פרויקט</div>
-          <div class="text-sm font-medium text-gray-800">{{ formData.project_name }}</div>
-        </div>
-        <div>
-          <div class="text-xs text-gray-400 mb-1">מספר Priority</div>
-          <div class="text-sm font-medium text-gray-800 font-mono">{{ formData.priority_id || '-' }}</div>
-        </div>
-        <div>
-          <div class="text-xs text-gray-400 mb-1">תאריך התחלה</div>
-          <div class="text-sm font-medium text-gray-800">{{ formData.start_date || '-' }}</div>
-        </div>
-        <div>
-          <div class="text-xs text-gray-400 mb-1">מנהל פרויקט</div>
-          <div class="text-sm font-medium text-gray-800">{{ formData.manager || '-' }}</div>
-        </div>
-        <div>
-          <div class="text-xs text-gray-400 mb-1">מזמין</div>
-          <div class="text-sm font-medium text-gray-800">{{ formData.client || '-' }}</div>
-        </div>
-        <div>
-          <div class="text-xs text-gray-400 mb-1">תחום</div>
-          <div class="text-sm font-medium text-gray-800">{{ formData.area || '-' }}</div>
-        </div>
-        <div>
-          <div class="text-xs text-gray-400 mb-1">ציר</div>
-          <div class="text-sm font-medium text-gray-800">{{ formData.axis || '-' }}</div>
-        </div>
-        <div>
-          <div class="text-xs text-gray-400 mb-1">סטטוס</div>
-          <div class="text-sm font-medium text-gray-800">{{ statusLabel }}</div>
-        </div>
-      </div>
-      <div v-if="formData.description" class="mt-4 pt-4 border-t border-gray-100">
-        <div class="text-xs text-gray-400 mb-1">תיאור</div>
-        <div class="text-sm text-gray-600">{{ formData.description }}</div>
-      </div>
-    </div>
-
-    <!-- Revenue -->
-    <div class="bg-white rounded-xl border border-gray-100 p-4 sm:p-6">
-      <h4 class="text-sm font-bold text-gray-700 mb-4">הכנסות</h4>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 sm:gap-x-8 gap-y-3 mb-5">
-        <div>
-          <div class="text-xs text-gray-400 mb-1">סך הכנסות</div>
-          <div class="text-xl font-bold text-gray-800">{{ (formData.total_revenue || 0).toLocaleString('he-IL') }} ₪</div>
-        </div>
-      </div>
-
-      <!-- Payment terms -->
-      <div v-if="formData.revenue_payment_terms?.length" class="mb-5">
-        <div class="text-xs text-gray-400 mb-2">תנאי תשלום</div>
-        <div class="flex flex-wrap gap-2">
-          <div v-for="(term, i) in formData.revenue_payment_terms" :key="i"
-            class="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg border border-gray-100 text-xs">
-            <span class="font-medium text-gray-700">{{ term.type }}</span>
-            <span class="text-gray-400">{{ term.percent }}%</span>
-            <span v-if="formData.total_revenue" class="text-gray-400">
-              · {{ Math.round(formData.total_revenue * term.percent / 100).toLocaleString('he-IL') }} ₪
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Revenue forecast -->
+  <div v-else class="space-y-2">
+    <!-- Header -->
+    <div class="flex items-center justify-between flex-wrap gap-4 mb-4">
       <div>
-        <div class="text-xs text-gray-400 mb-2">תחזית הכנסות חודשית</div>
-        <div class="bg-gray-50 rounded-xl p-4 overflow-x-auto">
-          <table class="w-full text-xs">
-            <thead>
-              <tr>
-                <th v-for="m in 12" :key="m" class="px-2 py-1.5 text-center font-medium text-gray-500">{{ m }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td v-for="m in 12" :key="m" class="px-2 py-1.5 text-center">
-                  <span :class="[forecast(m) > 0 ? 'text-emerald-700 font-medium' : 'text-gray-300']">
-                    {{ forecast(m) }}%
-                  </span>
-                </td>
-              </tr>
-              <tr v-if="formData.total_revenue">
-                <td v-for="m in 12" :key="m" class="px-2 py-1 text-center text-[10px] text-gray-400">
-                  {{ forecast(m) ? Math.round(formData.total_revenue * forecast(m) / 100).toLocaleString('he-IL') : '-' }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <div class="ed-eyebrow mb-1">פרטי פרויקט</div>
+        <h3 class="font-sans font-semibold text-ink text-2xl leading-none">{{ project }}</h3>
       </div>
+      <button @click="exportPDF" :disabled="exporting" class="ed-btn">
+        {{ exporting ? 'מייצא…' : 'ייצוא PDF' }} ↓
+      </button>
     </div>
 
-    <!-- Expenses -->
-    <div class="bg-white rounded-xl border border-gray-100 p-4 sm:p-6">
-      <h4 class="text-sm font-bold text-gray-700 mb-4">הוצאות</h4>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 sm:gap-x-8 gap-y-3 mb-5">
-        <div>
-          <div class="text-xs text-gray-400 mb-1">תקציב הוצאות</div>
-          <div class="text-xl font-bold text-gray-800">{{ (formData.total_budget || 0).toLocaleString('he-IL') }} ₪</div>
-        </div>
-        <div>
-          <div class="text-xs text-gray-400 mb-1">תנאי תשלום הוצאות</div>
-          <div class="text-sm font-medium text-gray-800">{{ formData.payment_terms_expense?.type || '-' }}</div>
+    <!-- PDF content wrapper -->
+    <div ref="pdfContent">
+
+      <!-- PDF header (visible only inside generated PDF) -->
+      <div class="pdf-header" style="display:none">
+        <div style="text-align:center; margin-bottom:24px; padding-bottom:16px; border-bottom:2px solid #0f172a;">
+          <h1 style="font-family: 'DM Sans', 'Rubik', sans-serif; font-size:26px; font-weight:700; color:#0f172a; margin:0; letter-spacing:-0.02em;">Logfi</h1>
+          <p style="font-family: 'DM Sans', 'Rubik', sans-serif; font-size:11px; color:#475569; margin:4px 0 10px; font-weight:500;">ניהול פיננסי חכם</p>
+          <h2 style="font-family: 'DM Sans', 'Rubik', sans-serif; font-size:20px; font-weight:700; color:#0f172a; margin:10px 0 4px;">{{ formData.project_name || project }}</h2>
+          <p style="font-family: 'DM Sans', 'Rubik', sans-serif; font-size:11px; color:#475569;">מספר עדיפות: {{ formData.priority_id || '—' }} · מנהל: {{ formData.manager || '—' }} · ציר: {{ formData.axis || '—' }} — {{ formData.area || '—' }}</p>
+          <p style="font-family: 'DM Sans', 'Rubik', sans-serif; font-size:10px; color:#94a3b8;">הופק בתאריך: {{ new Date().toLocaleDateString('he-IL') }}</p>
         </div>
       </div>
 
-      <!-- Subcontractors -->
-      <div v-if="formData.subcontractors?.length" class="mb-5">
-        <div class="text-xs text-gray-400 mb-2 flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-          קבלני משנה ({{ formData.subcontractors.length }})
+      <!-- Project Info -->
+      <RuledSection eyebrow="מידע כללי" title="מסמך פרויקט">
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-8 gap-y-5">
+          <div v-if="formData.project_name">
+            <div class="ed-eyebrow mb-1">שם פרויקט</div>
+            <div class="font-sans font-semibold text-ink">{{ formData.project_name }}</div>
+          </div>
+          <div>
+            <div class="ed-eyebrow mb-1">מספר עדיפות</div>
+            <div class="font-sans font-semibold text-ink ed-num"><bdi lang="en">{{ formData.priority_id || '—' }}</bdi></div>
+          </div>
+          <div>
+            <div class="ed-eyebrow mb-1">מנהל פרויקט</div>
+            <div class="font-sans font-semibold text-ink">{{ formData.manager || '—' }}</div>
+          </div>
+          <div>
+            <div class="ed-eyebrow mb-1">מזמין</div>
+            <div class="font-sans font-semibold text-ink">{{ formData.client || '—' }}</div>
+          </div>
+          <div>
+            <div class="ed-eyebrow mb-1">תאריך התחלה</div>
+            <div class="font-sans font-semibold text-ink ed-num">{{ formatDate(formData.start_date) }}</div>
+          </div>
+          <div>
+            <div class="ed-eyebrow mb-1">צפי סיום</div>
+            <div class="font-sans font-semibold text-ink ed-num">{{ formatDate(formData.expected_end_date) }}</div>
+          </div>
+          <div>
+            <div class="ed-eyebrow mb-1">ציר</div>
+            <div class="font-sans font-semibold text-ink">{{ formData.axis || '—' }}</div>
+          </div>
+          <div>
+            <div class="ed-eyebrow mb-1">תחום</div>
+            <div class="font-sans font-semibold text-ink">{{ formData.area || '—' }}</div>
+          </div>
+          <div>
+            <div class="ed-eyebrow mb-1">סטטוס</div>
+            <div class="font-sans font-semibold" :class="statusToneClass">{{ statusLabel }}</div>
+          </div>
         </div>
-        <div class="bg-gray-50 rounded-lg overflow-hidden">
-          <table class="w-full text-xs">
+        <div v-if="formData.description" class="mt-6 pt-4 border-t border-rule">
+          <div class="ed-eyebrow mb-2">תיאור</div>
+          <p class="font-sans text-ink leading-relaxed">{{ formData.description }}</p>
+        </div>
+      </RuledSection>
+
+      <!-- Revenue Summary -->
+      <RuledSection eyebrow="הכנסות" title="סיכום הכנסות">
+        <HeroNumber
+          :label="'סך הכנסות (₪)'"
+          :value="formData.total_revenue || 0"
+          prefix="₪"
+          size="lg"
+        />
+        <div v-if="formData.revenue_payment_terms?.length" class="mt-8">
+          <div class="ed-eyebrow mb-3">תנאי תשלום הכנסה</div>
+          <table class="ed-table">
             <thead>
-              <tr class="border-b border-gray-200">
-                <th class="text-right px-3 py-2 font-medium text-gray-500">שם</th>
-                <th class="text-right px-3 py-2 font-medium text-gray-500">סכום חודשי</th>
-                <th class="text-right px-3 py-2 font-medium text-gray-500">תנאי תשלום</th>
-                <th class="text-right px-3 py-2 font-medium text-gray-500">תקופה</th>
+              <tr>
+                <th>סוג</th>
+                <th class="num">אחוז</th>
+                <th class="num">סכום (₪)</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(sub, i) in formData.subcontractors" :key="i" class="border-b border-gray-100">
-                <td class="px-3 py-2 font-medium text-gray-700">{{ sub.name }}</td>
-                <td class="px-3 py-2 text-gray-600">{{ (sub.monthly_amount || 0).toLocaleString('he-IL') }} ₪</td>
-                <td class="px-3 py-2 text-gray-600">{{ sub.payment_terms || '-' }}</td>
-                <td class="px-3 py-2 text-gray-400">{{ sub.start_date || '-' }} — {{ sub.end_date || '-' }}</td>
+              <tr v-for="(term, i) in formData.revenue_payment_terms" :key="i">
+                <td class="font-sans font-semibold">{{ term.type }}</td>
+                <td class="num"><bdi class="ed-num">{{ term.percent }}%</bdi></td>
+                <td class="num"><bdi class="ed-num">{{ fmt(Math.round((formData.total_revenue || 0) * (term.percent || 0) / 100)) }}</bdi></td>
               </tr>
             </tbody>
           </table>
         </div>
-      </div>
+      </RuledSection>
 
-      <!-- Expense categories -->
-      <template v-for="cat in expenseCategories" :key="cat.key">
-        <div v-if="formData['expense_lines_' + cat.key]?.length" class="mb-5">
-          <div class="text-xs text-gray-400 mb-2 flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full" :class="cat.color"></span>
-            {{ cat.label }} ({{ formData['expense_lines_' + cat.key].length }})
-          </div>
-          <div class="bg-gray-50 rounded-lg overflow-hidden">
-            <table class="w-full text-xs">
+      <!-- Expenses Summary -->
+      <RuledSection eyebrow="הוצאות" title="סיכום הוצאות">
+        <!-- Subcontractors -->
+        <div v-if="formData.subcontractors?.length" class="mb-8">
+          <div class="ed-eyebrow mb-3">קבלני משנה · <bdi class="ed-num">{{ formData.subcontractors.length }}</bdi></div>
+          <table class="ed-table">
+            <thead>
+              <tr>
+                <th>שם</th>
+                <th class="num">סכום כולל (₪)</th>
+                <th>תנאי תשלום</th>
+                <th>תקופה</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(sub, i) in formData.subcontractors" :key="i">
+                <td class="font-sans font-semibold">{{ sub.name }}</td>
+                <td class="num"><bdi class="ed-num">{{ fmt(sub.total_amount || sub.monthly_amount || 0) }}</bdi></td>
+                <td>
+                  <template v-if="Array.isArray(sub.payment_terms)">
+                    <span v-for="(t, j) in sub.payment_terms" :key="j">{{ t.type }} {{ t.percent }}%<template v-if="j < sub.payment_terms.length - 1">, </template></span>
+                  </template>
+                  <template v-else>{{ sub.payment_terms || '—' }}</template>
+                </td>
+                <td class="text-ink-muted text-xs">{{ formatDate(sub.start_date) }} — {{ formatDate(sub.end_date) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Expense categories -->
+        <template v-for="cat in expenseCategories" :key="cat.key">
+          <div v-if="formData['expense_lines_' + cat.key]?.length" class="mb-8">
+            <div class="ed-eyebrow mb-3">{{ cat.label }} · <bdi class="ed-num">{{ formData['expense_lines_' + cat.key].length }}</bdi></div>
+            <table class="ed-table">
               <thead>
-                <tr class="border-b border-gray-200">
-                  <th class="text-right px-3 py-2 font-medium text-gray-500">שם</th>
-                  <th class="text-right px-3 py-2 font-medium text-gray-500">סכום חודשי</th>
-                  <th class="text-right px-3 py-2 font-medium text-gray-500">תקופה</th>
+                <tr>
+                  <th>שם</th>
+                  <th class="num">סכום חודשי (₪)</th>
+                  <th>תנאי תשלום</th>
+                  <th>תקופה</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(line, i) in formData['expense_lines_' + cat.key]" :key="i" class="border-b border-gray-100">
-                  <td class="px-3 py-2 font-medium text-gray-700">{{ line.name }}</td>
-                  <td class="px-3 py-2 text-gray-600">{{ (line.monthly_amount || 0).toLocaleString('he-IL') }} ₪</td>
-                  <td class="px-3 py-2 text-gray-400">
-                    <template v-if="line.start_date">{{ line.start_date }} — {{ line.end_date || '-' }}</template>
-                    <template v-else-if="line.start_month">חודש {{ line.start_month }} — {{ line.end_month }}</template>
-                    <template v-else>-</template>
+                <tr v-for="(line, i) in formData['expense_lines_' + cat.key]" :key="i">
+                  <td class="font-sans font-semibold">{{ line.name }}</td>
+                  <td class="num"><bdi class="ed-num">{{ fmt(line.monthly_amount || 0) }}</bdi></td>
+                  <td>{{ line.payment_terms || '—' }}</td>
+                  <td class="text-ink-muted text-xs">
+                    <template v-if="line.start_date">{{ formatDate(line.start_date) }} — {{ formatDate(line.end_date) }}</template>
+                    <template v-else>—</template>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
-        </div>
-      </template>
-    </div>
+        </template>
 
-    <!-- Attendance summary -->
-    <div v-if="formData.manpower_attendance_summary" class="bg-white rounded-xl border border-gray-100 p-4 sm:p-6">
-      <h4 class="text-sm font-bold text-gray-700 mb-4">נוכחות (מנוכחות)</h4>
-      <div class="grid grid-cols-3 gap-4">
-        <div class="bg-purple-50 rounded-lg p-4 text-center">
-          <div class="text-2xl font-bold text-purple-600">{{ formData.manpower_attendance_summary.total_hours?.toFixed(1) }}</div>
-          <div class="text-xs text-gray-500 mt-1">שעות</div>
+        <!-- Total expenses -->
+        <div class="mt-6 pt-4 border-t border-rule-strong">
+          <HeroNumber label='סה״כ הוצאות משוערכות' :value="totalExpenses" prefix="₪" size="md" />
         </div>
-        <div class="bg-purple-50 rounded-lg p-4 text-center">
-          <div class="text-2xl font-bold text-purple-600">{{ formData.manpower_attendance_summary.employees }}</div>
-          <div class="text-xs text-gray-500 mt-1">עובדים</div>
+      </RuledSection>
+
+      <!-- Profit Summary -->
+      <RuledSection eyebrow="רווחיות" title="סיכום רווחיות">
+        <div class="flex flex-wrap gap-y-8 ed-col-rule">
+          <div class="flex-1" style="min-width: 180px;">
+            <HeroNumber label="הכנסות" :value="formData.total_revenue || 0" prefix="₪" size="md" />
+          </div>
+          <div class="flex-1" style="min-width: 180px;">
+            <HeroNumber label="הוצאות" :value="totalExpenses" prefix="₪" size="md" tone="warning" />
+          </div>
+          <div class="flex-1" style="min-width: 180px;">
+            <HeroNumber
+              label="רווח צפוי"
+              :value="profit"
+              prefix="₪"
+              :tone="profit >= 0 ? 'positive' : 'negative'"
+              size="md"
+              :footnote="'מרווח ' + marginPercent"
+            />
+          </div>
         </div>
-        <div class="bg-purple-50 rounded-lg p-4 text-center">
-          <div class="text-2xl font-bold text-purple-600">{{ formData.manpower_attendance_summary.total_cost?.toLocaleString('he-IL') }}</div>
-          <div class="text-xs text-gray-500 mt-1">עלות ₪</div>
-        </div>
+      </RuledSection>
+
+      <!-- PDF footer -->
+      <div class="pdf-footer" style="display:none; text-align:center; margin-top:24px; padding-top:12px; border-top:1px solid #d8cfbe; font-size:10px; color:#928a7e;">
+        מסמך זה הופק ממערכת Logfi · {{ new Date().toLocaleDateString('he-IL') }} {{ new Date().toLocaleTimeString('he-IL', {hour:'2-digit', minute:'2-digit'}) }}
       </div>
-    </div>
+
+    </div><!-- /pdfContent -->
   </div>
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
-import { getProjectForm } from '../services/api'
+import { ref, computed, watch, onMounted } from 'vue'
+import { getProjectForm, formatNumber } from '../services/api'
+import html2pdf from 'html2pdf.js'
+import { RuledSection, HeroNumber } from './editorial'
 
 const props = defineProps({
   project: { type: String, required: true }
@@ -230,31 +214,75 @@ defineEmits(['edit'])
 
 const formData = ref(null)
 const loading = ref(true)
+const exporting = ref(false)
+const pdfContent = ref(null)
+const fmt = formatNumber
 
 const expenseCategories = [
-  { key: 'manpower', label: 'כוח אדם', color: 'bg-purple-400' },
-  { key: 'equipment', label: 'ציוד וכלים', color: 'bg-orange-400' },
-  { key: 'insurance', label: 'ביטוחים', color: 'bg-green-400' },
-  { key: 'consultants', label: 'מתכננים ויועצים', color: 'bg-yellow-400' },
-  { key: 'financing', label: 'הוצאות מימון', color: 'bg-red-400' },
-  { key: 'other', label: 'אחר', color: 'bg-gray-400' },
+  { key: 'manpower', label: 'כוח אדם' },
+  { key: 'equipment', label: 'ציוד וכלים' },
+  { key: 'insurance', label: 'ביטוחים' },
+  { key: 'consultants', label: 'מתכננים ויועצים' },
+  { key: 'financing', label: 'הוצאות מימון' },
+  { key: 'other', label: 'אחר' },
 ]
 
-const statusLabel = ref('-')
+const statusLabel = computed(() => {
+  const s = formData.value?.status
+  if (s === 'active') return 'פעיל'
+  if (s === 'on-hold') return 'מושהה'
+  if (s === 'completed') return 'הושלם'
+  return '—'
+})
+const statusToneClass = computed(() => {
+  const s = formData.value?.status
+  if (s === 'active') return 'ed-tone-positive'
+  if (s === 'on-hold') return 'ed-tone-warning'
+  if (s === 'completed') return 'ed-tone-muted'
+  return 'text-ink'
+})
 
-function forecast(m) {
-  return formData.value?.revenue_forecast?.[m] || formData.value?.revenue_forecast?.[String(m)] || 0
+const totalExpenses = computed(() => {
+  if (!formData.value) return 0
+  let total = 0
+  for (const sub of formData.value.subcontractors || []) {
+    total += sub.total_amount || sub.monthly_amount || 0
+  }
+  for (const cat of expenseCategories) {
+    for (const line of formData.value['expense_lines_' + cat.key] || []) {
+      const sm = parseMonth(line.start_date, 1)
+      const em = parseMonth(line.end_date, 12)
+      const months = Math.max(1, em - sm + 1)
+      total += (line.monthly_amount || 0) * months
+    }
+  }
+  return Math.round(total)
+})
+
+const profit = computed(() => (formData.value?.total_revenue || 0) - totalExpenses.value)
+const marginPercent = computed(() => {
+  const rev = formData.value?.total_revenue || 0
+  if (rev <= 0) return '—'
+  return (profit.value / rev * 100).toFixed(1) + '%'
+})
+
+function parseMonth(dateStr, def) {
+  if (!dateStr) return def
+  const parts = dateStr.split('-')
+  return parts.length >= 2 ? parseInt(parts[1]) : def
+}
+
+function formatDate(d) {
+  if (!d) return '—'
+  const parts = d.split('-')
+  if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`
+  return d
 }
 
 async function loadData() {
   loading.value = true
   try {
-    const data = await getProjectForm(props.project)
-    formData.value = data
-    if (data?.status === 'active') statusLabel.value = 'פעיל'
-    else if (data?.status === 'on-hold') statusLabel.value = 'מושהה'
-    else if (data?.status === 'completed') statusLabel.value = 'הושלם'
-    else statusLabel.value = '-'
+    formData.value = await getProjectForm(props.project)
   } catch {
     formData.value = null
   } finally {
@@ -262,8 +290,37 @@ async function loadData() {
   }
 }
 
-function exportPDF() {
-  window.print()
+async function exportPDF() {
+  if (!pdfContent.value) return
+  exporting.value = true
+
+  // Wait for fonts to be fully loaded before capture
+  try {
+    if (document.fonts && document.fonts.ready) {
+      await document.fonts.ready
+    }
+  } catch {}
+
+  const header = pdfContent.value.querySelector('.pdf-header')
+  const footer = pdfContent.value.querySelector('.pdf-footer')
+  if (header) header.style.display = 'block'
+  if (footer) footer.style.display = 'block'
+
+  try {
+    const filename = `${formData.value?.project_name || props.project}_${new Date().toISOString().slice(0,10)}.pdf`
+    await html2pdf().set({
+      margin: [10, 10, 10, 10],
+      filename,
+      image: { type: 'jpeg', quality: 0.95 },
+      html2canvas: { scale: 2, useCORS: true, scrollY: 0, backgroundColor: '#ffffff' },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+    }).from(pdfContent.value).save()
+  } finally {
+    if (header) header.style.display = 'none'
+    if (footer) footer.style.display = 'none'
+    exporting.value = false
+  }
 }
 
 onMounted(loadData)

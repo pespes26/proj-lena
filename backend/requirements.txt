@@ -3,5 +3,8 @@ uvicorn[standard]
 openpyxl
 pandas
 python-multipart
-python-jose[cryptography]
-bcrypt
+firebase-admin
+google-cloud-storage
+google-cloud-firestore
+anthropic
+google-genai

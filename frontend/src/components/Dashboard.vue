@@ -1,195 +1,231 @@
 <template>
   <div>
-    <div v-if="error" class="text-red-500 text-sm mb-6">{{ error }}</div>
-    <div v-if="loading" class="text-center py-20 text-gray-400 text-lg">טוען נתונים...</div>
+    <SectionHeader
+      eyebrow="דשבורד"
+      :kicker="dateLabel"
+      title="מבט כללי"
+      subtitle="סקירה מאוחדת של כל פרויקטי הקבוצה · הכנסות, הוצאות ורווח תפעולי"
+    />
+
+    <p v-if="error" class="font-sans ed-tone-negative mb-6">{{ error }}</p>
+    <div v-if="loading" class="font-sans text-ink-muted py-20 text-center">טוען נתונים…</div>
 
     <template v-if="data">
-      <!-- Hero KPI -->
-      <div class="bg-white rounded-xl p-4 sm:p-8 mb-8">
-        <div class="mb-6">
-          <div class="text-xs text-gray-400 mb-1">הכנסה כוללת</div>
-          <div class="text-3xl sm:text-5xl font-extrabold tracking-tight text-gray-900">{{ fmt(data.total_revenue) }}</div>
-          <div class="text-xs text-gray-400 mt-1">אלפי ש"ח — שנתי</div>
-        </div>
+      <!-- Hero KPI — massive total revenue with secondary ruled strip -->
+      <section class="ed-section ed-fade-up">
+        <HeroNumber
+          label="הכנסה שנתית כוללת"
+          :value="data.total_revenue"
+          prefix="₪"
+          size="xl"
+          footnote="אלפי ש״ח · שנתי · מאוחד מכל הפרויקטים"
+        />
 
-        <div class="grid grid-cols-2 sm:flex sm:items-baseline gap-4 sm:gap-10 flex-wrap">
-          <div>
-            <div class="text-xs text-gray-400 mb-0.5">הוצאות</div>
-            <div class="text-xl font-semibold text-gray-900">{{ fmt(data.total_expenses) }}</div>
+        <div class="mt-8 flex flex-wrap gap-y-8 ed-col-rule ed-fade-up-delay-1">
+          <div class="flex-1" style="min-width: 180px;">
+            <HeroNumber label="הוצאות" :value="data.total_expenses" prefix="₪" size="md" />
           </div>
-          <div>
-            <div class="text-xs text-gray-400 mb-0.5">רווח תפעולי</div>
-            <div class="flex items-baseline gap-2">
-              <span class="text-xl font-semibold" :class="data.total_operating_profit >= 0 ? 'text-gray-900' : 'text-red-500'">
-                {{ fmt(data.total_operating_profit) }}
-              </span>
-              <span class="text-sm font-medium" :class="data.margin >= 20 ? 'text-emerald-700' : 'text-red-500'">
-                {{ data.margin != null ? data.margin + '%' : '' }}
-              </span>
-            </div>
+          <div class="flex-1" style="min-width: 180px;">
+            <HeroNumber
+              label="רווח תפעולי"
+              :value="data.total_operating_profit"
+              prefix="₪"
+              :tone="data.total_operating_profit >= 0 ? 'positive' : 'negative'"
+              :delta="data.margin != null ? Number(data.margin) : null"
+              deltaSuffix="%"
+              size="md"
+            />
           </div>
-          <div>
-            <div class="text-xs text-gray-400 mb-0.5">מצב מזומנים</div>
-            <div class="text-xl font-semibold" :class="data.cash_position >= 0 ? 'text-gray-900' : 'text-red-500'">
-              {{ fmt(data.cash_position) }}
-            </div>
-          </div>
-          <div v-if="cfData">
-            <div class="text-xs text-gray-400 mb-0.5">תזרים מצטבר</div>
-            <div class="text-xl font-semibold text-gray-900">
-              {{ fmt(cfData.cumulative?.[cfData.cumulative.length - 1]?.value || 0) }}
-            </div>
+          <div class="flex-1" style="min-width: 180px;">
+            <HeroNumber
+              label="מצב מזומנים"
+              :value="data.cash_position"
+              prefix="₪"
+              :tone="data.cash_position >= 0 ? 'neutral' : 'negative'"
+              size="md"
+            />
           </div>
         </div>
-      </div>
+      </section>
 
-      <!-- Chart Section -->
-      <div class="bg-white rounded-xl p-4 sm:p-8 mb-8">
-        <div class="flex items-center justify-between mb-6">
-          <span class="section-label">תזרים כספי</span>
-          <div class="flex items-center gap-1">
-            <button v-for="mode in chartModes" :key="mode.id"
+      <!-- Profit by projects -->
+      <RuledSection
+        eyebrow="השוואה"
+        title="רווח לפי פרויקטים"
+        caption="לחץ על המצבים השונים לשינוי אופן הצגת הנתונים."
+      >
+        <template #actions>
+          <div class="flex gap-4">
+            <button
+              v-for="mode in chartModes"
+              :key="mode.id"
               @click="chartMode = mode.id"
-              :class="['px-3 py-1 text-xs font-medium transition-colors rounded-lg',
-                chartMode === mode.id
-                  ? 'text-gray-900 bg-gray-100'
-                  : 'text-gray-400 hover:text-gray-600']">
+              class="ed-link text-sm"
+              :class="{ 'is-active': chartMode === mode.id }"
+            >
               {{ mode.label }}
             </button>
           </div>
-        </div>
+        </template>
         <ProjectCompareChart :summaries="data.project_summaries" :mode="chartMode" />
+        <template #footnote>
+          <FootnoteSource label="מקור:" text="הנהלת חשבונות FM" :updated="updatedLabel" />
+        </template>
+      </RuledSection>
+
+      <!-- Axis split -->
+      <RuledSection
+        eyebrow="ציר"
+        title="חלוקת רווח תפעולי לפי ציר"
+        caption='סך הרווח מחולק בין שלושת הצירים: לוגי, מנרב, פיתוח עסקי.'
+      >
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-10 items-center">
+          <div class="lg:col-span-2 flex justify-center">
+            <div class="w-full max-w-xs">
+              <Doughnut :data="axisPieData" :options="doughnutOptions" />
+            </div>
+          </div>
+          <div class="lg:col-span-3 flex flex-col gap-5">
+            <div v-for="axis in axes" :key="axis" class="flex items-baseline justify-between gap-4 pb-3 border-b border-border">
+              <div>
+                <div class="font-sans font-semibold text-ink text-[15px] leading-tight">{{ axis }}</div>
+                <div class="font-sans text-ink-muted text-xs mt-0.5">{{ axisProjects(axis).length }} פרויקטים</div>
+              </div>
+              <div class="font-sans font-medium ed-num tracking-tight" :class="axisTotal(axis) >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'" style="font-size: clamp(1.375rem, 2.6vw, 1.875rem); line-height: 1;">
+                <bdi>{{ fmt(axisTotal(axis)) }}</bdi>
+              </div>
+            </div>
+          </div>
+        </div>
+      </RuledSection>
+
+      <!-- Per-axis detail (3 columns) -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-2">
+        <div v-for="axis in axes" :key="axis" class="flex flex-col gap-3">
+          <div class="border-b border-border-strong pb-4">
+            <div class="flex items-baseline justify-between mb-1">
+              <div class="font-sans font-semibold text-ink text-[15px]">{{ axis }}</div>
+              <div class="font-sans text-ink-faint text-[11px] font-medium">{{ axisProjects(axis).length }} פרויקטים</div>
+            </div>
+            <div class="font-sans font-medium ed-num tracking-tight" :class="axisTotal(axis) >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'" style="font-size: clamp(1.375rem, 2.4vw, 1.75rem); line-height: 1.05;">
+              <bdi>{{ fmt(axisTotal(axis)) }}</bdi>
+            </div>
+          </div>
+          <div v-if="axisProjects(axis).length === 0" class="font-sans text-ink-faint text-sm py-4">אין פרויקטים בציר זה</div>
+          <div
+            v-for="p in axisProjects(axis)"
+            :key="p.name"
+            class="py-3 border-b border-border"
+          >
+            <div class="flex items-baseline justify-between gap-2 mb-1.5">
+              <span class="font-sans font-semibold text-ink text-sm truncate">{{ p.name }}</span>
+              <span
+                class="font-sans font-medium ed-num tracking-tight text-[15px] flex-shrink-0"
+                :class="p.profit >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'"
+              >
+                <bdi>{{ fmt(p.profit) }}</bdi>
+              </span>
+            </div>
+            <div class="flex items-center gap-2 text-[11px] font-sans font-medium text-ink-faint">
+              <span>הכנסה <bdi class="ed-num text-ink-muted">{{ fmt(p.revenue) }}</bdi></span>
+              <div class="flex-1 h-[2px] bg-slate-100 overflow-hidden rounded-full">
+                <div class="h-full bg-ink rounded-full" :style="{ width: revenueBarPct(p) + '%' }"></div>
+              </div>
+              <span>הוצאה <bdi class="ed-num text-ink-muted">{{ fmt(p.expenses) }}</bdi></span>
+            </div>
+            <div class="mt-2">
+              <span class="ui-pill" :class="marginPillClass(p.margin)">
+                מרווח {{ p.margin != null ? p.margin + '%' : '—' }}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- Table + Sidebar -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Project Table -->
-        <div class="lg:col-span-2 bg-white rounded-xl overflow-hidden">
-          <div class="px-3 sm:px-8 pt-6 pb-4">
-            <span class="section-label">פרויקטים</span>
-          </div>
-          <div class="overflow-x-auto">
-          <table class="w-full text-sm min-w-[600px]">
+      <!-- Monthly Revenue & Expenses -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 mt-2">
+        <RuledSection
+          eyebrow="תחזית הכנסות"
+          title="צפי חודשי"
+          caption="סך הכנסות צפויות מכל הפרויקטים לפי חודש."
+        >
+          <Bar :data="monthlyRevenueChartData" :options="barChartOptions" />
+        </RuledSection>
+        <RuledSection
+          eyebrow="תחזית הוצאות"
+          title="צפי חודשי"
+          caption="סך הוצאות צפויות מכל הפרויקטים לפי חודש."
+        >
+          <Bar :data="monthlyExpenseChartData" :options="barChartOptions" />
+        </RuledSection>
+      </div>
+
+      <!-- Project table -->
+      <RuledSection eyebrow="פירוט" title="טבלת פרויקטים">
+        <div class="overflow-x-auto">
+          <table class="ed-table" style="min-width: 600px;">
             <thead>
               <tr>
-                <th class="px-3 sm:px-8 pb-3 text-right text-xs uppercase tracking-wide text-gray-400 font-medium">פרויקט</th>
-                <th class="hidden sm:table-cell px-4 pb-3 text-right text-xs uppercase tracking-wide text-gray-400 font-medium">מנהל</th>
-                <th class="px-4 pb-3 text-right text-xs uppercase tracking-wide text-gray-400 font-medium">הכנסות</th>
-                <th class="px-4 pb-3 text-right text-xs uppercase tracking-wide text-gray-400 font-medium">הוצאות</th>
-                <th class="px-4 pb-3 text-right text-xs uppercase tracking-wide text-gray-400 font-medium">רווח</th>
-                <th class="px-4 pb-3 text-right text-xs uppercase tracking-wide text-gray-400 font-medium">מרווח</th>
-                <th class="hidden sm:table-cell px-3 sm:px-8 pb-3 text-right text-xs uppercase tracking-wide text-gray-400 font-medium w-28">יחס</th>
+                <th>פרויקט</th>
+                <th class="hidden sm:table-cell">ציר</th>
+                <th class="num">הכנסות</th>
+                <th class="num">הוצאות</th>
+                <th class="num">רווח</th>
+                <th class="num">מרווח</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(summary, name) in data.project_summaries" :key="name"
-                class="border-t border-gray-100 hover:bg-gray-50/60 transition-colors">
-                <td class="px-3 sm:px-8 py-4">
-                  <div class="font-medium text-gray-800">{{ name }}</div>
-                  <div class="text-xs text-gray-400 font-mono">{{ priorityIds[name] }}</div>
-                </td>
-                <td class="hidden sm:table-cell px-4 py-4 text-gray-500 text-xs">{{ managers[name] || '-' }}</td>
-                <td class="px-4 py-4 text-gray-700">{{ fmt(summary.total_revenue) }}</td>
-                <td class="px-4 py-4 text-gray-700">{{ fmt(summary.total_op_expenses + summary.total_salary_expenses) }}</td>
-                <td class="px-4 py-4 font-semibold" :class="summary.total_operating_profit >= 0 ? 'text-gray-900' : 'text-red-500'">
-                  {{ fmt(summary.total_operating_profit) }}
-                </td>
-                <td class="px-4 py-4">
-                  <span v-if="summary.margin != null" class="font-medium"
-                    :class="summary.margin >= 20 ? 'text-emerald-700' : 'text-red-500'">
-                    {{ summary.margin }}%
-                  </span>
-                  <span v-else class="text-gray-300">-</span>
-                </td>
-                <td class="hidden sm:table-cell px-3 sm:px-8 py-4">
-                  <div class="flex h-[2px] rounded-full overflow-hidden bg-gray-200">
-                    <div class="bg-emerald-600 transition-all" :style="{ width: getRevenueRatio(summary) + '%' }"></div>
-                    <div class="bg-gray-400 transition-all" :style="{ width: getExpenseRatio(summary) + '%' }"></div>
+              <tr v-for="(summary, name) in data.project_summaries" :key="name">
+                <td>
+                  <div class="font-sans font-semibold text-ink">{{ name }}</div>
+                  <div class="ed-eyebrow mt-0.5" style="font-size: 0.625rem;">
+                    <bdi lang="en">{{ summary.meta?.priority_id || '—' }}</bdi>
                   </div>
+                </td>
+                <td class="hidden sm:table-cell text-ink-muted text-xs">{{ summary.meta?.axis || '—' }}</td>
+                <td class="num"><bdi class="ed-num">{{ fmt(summary.total_revenue) }}</bdi></td>
+                <td class="num"><bdi class="ed-num">{{ fmt(summary.total_op_expenses + summary.total_salary_expenses) }}</bdi></td>
+                <td class="num" :class="summary.total_operating_profit >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'">
+                  <bdi class="ed-num">{{ fmt(summary.total_operating_profit) }}</bdi>
+                </td>
+                <td class="num" :class="marginTone(summary.margin)">
+                  <bdi class="ed-num">{{ summary.margin != null ? summary.margin + '%' : '—' }}</bdi>
                 </td>
               </tr>
             </tbody>
           </table>
-          </div>
         </div>
-
-        <!-- Sidebar -->
-        <div class="space-y-8">
-          <!-- Financial Health -->
-          <div class="bg-white rounded-xl p-4 sm:p-6">
-            <span class="section-label">בריאות פיננסית</span>
-            <div class="mt-5 space-y-5">
-              <div>
-                <div class="flex justify-between text-sm mb-2">
-                  <span class="text-gray-500">הכנסות</span>
-                  <span class="font-semibold text-gray-800">{{ fmt(data.total_revenue) }}</span>
-                </div>
-                <div class="h-[2px] bg-gray-200 rounded-full overflow-hidden">
-                  <div class="h-full bg-emerald-600 rounded-full" style="width: 100%"></div>
-                </div>
-              </div>
-              <div>
-                <div class="flex justify-between text-sm mb-2">
-                  <span class="text-gray-500">הוצאות</span>
-                  <span class="font-semibold text-gray-800">{{ fmt(data.total_expenses) }}</span>
-                </div>
-                <div class="h-[2px] bg-gray-200 rounded-full overflow-hidden">
-                  <div class="h-full bg-gray-500 rounded-full"
-                    :style="{ width: (data.total_expenses / data.total_revenue * 100) + '%' }"></div>
-                </div>
-              </div>
-              <div>
-                <div class="flex justify-between text-sm mb-2">
-                  <span class="text-gray-500">רווח נקי</span>
-                  <span class="font-semibold" :class="data.total_operating_profit >= 0 ? 'text-emerald-700' : 'text-red-500'">
-                    {{ fmt(data.total_operating_profit) }}
-                  </span>
-                </div>
-                <div class="h-[2px] bg-gray-200 rounded-full overflow-hidden">
-                  <div class="h-full bg-emerald-600 rounded-full"
-                    :style="{ width: Math.max(0, data.total_operating_profit / data.total_revenue * 100) + '%' }"></div>
-                </div>
-              </div>
-
-              <div class="pt-4 border-t border-gray-100">
-                <div class="text-xs text-gray-400 mb-3">פרויקטים מתחת לסף (20%)</div>
-                <div v-for="(summary, name) in data.project_summaries" :key="name">
-                  <div v-if="summary.margin != null && summary.margin < 20"
-                    class="flex items-center justify-between py-1.5">
-                    <span class="text-sm text-gray-600">· {{ name }}</span>
-                    <span class="text-sm font-medium text-red-500">{{ summary.margin }}%</span>
-                  </div>
-                </div>
-                <div v-if="!hasAlerts" class="text-sm text-emerald-700 font-medium py-1">כל הפרויקטים מעל הסף</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Expense Breakdown -->
-          <div class="bg-white rounded-xl p-4 sm:p-6">
-            <span class="section-label">פילוח הוצאות</span>
-            <div class="mt-5">
-              <ExpenseBreakdown :summary="totalSummary" />
-            </div>
-          </div>
-        </div>
-      </div>
+      </RuledSection>
     </template>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { getDashboard, getCashflow, formatNumber } from '../services/api'
+import { getDashboard, getPnl, formatNumber } from '../services/api'
+import { Doughnut, Bar } from 'vue-chartjs'
+import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from 'chart.js'
 import ProjectCompareChart from './ProjectCompareChart.vue'
-import ExpenseBreakdown from './ExpenseBreakdown.vue'
+import { SectionHeader, RuledSection, HeroNumber, FootnoteSource, currentHebrewDate } from './editorial'
+import { COLORS, tooltipConfig, axisConfig } from '../utils/chartDefaults'
+
+ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement)
 
 const data = ref(null)
-const cfData = ref(null)
+const pnlData = ref(null)
 const loading = ref(true)
 const error = ref(null)
 const fmt = formatNumber
 const chartMode = ref('grouped')
+
+const dateLabel = computed(() => currentHebrewDate())
+const updatedLabel = computed(() => {
+  const d = new Date()
+  return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`
+})
+
+const axes = ['לוגי', 'מנרב', 'פיתוח עסקי']
+const axisColors = { 'לוגי': COLORS.primary, 'מנרב': COLORS.amber, 'פיתוח עסקי': COLORS.orange }
 
 const chartModes = [
   { id: 'grouped', label: 'מקובץ' },
@@ -197,50 +233,144 @@ const chartModes = [
   { id: 'profit', label: 'רווח בלבד' },
 ]
 
-const managers = computed(() => {
-  if (!data.value) return {}
-  const m = {}
-  for (const [name, s] of Object.entries(data.value.project_summaries)) {
-    m[name] = s.meta?.manager || ''
-  }
-  return m
-})
-const priorityIds = computed(() => {
-  if (!data.value) return {}
-  const p = {}
-  for (const [name, s] of Object.entries(data.value.project_summaries)) {
-    p[name] = s.meta?.priority_id || ''
-  }
-  return p
-})
-
-const totalSummary = computed(() => {
-  if (!data.value) return { total_op_expenses: 0, total_salary_expenses: 0 }
-  const sums = Object.values(data.value.project_summaries)
-  return {
-    total_op_expenses: sums.reduce((a, s) => a + s.total_op_expenses, 0),
-    total_salary_expenses: sums.reduce((a, s) => a + s.total_salary_expenses, 0),
-  }
-})
-
-const hasAlerts = computed(() => {
-  if (!data.value) return false
-  return Object.values(data.value.project_summaries).some(s => s.margin != null && s.margin < 20)
-})
-
-function getRevenueRatio(summary) {
-  const total = summary.total_revenue + summary.total_op_expenses + summary.total_salary_expenses
-  return total > 0 ? (summary.total_revenue / total * 100).toFixed(0) : 50
+function axisProjects(axis) {
+  if (!data.value) return []
+  return Object.entries(data.value.project_summaries)
+    .filter(([, s]) => s.meta?.axis === axis)
+    .map(([name, s]) => ({
+      name,
+      profit: s.total_operating_profit,
+      revenue: s.total_revenue,
+      expenses: s.total_op_expenses + s.total_salary_expenses,
+      margin: s.margin,
+    }))
+    .sort((a, b) => b.profit - a.profit)
 }
-function getExpenseRatio(summary) {
-  const total = summary.total_revenue + summary.total_op_expenses + summary.total_salary_expenses
-  return total > 0 ? ((summary.total_op_expenses + summary.total_salary_expenses) / total * 100).toFixed(0) : 50
+
+function axisTotal(axis) {
+  return axisProjects(axis).reduce((sum, p) => sum + p.profit, 0)
+}
+
+function revenueBarPct(p) {
+  const total = p.revenue + p.expenses
+  return total > 0 ? Math.round(p.revenue / total * 100) : 50
+}
+
+function marginTone(m) {
+  if (m == null) return 'ed-tone-muted'
+  if (m >= 20) return 'ed-tone-positive'
+  if (m >= 10) return 'ed-tone-warning'
+  return 'ed-tone-negative'
+}
+
+function marginPillClass(m) {
+  if (m == null) return 'ui-pill-neutral'
+  if (m >= 20) return 'ui-pill-positive'
+  if (m >= 10) return 'ui-pill-warning'
+  return 'ui-pill-negative'
+}
+
+// Axis pie
+const axisPieData = computed(() => {
+  const labels = []
+  const values = []
+  const colors = []
+  for (const axis of axes) {
+    const projects = axisProjects(axis)
+    if (projects.length === 0) continue
+    const total = projects.reduce((sum, p) => sum + p.profit, 0)
+    if (total !== 0) {
+      labels.push(axis + (total < 0 ? ' (הפסד)' : ''))
+      values.push(Math.abs(Math.round(total)))
+      colors.push(total >= 0 ? axisColors[axis] : COLORS.negative || COLORS.red)
+    }
+  }
+  return {
+    labels,
+    datasets: [{
+      data: values,
+      backgroundColor: colors,
+      borderWidth: 2,
+      borderColor: '#ffffff',
+      hoverOffset: 6,
+    }]
+  }
+})
+
+const doughnutOptions = {
+  responsive: true,
+  cutout: '62%',
+  plugins: {
+    legend: {
+      position: 'bottom',
+      rtl: true,
+      labels: { font: { family: "'Assistant', system-ui, sans-serif", size: 12 }, padding: 16, usePointStyle: true, pointStyle: 'rectRounded', color: COLORS.inkMuted },
+    },
+    tooltip: {
+      ...tooltipConfig,
+      callbacks: { label: (ctx) => ` ${ctx.label}: ${Number(ctx.raw).toLocaleString('he-IL')}` },
+    },
+  },
+}
+
+// Monthly charts
+const monthLabels = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
+
+const monthlyRevenueChartData = computed(() => {
+  if (!pnlData.value) return { labels: monthLabels, datasets: [] }
+  const monthly = new Array(12).fill(0)
+  for (const projectPnl of Object.values(pnlData.value)) {
+    for (const m of projectPnl.months || []) {
+      if (m.month >= 1 && m.month <= 12) monthly[m.month - 1] += m.revenue
+    }
+  }
+  return {
+    labels: monthLabels,
+    datasets: [{
+      label: 'הכנסות',
+      data: monthly.map(v => Math.round(v)),
+      backgroundColor: COLORS.primary,
+      borderRadius: 0,
+    }]
+  }
+})
+
+const monthlyExpenseChartData = computed(() => {
+  if (!pnlData.value) return { labels: monthLabels, datasets: [] }
+  const monthly = new Array(12).fill(0)
+  for (const projectPnl of Object.values(pnlData.value)) {
+    for (const m of projectPnl.months || []) {
+      if (m.month >= 1 && m.month <= 12) monthly[m.month - 1] += m.op_expenses + m.salary_expenses
+    }
+  }
+  return {
+    labels: monthLabels,
+    datasets: [{
+      label: 'הוצאות',
+      data: monthly.map(v => Math.round(v)),
+      backgroundColor: COLORS.amber,
+      borderRadius: 0,
+    }]
+  }
+})
+
+const barChartOptions = {
+  responsive: true,
+  plugins: {
+    legend: { display: false },
+    tooltip: tooltipConfig,
+  },
+  scales: {
+    y: axisConfig.y,
+    x: axisConfig.x,
+  }
 }
 
 onMounted(async () => {
   try {
-    data.value = await getDashboard()
-    getCashflow().then(d => { cfData.value = d }).catch(() => {})
+    const [dashData, pnl] = await Promise.all([getDashboard(), getPnl()])
+    data.value = dashData
+    pnlData.value = pnl
   } catch (e) {
     error.value = e.message
   } finally {

@@ -173,10 +173,13 @@ def form_to_pnl(form_data, current_month=None):
         'margin': round((total_profit / total_rev) * 100, 1) if total_rev > 0 else None,
     }
 
+    axis = form_data.get('axis', '')
+    area = form_data.get('area', '')
     meta = {
         'manager': form_data.get('manager', ''),
-        'area': form_data.get('area', ''),
-        'axis': form_data.get('axis', ''),
+        'area': area,
+        'axis': axis,
+        'axis_area': f"{axis} - {area}" if axis and area else axis or area,
         'priority_id': form_data.get('priority_id', ''),
         'start_month': _parse_month(form_data.get('start_date', ''), 1),
         'end_month': _parse_month(form_data.get('expected_end_date', ''), 12),

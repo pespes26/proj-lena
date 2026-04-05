@@ -6,7 +6,8 @@
         type="text"
         :value="displayValue"
         :placeholder="placeholder"
-        :class="[inputClass, invalidDate ? 'border-red-400! bg-red-50!' : '']"
+        :class="[inputClass || 'ed-input', invalidDate ? 'is-error' : '']"
+        style="padding-right: 2.5rem;"
         @input="onInput"
         @focus="showCalendar = true"
         @keydown.escape="showCalendar = false"
@@ -14,66 +15,62 @@
         dir="ltr"
       />
       <button type="button" @click="showCalendar = !showCalendar"
-        class="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 text-gray-400 hover:text-gray-600 transition">
-        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        class="absolute right-2 top-1/2 -translate-y-1/2 text-ink-muted hover:text-accent transition-colors p-1 rounded-md hover:bg-slate-100" aria-label="בחר תאריך">
+        <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.6">
           <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
         </svg>
       </button>
     </div>
-    <span v-if="invalidDate" class="text-red-500 text-[10px] mt-0.5 block">תאריך לא תקין</span>
+    <span v-if="invalidDate" class="font-sans text-[10px] ed-tone-negative mt-1 block">תאריך לא תקין</span>
 
-    <!-- Calendar dropdown -->
+    <!-- Calendar dropdown — editorial paper sheet -->
     <Teleport to="body">
       <div v-if="showCalendar" class="fixed inset-0 z-[100]" @click="showCalendar = false"></div>
       <div v-if="showCalendar" ref="calendarEl"
-        class="fixed z-[101] bg-white rounded-xl shadow-xl border border-gray-200 p-3 w-[280px]"
+        class="fixed z-[101] bg-surface border border-border rounded-xl shadow-lg w-[300px] ed-fade-up"
         :style="calendarPosition">
         <!-- Month/Year navigation -->
-        <div class="flex items-center justify-between mb-3">
-          <button type="button" @click="prevMonth"
-            class="p-1 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        <div class="flex items-center justify-between px-4 pt-3 pb-2">
+          <button type="button" @click="prevMonth" class="text-ink-muted hover:text-accent transition-colors p-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="square" d="M15 19l-7-7 7-7"/></svg>
           </button>
-          <div class="text-sm font-medium text-gray-800">
-            {{ hebrewMonths[viewMonth] }} {{ viewYear }}
+          <div class="font-sans font-semibold text-ink ed-num">
+            <span>{{ hebrewMonths[viewMonth] }}</span> <bdi>{{ viewYear }}</bdi>
           </div>
-          <button type="button" @click="nextMonth"
-            class="p-1 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+          <button type="button" @click="nextMonth" class="text-ink-muted hover:text-accent transition-colors p-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="square" d="M9 5l7 7-7 7"/></svg>
           </button>
         </div>
+        <hr class="ed-rule mx-4" />
 
         <!-- Day headers -->
-        <div class="grid grid-cols-7 mb-1">
-          <div v-for="d in dayHeaders" :key="d" class="text-center text-[10px] font-medium text-gray-400 py-1">{{ d }}</div>
+        <div class="grid grid-cols-7 px-4 pt-3">
+          <div v-for="d in dayHeaders" :key="d" class="ed-eyebrow text-center py-1" style="font-size: 0.625rem;">{{ d }}</div>
         </div>
 
         <!-- Days grid -->
-        <div class="grid grid-cols-7">
+        <div class="grid grid-cols-7 px-4 pb-3">
           <div v-for="(day, i) in calendarDays" :key="i" class="p-0.5">
             <button v-if="day"
               type="button"
               @click="selectDay(day)"
               :disabled="isBeforeMin(day)"
               :class="[
-                'w-full aspect-square rounded-lg text-xs transition flex items-center justify-center',
-                isBeforeMin(day) ? 'text-gray-200 cursor-not-allowed' :
-                isSelected(day) ? 'bg-emerald-700 text-white font-bold' :
-                isToday(day) ? 'bg-emerald-50 text-emerald-800 font-semibold ring-1 ring-emerald-300' :
-                day.outside ? 'text-gray-300' :
-                'text-gray-700 hover:bg-gray-100'
+                'ed-date-cell',
+                isBeforeMin(day) ? 'is-disabled' : '',
+                isSelected(day) ? 'is-selected' : '',
+                isToday(day) && !isSelected(day) ? 'is-today' : '',
+                day.outside ? 'is-outside' : '',
               ]">
-              {{ day.date }}
+              <bdi class="ed-num">{{ day.date }}</bdi>
             </button>
-            <div v-else class="w-full aspect-square"></div>
           </div>
         </div>
 
         <!-- Today button -->
-        <div class="mt-2 pt-2 border-t border-gray-100">
-          <button type="button" @click="goToday"
-            class="w-full text-center text-xs text-emerald-700 font-medium hover:bg-emerald-50 rounded-lg py-1.5 transition">
-            היום
+        <div class="border-t border-rule px-4 py-2">
+          <button type="button" @click="goToday" class="ed-link text-sm w-full text-center block">
+            היום →
           </button>
         </div>
       </div>
@@ -317,3 +314,44 @@ function updatePosition() {
   }
 }
 </script>
+
+<style scoped>
+.ed-date-cell {
+  width: 100%;
+  aspect-ratio: 1;
+  border: 0;
+  background: transparent;
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ink);
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease, border-bottom-color 0.15s ease;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid transparent;
+}
+.ed-date-cell:hover:not(.is-disabled) {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.ed-date-cell.is-outside {
+  color: var(--ink-faint);
+}
+.ed-date-cell.is-today {
+  border-bottom: 2px solid var(--ink);
+  font-weight: 700;
+}
+.ed-date-cell.is-selected {
+  background: var(--ink);
+  color: var(--paper);
+  font-weight: 900;
+}
+.ed-date-cell.is-disabled {
+  color: var(--ink-faint);
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+</style>

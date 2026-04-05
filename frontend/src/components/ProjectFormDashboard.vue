@@ -1,206 +1,165 @@
 <template>
-  <div v-if="loading" class="text-center py-20 text-gray-400">טוען נתונים...</div>
-  <div v-else-if="!formData" class="text-center py-20">
-    <div class="text-5xl mb-4 opacity-30">📊</div>
-    <div class="text-lg font-medium text-gray-500 mb-2">אין מידע כעת</div>
-    <div class="text-sm text-gray-400">לפרויקט זה אין עדיין נתונים.</div>
+  <div v-if="loading" class="font-sans text-ink-muted py-20 text-center">טוען נתונים…</div>
+  <div v-else-if="!formData" class="ed-section text-center py-16">
+    <div class="ed-eyebrow mb-3">אין נתונים</div>
+    <p class="font-sans text-xl text-ink max-w-md mx-auto">לפרויקט זה אין עדיין נתונים.</p>
   </div>
   <div v-else>
     <!-- Project Header -->
-    <div class="flex items-start justify-between mb-8">
+    <div class="flex items-start justify-between mb-6 flex-wrap gap-4">
       <div>
-        <div class="flex items-center gap-3 mb-1">
-          <h2 class="text-xl font-bold text-gray-800">{{ project }}</h2>
-          <span class="text-xs bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full font-medium">{{ formData.area || 'FM' }}</span>
+        <div class="ed-eyebrow mb-1">ניהול פרויקט · {{ formData.area || 'FM' }}</div>
+        <h2 class="font-sans font-semibold text-ink text-3xl leading-none">{{ project }}</h2>
+        <div class="font-sans text-ink-muted text-sm mt-2 flex items-center gap-4 flex-wrap">
+          <span v-if="formData.manager">{{ formData.manager }}</span>
+          <span v-if="formData.client">· {{ formData.client }}</span>
+          <span v-if="formData.start_date">· {{ formatDate(formData.start_date) }}</span>
+          <span v-if="formData.priority_id" class="ed-num"><bdi lang="en">{{ formData.priority_id }}</bdi></span>
         </div>
-        <div class="text-sm text-gray-500 flex items-center gap-4 flex-wrap">
-          <span v-if="formData.manager" class="flex items-center gap-1">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-            {{ formData.manager }}
-          </span>
-          <span v-if="formData.client" class="flex items-center gap-1">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-            {{ formData.client }}
-          </span>
-          <span v-if="formData.start_date" class="flex items-center gap-1">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-            {{ formatDate(formData.start_date) }}
-          </span>
-          <span v-if="formData.priority_id" class="font-mono text-xs text-gray-400">{{ formData.priority_id }}</span>
-        </div>
-        <p v-if="formData.description" class="text-xs text-gray-400 mt-2 max-w-xl">{{ formData.description }}</p>
+        <p v-if="formData.description" class="font-sans text-ink-faint text-sm mt-2 max-w-xl">{{ formData.description }}</p>
       </div>
-      <button @click="$emit('edit')"
-        class="px-4 py-2 bg-gray-100 text-gray-600 text-sm rounded-xl hover:bg-gray-200 transition flex items-center gap-2">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-        עריכת טופס
+      <button @click="$emit('edit')" class="ed-btn">
+        עריכת טופס →
       </button>
     </div>
 
-    <!-- KPI Cards -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-8">
-      <div class="bg-white rounded-2xl border border-gray-200 p-3 sm:p-5">
-        <div class="text-xs text-gray-400 mb-1">סך הכנסות</div>
-        <div class="text-lg sm:text-2xl font-bold text-gray-800">{{ fmt(totalRevenue) }}</div>
-        <div class="text-[10px] text-gray-400 mt-1">₪</div>
-      </div>
-      <div class="bg-white rounded-2xl border border-gray-200 p-3 sm:p-5">
-        <div class="text-xs text-gray-400 mb-1">סך הוצאות</div>
-        <div class="text-lg sm:text-2xl font-bold text-orange-600">{{ fmt(totalExpenses) }}</div>
-        <div class="text-[10px] text-gray-400 mt-1">₪</div>
-      </div>
-      <div class="bg-white rounded-2xl border border-gray-200 p-3 sm:p-5">
-        <div class="text-xs text-gray-400 mb-1">רווח צפוי</div>
-        <div class="text-lg sm:text-2xl font-bold" :class="profit >= 0 ? 'text-emerald-700' : 'text-red-500'">{{ fmt(profit) }}</div>
-        <div class="text-[10px] text-gray-400 mt-1">₪</div>
-      </div>
-      <div class="bg-white rounded-2xl border border-gray-200 p-3 sm:p-5">
-        <div class="text-xs text-gray-400 mb-1">מרווח צפוי</div>
-        <div class="text-lg sm:text-2xl font-bold" :class="margin >= 20 ? 'text-emerald-700' : margin >= 0 ? 'text-orange-500' : 'text-red-500'">{{ margin.toFixed(1) }}%</div>
-        <div class="w-full bg-gray-200 rounded-full h-1.5 mt-2">
-          <div class="h-full rounded-full transition-all" :class="margin >= 20 ? 'bg-emerald-700' : margin >= 0 ? 'bg-orange-400' : 'bg-red-500'"
-            :style="{ width: Math.min(Math.max(margin, 0), 100) + '%' }"></div>
+    <!-- KPI strip -->
+    <section class="ed-section">
+      <div class="flex flex-wrap gap-y-8 ed-col-rule">
+        <div class="flex-1" style="min-width: 160px;">
+          <HeroNumber label="סך הכנסות" :value="totalRevenue" prefix="₪" size="md" />
+        </div>
+        <div class="flex-1" style="min-width: 160px;">
+          <HeroNumber label="סך הוצאות" :value="totalExpenses" prefix="₪" tone="warning" size="md" />
+        </div>
+        <div class="flex-1" style="min-width: 160px;">
+          <HeroNumber label="רווח צפוי" :value="profit" prefix="₪" :tone="profit >= 0 ? 'positive' : 'negative'" size="md" />
+        </div>
+        <div class="flex-1" style="min-width: 160px;">
+          <HeroNumber
+            label="מרווח צפוי"
+            :value="margin"
+            suffix="%"
+            format="percent"
+            :tone="margin >= 20 ? 'positive' : margin >= 0 ? 'warning' : 'negative'"
+            size="md"
+          />
         </div>
       </div>
-    </div>
+    </section>
 
     <!-- Payment Terms + Revenue Chart -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-8">
-      <!-- Payment Terms -->
-      <div class="bg-white rounded-2xl border border-gray-200 p-5">
-        <h3 class="text-sm font-bold text-gray-700 mb-4">תנאי תשלום הכנסה</h3>
-        <div v-if="paymentTerms.length" class="space-y-3">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 mt-2">
+      <RuledSection eyebrow="תנאי תשלום" title="הכנסה">
+        <div v-if="paymentTerms.length" class="space-y-5">
           <div v-for="(term, i) in paymentTerms" :key="i">
-            <div class="flex items-center justify-between text-xs mb-1">
-              <span class="text-gray-600 font-medium">{{ term.type }}</span>
-              <span class="text-gray-500">{{ term.percent }}%</span>
+            <div class="flex items-baseline justify-between mb-1.5">
+              <span class="font-sans font-semibold text-ink">{{ term.type }}</span>
+              <span class="font-sans font-semibold text-ink ed-num"><bdi>{{ term.percent }}%</bdi></span>
             </div>
-            <div class="w-full bg-gray-100 rounded-full h-2.5">
-              <div class="h-full rounded-full transition-all" :style="{ width: term.percent + '%' }"
-                :class="term.type === 'מקדמה' || term.type === 'מזומן' ? 'bg-emerald-500' : 'bg-amber-400'"></div>
+            <div class="w-full h-[2px] bg-paper-dark">
+              <div class="h-full transition-all" :style="{ width: term.percent + '%' }" :class="term.type === 'מקדמה' || term.type === 'מזומן' ? 'bg-positive' : 'bg-warning'"></div>
             </div>
-            <div class="text-[10px] text-gray-400 mt-0.5">
-              {{ fmt(Math.round(totalRevenue * term.percent / 100)) }} ₪
-              <span v-if="term.type !== 'מקדמה' && term.type !== 'מזומן'" class="text-amber-500"> — תשלום בהשהייה</span>
+            <div class="ed-eyebrow mt-1.5" style="font-size: 0.625rem;">
+              <bdi class="ed-num">{{ fmt(Math.round(totalRevenue * term.percent / 100)) }} ₪</bdi>
+              <span v-if="term.type !== 'מקדמה' && term.type !== 'מזומן'" class="ed-tone-warning"> · תשלום בהשהייה</span>
             </div>
           </div>
         </div>
-        <div v-else class="text-xs text-gray-400 text-center py-4">לא הוגדרו תנאי תשלום</div>
-      </div>
+        <p v-else class="font-sans text-ink-faint text-sm text-center py-6">לא הוגדרו תנאי תשלום</p>
+      </RuledSection>
 
-      <!-- Revenue Forecast Chart -->
-      <div class="sm:col-span-2 bg-white rounded-2xl border border-gray-200 p-5">
-        <h3 class="text-sm font-bold text-gray-700 mb-4">תחזית הכנסות חודשית</h3>
-        <div class="h-48">
+      <RuledSection eyebrow="תחזית" title="הכנסות חודשיות" class="lg:col-span-2">
+        <div class="h-52">
           <Bar v-if="revenueChartData" :data="revenueChartData" :options="barOptions" />
         </div>
-        <div class="flex items-center gap-4 mt-3 text-[10px] text-gray-400">
-          <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-emerald-500"></span> הכנסה צפויה</div>
-          <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-amber-400"></span> כניסת תשלום (שוטף+)</div>
-        </div>
-      </div>
+      </RuledSection>
     </div>
 
     <!-- Expenses Section -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-8">
-      <!-- Expense Breakdown Doughnut -->
-      <div class="bg-white rounded-2xl border border-gray-200 p-5">
-        <h3 class="text-sm font-bold text-gray-700 mb-4">פילוח הוצאות</h3>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 mt-2">
+      <RuledSection eyebrow="פילוח" title="קטגוריות הוצאה">
         <div class="h-48" v-if="expenseChartData">
           <Doughnut :data="expenseChartData" :options="doughnutOptions" />
         </div>
-        <div v-else class="text-xs text-gray-400 text-center py-10">אין הוצאות</div>
-        <div class="space-y-1.5 mt-4">
-          <div v-for="cat in expenseCategories" :key="cat.key" class="flex items-center justify-between text-xs">
-            <div class="flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full" :style="{ backgroundColor: cat.chartColor }"></span>
-              <span class="text-gray-600">{{ cat.label }}</span>
+        <p v-else class="font-sans text-ink-faint text-center py-8">אין הוצאות</p>
+        <div class="space-y-2 mt-5 pt-4 border-t border-rule">
+          <div v-for="cat in expenseCategories" :key="cat.key" class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2" :style="{ backgroundColor: cat.chartColor }"></span>
+              <span class="font-sans text-sm text-ink">{{ cat.label }}</span>
             </div>
-            <span class="font-medium text-gray-700">{{ fmt(cat.total) }} ₪</span>
+            <span class="font-sans font-semibold text-ink text-sm ed-num"><bdi>{{ fmt(cat.total) }} ₪</bdi></span>
           </div>
         </div>
-      </div>
+      </RuledSection>
 
-      <!-- Suppliers list -->
-      <div class="sm:col-span-2 bg-white rounded-2xl border border-gray-200 p-5">
-        <h3 class="text-sm font-bold text-gray-700 mb-4">ספקים וקבלנים</h3>
-        <div v-if="allSuppliers.length" class="space-y-2 max-h-80 overflow-y-auto">
-          <div v-for="(sup, i) in allSuppliers" :key="i"
-            class="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3 border border-gray-100">
-            <div>
-              <div class="text-sm font-medium text-gray-700">{{ sup.name || 'ללא שם' }}</div>
-              <div class="text-[10px] text-gray-400 flex items-center gap-2 mt-0.5">
-                <span class="px-1.5 py-0.5 rounded bg-gray-200 text-gray-500">{{ sup.category }}</span>
-                <span v-if="sup.payment_terms">{{ sup.payment_terms }}</span>
-                <span v-if="sup.start_date">{{ formatDate(sup.start_date) }}</span>
-                <span v-if="sup.start_date && sup.end_date">→</span>
+      <RuledSection eyebrow="ספקים וקבלנים" :title="allSuppliers.length + ' ספקים'" class="lg:col-span-2">
+        <div v-if="allSuppliers.length" class="divide-y divide-rule max-h-96 overflow-y-auto">
+          <div v-for="(sup, i) in allSuppliers" :key="i" class="flex items-baseline justify-between py-3 gap-4">
+            <div class="flex-1 min-w-0">
+              <div class="font-sans font-semibold text-ink truncate">{{ sup.name || 'ללא שם' }}</div>
+              <div class="ed-eyebrow mt-1" style="font-size: 0.625rem;">
+                <span>{{ sup.category }}</span>
+                <span v-if="sup.payment_terms"> · {{ sup.payment_terms }}</span>
+                <span v-if="sup.start_date"> · {{ formatDate(sup.start_date) }}</span>
+                <span v-if="sup.start_date && sup.end_date"> → </span>
                 <span v-if="sup.end_date">{{ formatDate(sup.end_date) }}</span>
               </div>
             </div>
-            <div class="text-sm font-bold text-gray-700">{{ fmt(sup.amount) }} ₪</div>
+            <div class="font-sans font-semibold text-ink ed-num"><bdi>{{ fmt(sup.amount) }} ₪</bdi></div>
           </div>
         </div>
-        <div v-else class="text-xs text-gray-400 text-center py-10">לא הוגדרו ספקים</div>
-      </div>
+        <p v-else class="font-sans text-ink-faint text-center py-8">לא הוגדרו ספקים</p>
+      </RuledSection>
     </div>
 
     <!-- Monthly Expense Breakdown -->
-    <div class="bg-white rounded-2xl border border-gray-200 p-5 mb-8">
-      <h3 class="text-sm font-bold text-gray-700 mb-4">פירוט הוצאות חודשי</h3>
+    <RuledSection eyebrow="פירוט חודשי" title="הוצאות לפי קטגוריה">
       <div class="overflow-x-auto">
-        <table class="w-full min-w-[600px] text-xs" dir="rtl">
+        <table class="ed-table" style="min-width: 600px;" dir="rtl">
           <thead>
-            <tr class="border-b border-gray-200">
-              <th class="text-right py-2 px-2 font-medium text-gray-500 sticky right-0 bg-white">קטגוריה / ספק</th>
-              <th v-for="m in activeMonths" :key="m" class="text-center py-2 px-1.5 font-medium text-gray-400 min-w-[60px]">{{ monthName(m) }}</th>
-              <th class="text-center py-2 px-2 font-bold text-gray-600">סה"כ</th>
+            <tr>
+              <th>קטגוריה / ספק</th>
+              <th v-for="m in activeMonths" :key="m" class="num" style="min-width: 70px;">{{ monthName(m) }}</th>
+              <th class="num">סה״כ</th>
             </tr>
           </thead>
           <tbody>
             <template v-for="cat in monthlyBreakdown" :key="cat.key">
-              <!-- Category header row -->
-              <tr class="bg-gray-50/70">
-                <td class="py-2 px-2 font-bold text-gray-700 sticky right-0 bg-gray-50/70">{{ cat.label }}</td>
-                <td v-for="m in activeMonths" :key="m" class="text-center py-2 px-1.5 font-bold text-gray-700">
-                  {{ cat.monthlyTotals[m] ? fmt(cat.monthlyTotals[m]) : '-' }}
+              <tr style="background: rgba(235, 228, 211, 0.3);">
+                <td class="font-sans font-semibold text-ink">{{ cat.label }}</td>
+                <td v-for="m in activeMonths" :key="m" class="num font-sans font-semibold">
+                  <bdi class="ed-num">{{ cat.monthlyTotals[m] ? fmt(cat.monthlyTotals[m]) : '—' }}</bdi>
                 </td>
-                <td class="text-center py-2 px-2 font-bold text-emerald-700">{{ fmt(cat.grandTotal) }}</td>
+                <td class="num font-sans font-semibold ed-tone-positive"><bdi class="ed-num">{{ fmt(cat.grandTotal) }}</bdi></td>
               </tr>
-              <!-- Individual line items -->
-              <tr v-for="(line, li) in cat.lines" :key="li" class="border-b border-gray-50 hover:bg-gray-50/50">
-                <td class="py-1.5 px-2 pr-6 text-gray-500 sticky right-0 bg-white">{{ line.name || 'ללא שם' }}</td>
-                <td v-for="m in activeMonths" :key="m" class="text-center py-1.5 px-1.5"
-                  :class="line.months[m] ? 'text-gray-700' : 'text-gray-200'">
-                  {{ line.months[m] ? fmt(line.months[m]) : '-' }}
+              <tr v-for="(line, li) in cat.lines" :key="li">
+                <td class="text-ink-muted" style="padding-inline-start: 2rem;">{{ line.name || 'ללא שם' }}</td>
+                <td v-for="m in activeMonths" :key="m" class="num" :class="line.months[m] ? '' : 'ed-tone-faint'">
+                  <bdi class="ed-num">{{ line.months[m] ? fmt(line.months[m]) : '—' }}</bdi>
                 </td>
-                <td class="text-center py-1.5 px-2 font-medium text-gray-600">{{ fmt(line.total) }}</td>
+                <td class="num"><bdi class="ed-num">{{ fmt(line.total) }}</bdi></td>
               </tr>
             </template>
-            <!-- Grand total row -->
-            <tr class="border-t-2 border-gray-300 bg-gray-100">
-              <td class="py-2.5 px-2 font-bold text-gray-800 sticky right-0 bg-gray-100">סה"כ הוצאות</td>
-              <td v-for="m in activeMonths" :key="m" class="text-center py-2.5 px-1.5 font-bold text-gray-800">
-                {{ grandMonthlyTotal(m) ? fmt(grandMonthlyTotal(m)) : '-' }}
+            <tr style="border-top: 3px double var(--rule-strong);">
+              <td class="font-sans font-semibold text-ink">סה״כ הוצאות</td>
+              <td v-for="m in activeMonths" :key="m" class="num font-sans font-semibold">
+                <bdi class="ed-num">{{ grandMonthlyTotal(m) ? fmt(grandMonthlyTotal(m)) : '—' }}</bdi>
               </td>
-              <td class="text-center py-2.5 px-2 font-bold text-red-600 text-sm">{{ fmt(grandTotal) }}</td>
+              <td class="num font-sans font-semibold ed-tone-negative"><bdi class="ed-num">{{ fmt(grandTotal) }}</bdi></td>
             </tr>
           </tbody>
         </table>
       </div>
-    </div>
+    </RuledSection>
 
     <!-- Cashflow Chart -->
-    <div class="bg-white rounded-2xl border border-gray-200 p-5">
-      <h3 class="text-sm font-bold text-gray-700 mb-4">תזרים צפוי</h3>
-      <div class="h-56">
+    <RuledSection eyebrow="תזרים צפוי" title="כניסות, יציאות, ומצטבר">
+      <div class="h-64">
         <Bar v-if="cashflowChartData" :data="cashflowChartData" :options="cashflowOptions" />
       </div>
-      <div class="flex items-center gap-4 mt-3 text-[10px] text-gray-400">
-        <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-emerald-500"></span> כניסות</div>
-        <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-orange-400"></span> יציאות</div>
-        <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-emerald-500"></span> מצטבר</div>
-      </div>
-    </div>
+    </RuledSection>
   </div>
 </template>
 
@@ -209,6 +168,8 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { Bar, Doughnut } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend, PointElement, LineElement } from 'chart.js'
 import { getProjectForm } from '../services/api'
+import { RuledSection, HeroNumber } from './editorial'
+import { COLORS, tooltipConfig, axisConfig } from '../utils/chartDefaults'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend, PointElement, LineElement)
 
@@ -218,14 +179,13 @@ defineEmits(['edit'])
 const loading = ref(true)
 const formData = ref(null)
 
-const fmt = (val) => val != null ? Number(val).toLocaleString('he-IL', { maximumFractionDigits: 0 }) : '-'
+const fmt = (val) => val != null ? Number(val).toLocaleString('he-IL', { maximumFractionDigits: 0 }) : '—'
 const formatDate = (d) => {
   if (!d) return ''
   const parts = d.split('-')
   return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : d
 }
 
-// Extract X days from שוטף+X
 function extractShotefDays(type) {
   if (!type) return 0
   if (type.includes('שוטף+90')) return 90
@@ -236,7 +196,6 @@ function extractShotefDays(type) {
   return 0
 }
 
-// Calculate payment month: end of invoice month + X days
 function shotefPaymentMonth(invoiceMonth, invoiceYear, xDays) {
   const lastDay = new Date(invoiceYear, invoiceMonth, 0).getDate()
   const endOfMonth = new Date(invoiceYear, invoiceMonth - 1, lastDay)
@@ -260,14 +219,12 @@ const totalExpenses = computed(() => {
 const profit = computed(() => totalRevenue.value - totalExpenses.value)
 const margin = computed(() => totalRevenue.value > 0 ? (profit.value / totalRevenue.value) * 100 : 0)
 
-// Monthly revenue
 function monthlyRevenue(m) {
   if (!formData.value?.total_revenue || !formData.value?.revenue_forecast) return 0
   const pct = Number(formData.value.revenue_forecast[m]) || 0
   return Math.round(formData.value.total_revenue * pct / 100)
 }
 
-// Cash inflow per month (שוטף+X: end of invoice month + X days)
 function cashInflow(targetMonth) {
   if (!formData.value?.total_revenue) return 0
   const startYear = formData.value.start_date ? parseInt(formData.value.start_date.split('-')[0]) || 2026 : 2026
@@ -280,32 +237,26 @@ function cashInflow(targetMonth) {
       if (!pct) continue
       const termType = term.type
       if (termType === 'מקדמה' || termType === 'מזומן') {
-        // מקדמה/מזומן: no delay, same month
-        if (m === targetMonth) {
-          total += Math.round(rev * pct / 100)
-        }
+        if (m === targetMonth) total += Math.round(rev * pct / 100)
       } else {
-        // שוטף+X: end of invoice month + X days
         const xDays = extractShotefDays(termType)
         const payMonth = shotefPaymentMonth(m, startYear, xDays)
-        if (payMonth === targetMonth) {
-          total += Math.round(rev * pct / 100)
-        }
+        if (payMonth === targetMonth) total += Math.round(rev * pct / 100)
       }
     }
   }
   return total
 }
 
-// Expense categories
+// Editorial chart palette
 const categoryDefs = [
-  { key: 'subcontractors', label: 'קבלני משנה', chartColor: '#60a5fa' },
-  { key: 'manpower', label: 'כוח אדם', chartColor: '#a78bfa' },
-  { key: 'equipment', label: 'ציוד וכלים', chartColor: '#fb923c' },
-  { key: 'insurance', label: 'ביטוחים', chartColor: '#34C759' },
-  { key: 'consultants', label: 'מתכננים ויועצים', chartColor: '#facc15' },
-  { key: 'financing', label: 'הוצאות מימון', chartColor: '#f87171' },
-  { key: 'other', label: 'אחר', chartColor: '#94a3b8' },
+  { key: 'subcontractors', label: 'קבלני משנה', chartColor: COLORS.primary },
+  { key: 'manpower', label: 'כוח אדם', chartColor: COLORS.purple },
+  { key: 'equipment', label: 'ציוד וכלים', chartColor: COLORS.orange },
+  { key: 'insurance', label: 'ביטוחים', chartColor: COLORS.green },
+  { key: 'consultants', label: 'מתכננים ויועצים', chartColor: COLORS.amber },
+  { key: 'financing', label: 'הוצאות מימון', chartColor: COLORS.red },
+  { key: 'other', label: 'אחר', chartColor: COLORS.inkMuted },
 ]
 
 const expenseCategories = computed(() => {
@@ -327,7 +278,7 @@ const allSuppliers = computed(() => {
   for (const sub of formData.value.subcontractors || []) {
     list.push({ name: sub.name, amount: sub.monthly_amount, category: 'קבלני משנה', payment_terms: sub.payment_terms, start_date: sub.start_date, end_date: sub.end_date })
   }
-  for (const def of categoryDefs.slice(2)) { // skip subcontractors & manpower
+  for (const def of categoryDefs.slice(2)) {
     for (const line of formData.value['expense_lines_' + def.key] || []) {
       list.push({ name: line.name, amount: line.monthly_amount, category: def.label, payment_terms: line.payment_terms, start_date: line.start_date, end_date: line.end_date })
     }
@@ -335,7 +286,6 @@ const allSuppliers = computed(() => {
   return list
 })
 
-// Month helpers
 const hebrewMonths = { 1: 'ינואר', 2: 'פברואר', 3: 'מרץ', 4: 'אפריל', 5: 'מאי', 6: 'יוני', 7: 'יולי', 8: 'אוגוסט', 9: 'ספטמבר', 10: 'אוקטובר', 11: 'נובמבר', 12: 'דצמבר' }
 function monthName(m) { return hebrewMonths[m] || m }
 
@@ -345,7 +295,6 @@ function parseMonth(dateStr) {
   return parts.length >= 2 ? parseInt(parts[1]) : null
 }
 
-// Active project months (start to end)
 const activeMonths = computed(() => {
   if (!formData.value) return []
   const sm = parseMonth(formData.value.start_date) || 1
@@ -355,12 +304,10 @@ const activeMonths = computed(() => {
   return result
 })
 
-// Monthly expense breakdown by category
 const monthlyBreakdown = computed(() => {
   if (!formData.value) return []
   const result = []
 
-  // Subcontractors
   const subLines = (formData.value.subcontractors || []).map(sub => {
     const sm = parseMonth(sub.start_date) || parseMonth(formData.value.start_date) || 1
     const em = parseMonth(sub.end_date) || parseMonth(formData.value.expected_end_date) || 12
@@ -376,8 +323,7 @@ const monthlyBreakdown = computed(() => {
     result.push({ key: 'subcontractors', label: 'קבלני משנה', lines: subLines, monthlyTotals, grandTotal })
   }
 
-  // Other categories
-  for (const def of categoryDefs.slice(1)) { // skip subcontractors
+  for (const def of categoryDefs.slice(1)) {
     const lines = (formData.value['expense_lines_' + def.key] || []).map(line => {
       const sm = parseMonth(line.start_date) || line.start_month || parseMonth(formData.value.start_date) || 1
       const em = parseMonth(line.end_date) || line.end_month || parseMonth(formData.value.expected_end_date) || 12
@@ -407,7 +353,6 @@ const grandTotal = computed(() => {
   return monthlyBreakdown.value.reduce((sum, cat) => sum + cat.grandTotal, 0)
 })
 
-// Charts
 const months = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
 
 const revenueChartData = computed(() => {
@@ -415,8 +360,8 @@ const revenueChartData = computed(() => {
   return {
     labels: months,
     datasets: [
-      { label: 'הכנסה צפויה', data: months.map((_, i) => monthlyRevenue(i + 1)), backgroundColor: 'rgba(163, 230, 53, 0.6)', borderRadius: 6 },
-      { label: 'כניסת תשלום', data: months.map((_, i) => cashInflow(i + 1)), backgroundColor: 'rgba(251, 191, 36, 0.6)', borderRadius: 6 },
+      { label: 'הכנסה צפויה', data: months.map((_, i) => monthlyRevenue(i + 1)), backgroundColor: COLORS.primary, borderRadius: 0 },
+      { label: 'כניסת תשלום', data: months.map((_, i) => cashInflow(i + 1)), backgroundColor: COLORS.amber, borderRadius: 0 },
     ]
   }
 })
@@ -426,7 +371,7 @@ const expenseChartData = computed(() => {
   if (!cats.length) return null
   return {
     labels: cats.map(c => c.label),
-    datasets: [{ data: cats.map(c => c.total), backgroundColor: cats.map(c => c.chartColor), borderWidth: 0 }]
+    datasets: [{ data: cats.map(c => c.total), backgroundColor: cats.map(c => c.chartColor), borderWidth: 1, borderColor: COLORS.paperLight }]
   }
 })
 
@@ -434,7 +379,7 @@ const cashflowChartData = computed(() => {
   if (!formData.value) return null
   let cumulative = 0
   const inflows = months.map((_, i) => cashInflow(i + 1))
-  const outflows = months.map(() => totalExpenses.value / 12) // simplified monthly
+  const outflows = months.map(() => totalExpenses.value / 12)
   const cumulativeData = months.map((_, i) => {
     cumulative += inflows[i] - outflows[i]
     return cumulative
@@ -442,16 +387,47 @@ const cashflowChartData = computed(() => {
   return {
     labels: months,
     datasets: [
-      { label: 'כניסות', data: inflows, backgroundColor: 'rgba(163, 230, 53, 0.6)', borderRadius: 6, order: 2 },
-      { label: 'יציאות', data: outflows.map(v => -v), backgroundColor: 'rgba(251, 146, 60, 0.6)', borderRadius: 6, order: 2 },
-      { label: 'מצטבר', data: cumulativeData, type: 'line', borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.3, pointRadius: 3, order: 1 },
+      { label: 'כניסות', data: inflows, backgroundColor: COLORS.positive || COLORS.green, borderRadius: 0, order: 2 },
+      { label: 'יציאות', data: outflows.map(v => -v), backgroundColor: COLORS.amber, borderRadius: 0, order: 2 },
+      { label: 'מצטבר', data: cumulativeData, type: 'line', borderColor: COLORS.primary, backgroundColor: COLORS.primaryFill, fill: true, tension: 0.25, pointRadius: 3, order: 1 },
     ]
   }
 })
 
-const barOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { callback: v => v.toLocaleString('he-IL') } } } }
-const doughnutOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '65%' }
-const cashflowOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: v => v.toLocaleString('he-IL') } } } }
+const barOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: { legend: legendMini(), tooltip: tooltipConfig },
+  scales: { y: axisConfig.y, x: axisConfig.x },
+}
+const doughnutOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: { legend: { display: false }, tooltip: tooltipConfig },
+  cutout: '62%',
+}
+const cashflowOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: { legend: legendMini(), tooltip: tooltipConfig },
+  scales: { y: axisConfig.y, x: axisConfig.x },
+}
+
+function legendMini() {
+  return {
+    position: 'bottom',
+    rtl: true,
+    labels: {
+      font: { family: "'Assistant', system-ui, sans-serif", size: 11, weight: '500' },
+      color: COLORS.inkMuted,
+      padding: 12,
+      usePointStyle: true,
+      pointStyle: 'rectRounded',
+      boxWidth: 8,
+      boxHeight: 8,
+    },
+  }
+}
 
 async function load() {
   if (!props.project) return

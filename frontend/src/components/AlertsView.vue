@@ -1,59 +1,105 @@
 <template>
   <div>
-    <div class="flex items-center justify-between mb-6">
-      <h2 class="text-xl font-bold text-gray-800">התראות</h2>
-      <button v-if="!loading && alerts.length > 0" @click="clearAlerts"
-        class="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition flex items-center gap-2">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-        </svg>
-        איפוס התראות
-      </button>
-    </div>
+    <SectionHeader
+      eyebrow="התראות"
+      :kicker="dateLabel"
+      title="התראות פיננסיות"
+      subtitle="מעקב אחר חריגות מרווח, הפסדים תפעוליים, וחודשים ללא הכנסה."
+    >
+      <template #actions>
+        <button
+          v-if="!loading && alerts.length > 0"
+          @click="clearAlerts"
+          class="ed-link text-sm"
+        >
+          איפוס התראות ←
+        </button>
+      </template>
+    </SectionHeader>
 
-    <div v-if="loading" class="text-center py-20 text-gray-400">טוען נתונים...</div>
+    <div v-if="loading" class="font-sans text-ink-muted py-20 text-center">טוען נתונים…</div>
 
     <template v-if="!loading">
-      <div v-if="alerts.length === 0"
-        class="bg-white rounded-2xl p-12 shadow-sm border border-gray-100 text-center">
-        <div class="text-4xl mb-4">&#9989;</div>
-        <div class="text-lg font-semibold text-gray-700 mb-2">אין התראות</div>
-        <div class="text-sm text-gray-400">כל הפרויקטים פועלים בטווח התקין</div>
+      <!-- Empty state -->
+      <div v-if="alerts.length === 0" class="ed-section text-center py-16">
+        <div class="ed-eyebrow mb-3">—</div>
+        <p class="font-sans text-2xl text-ink leading-tight max-w-lg mx-auto">
+          כל הפרויקטים פועלים בטווח התקין.
+        </p>
+        <div class="ed-eyebrow mt-4">אין התראות פתוחות כרגע</div>
       </div>
 
-      <div v-else class="space-y-4">
-        <div v-for="(alert, i) in alerts" :key="i"
-          class="bg-white rounded-2xl p-5 shadow-sm border flex items-start gap-4 transition-colors"
-          :class="alert.severity === 'high' ? 'border-red-200' : 'border-orange-200'">
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-            :class="alert.severity === 'high' ? 'bg-red-50 text-red-500' : 'bg-orange-50 text-orange-500'">
-            <span class="text-lg">&#9888;</span>
+      <div v-else class="space-y-6">
+        <!-- Summary strip -->
+        <div class="ed-section flex flex-wrap gap-8 ed-col-rule ed-fade-up">
+          <div>
+            <div class="ed-eyebrow mb-2">סה״כ התראות</div>
+            <div class="font-sans font-semibold text-ink ed-num" style="font-size: clamp(2rem, 4vw, 3rem); line-height: 1;">{{ alerts.length }}</div>
           </div>
-          <div class="flex-1">
-            <div class="flex items-center gap-2 mb-1">
-              <span class="font-semibold text-gray-800">{{ alert.project }}</span>
-              <span class="text-xs px-2 py-0.5 rounded-full font-medium"
-                :class="alert.severity === 'high' ? 'bg-red-100 text-red-600' : 'bg-orange-100 text-orange-600'">
-                {{ alert.severity === 'high' ? 'גבוה' : 'בינוני' }}
-              </span>
-            </div>
-            <div class="text-sm text-gray-600">{{ alert.message }}</div>
-            <div v-if="alert.detail" class="text-xs text-gray-400 mt-1">{{ alert.detail }}</div>
+          <div>
+            <div class="ed-eyebrow mb-2 ed-tone-accent">חמור</div>
+            <div class="font-sans font-semibold ed-tone-accent ed-num" style="font-size: clamp(2rem, 4vw, 3rem); line-height: 1;">{{ highCount }}</div>
+          </div>
+          <div>
+            <div class="ed-eyebrow mb-2 ed-tone-warning">בינוני</div>
+            <div class="font-sans font-semibold ed-tone-warning ed-num" style="font-size: clamp(2rem, 4vw, 3rem); line-height: 1;">{{ mediumCount }}</div>
           </div>
         </div>
+
+        <!-- High-severity: pull-quote treatment -->
+        <template v-if="highAlerts.length > 0">
+          <div class="ed-eyebrow mb-2">חריגות חמורות</div>
+          <PullQuote
+            v-for="(alert, i) in highAlerts"
+            :key="'high-' + i"
+            severity="high"
+            :eyebrow="alert.project"
+          >
+            {{ alert.message }}
+            <template #cite>
+              {{ alert.detail }}
+            </template>
+          </PullQuote>
+        </template>
+
+        <!-- Medium-severity: hairline list -->
+        <template v-if="mediumAlerts.length > 0">
+          <div class="ed-eyebrow mt-8 mb-2">התראות לתשומת לב</div>
+          <div class="border-t border-rule-strong">
+            <article
+              v-for="(alert, i) in mediumAlerts"
+              :key="'med-' + i"
+              class="py-5 border-b border-rule"
+            >
+              <div class="flex items-baseline gap-3 mb-2 flex-wrap">
+                <span class="ed-eyebrow ed-tone-warning">בינוני</span>
+                <h3 class="font-sans font-semibold text-ink text-xl leading-tight">{{ alert.project }}</h3>
+              </div>
+              <p class="font-sans text-ink text-[0.9375rem] leading-relaxed">{{ alert.message }}</p>
+              <p v-if="alert.detail" class="ed-footnote mt-1.5" style="padding-top: 0; border-top: 0;">{{ alert.detail }}</p>
+            </article>
+          </div>
+        </template>
       </div>
     </template>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { getPnl } from '../services/api'
+import { SectionHeader, PullQuote, currentHebrewDate } from './editorial'
 
 const emit = defineEmits(['alertsCleared'])
 
 const alerts = ref([])
 const loading = ref(true)
+
+const dateLabel = computed(() => currentHebrewDate())
+const highAlerts = computed(() => alerts.value.filter(a => a.severity === 'high'))
+const mediumAlerts = computed(() => alerts.value.filter(a => a.severity !== 'high'))
+const highCount = computed(() => highAlerts.value.length)
+const mediumCount = computed(() => mediumAlerts.value.length)
 
 function clearAlerts() {
   alerts.value = []
@@ -64,7 +110,6 @@ onMounted(async () => {
   try {
     const data = await getPnl()
     for (const [name, project] of Object.entries(data)) {
-      // Check margin alerts
       if (project.summary.margin != null && project.summary.margin < 20) {
         alerts.value.push({
           project: name,
@@ -74,7 +119,6 @@ onMounted(async () => {
         })
       }
 
-      // Check months with negative operating profit
       const negativeProfitMonths = project.months.filter(m => m.operating_profit < 0 && m.revenue > 0)
       if (negativeProfitMonths.length > 0) {
         alerts.value.push({
@@ -85,7 +129,6 @@ onMounted(async () => {
         })
       }
 
-      // Months with no revenue (only within project date range)
       const startMonth = project.meta?.start_month || 1
       const endMonth = project.meta?.end_month || 12
       const projectMonths = project.months.filter(m => m.month >= startMonth && m.month <= endMonth)

@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from routers import projects, cashflow, dashboard, data, reports, project_form, attendance, auth
+from routers import projects, cashflow, dashboard, reports, project_form, auth, ai
 
 ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
 
@@ -21,10 +21,9 @@ app.include_router(auth.router)
 app.include_router(projects.router)
 app.include_router(cashflow.router)
 app.include_router(dashboard.router)
-app.include_router(data.router)
 app.include_router(reports.router)
 app.include_router(project_form.router)
-app.include_router(attendance.router)
+app.include_router(ai.router)
 
 # Serve frontend static files in production
 STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'frontend', 'dist')

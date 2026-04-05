@@ -7,6 +7,7 @@ backend/__pycache__/
 
 # Data files (contain sensitive financial data)
 data.xlsx
+*.xlsx
 attendance_data.json
 projects_data.json
 reports_data.json
@@ -18,6 +19,13 @@ frontend/dist/
 # Environment
 .env
 
+# Firebase service account (SECRET - never commit)
+backend/firebase-service-account.json
+*firebase-adminsdk*.json
+backend/service-account.json
+**/service-account*.json
+**/*-service-account*.json
+
 # Backups & contracts
 backups/
 contracts/
@@ -25,6 +33,10 @@ contracts/
 # IDE
 .vscode/
 .idea/
+
+# Claude Code local config
+.claude/settings.local.json
+.claude/launch.json
 
 # OS
 .DS_Store

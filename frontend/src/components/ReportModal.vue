@@ -1,39 +1,44 @@
 <template>
   <Teleport to="body">
-    <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center" dir="rtl">
+    <div v-if="show" class="ui-modal-layer" dir="rtl">
       <!-- Backdrop -->
-      <div class="absolute inset-0 bg-black/40" @click="$emit('close')"></div>
+      <div class="ui-modal-backdrop" @click="$emit('close')"></div>
 
       <!-- Modal -->
-      <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-2 sm:mx-4 overflow-hidden">
+      <div class="ui-modal-card ed-fade-up" style="max-width: 36rem;">
         <!-- Header -->
-        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <div>
-            <h3 class="font-bold text-gray-800">דיווח נקודתי</h3>
-            <p class="text-xs text-gray-400 mt-0.5">{{ project }}</p>
+        <header class="px-7 pt-6 pb-4">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <div class="ed-eyebrow mb-1">דיווח נקודתי</div>
+              <h3 class="font-sans font-semibold text-ink leading-none" style="font-size: clamp(1.75rem, 3vw, 2.25rem);">
+                הוסף דיווח
+              </h3>
+              <p class="font-sans text-ink-muted mt-1.5 text-sm">{{ project }}</p>
+            </div>
+            <button @click="$emit('close')" class="text-ink-muted hover:text-accent transition-colors" aria-label="סגור">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="square" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
           </div>
-          <button @click="$emit('close')"
-            class="p-2 rounded-xl hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-          </button>
-        </div>
+          <hr class="ed-rule mt-4" />
+        </header>
 
-        <!-- Form -->
-        <div class="px-6 py-5 space-y-4">
-          <!-- Type -->
+        <!-- Form body -->
+        <div class="flex-1 overflow-y-auto px-7 py-5 space-y-6">
+          <!-- Type segmented list -->
           <div>
-            <label class="block text-xs font-medium text-gray-600 mb-2">סוג דיווח</label>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              <button v-for="t in types" :key="t.id" @click="form.type = t.id"
-                :class="[
-                  'px-3 py-2.5 rounded-xl text-xs font-medium border transition-all text-center',
-                  form.type === t.id
-                    ? 'border-emerald-400 bg-emerald-50 text-emerald-800'
-                    : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'
-                ]">
-                <div class="text-lg mb-0.5">{{ t.icon }}</div>
+            <label class="ed-label">סוג דיווח</label>
+            <div class="flex flex-wrap gap-x-6 gap-y-2 border-t border-rule pt-3">
+              <button
+                v-for="t in types"
+                :key="t.id"
+                type="button"
+                @click="form.type = t.id"
+                class="ed-link text-base"
+                :class="{ 'is-active': form.type === t.id }"
+              >
                 {{ t.label }}
               </button>
             </div>
@@ -41,9 +46,8 @@
 
           <!-- Month -->
           <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1.5">חודש (אופציונלי)</label>
-            <select v-model="form.month"
-              class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:border-emerald-400 transition">
+            <label class="ed-label">חודש (אופציונלי)</label>
+            <select v-model="form.month" class="ed-select">
               <option :value="null">כללי — לא קשור לחודש ספציפי</option>
               <option v-for="m in 12" :key="m" :value="m">חודש {{ m }}</option>
             </select>
@@ -51,57 +55,75 @@
 
           <!-- Title -->
           <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1.5">כותרת *</label>
-            <input v-model="form.title" type="text" placeholder="למשל: הוצאה חריגה על תיקון..."
+            <label class="ed-label">כותרת *</label>
+            <input
+              v-model="form.title"
+              type="text"
+              placeholder="למשל: הוצאה חריגה על תיקון…"
               maxlength="100"
               @blur="validateTitle"
-              :class="['w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:border-emerald-400 transition',
-                fe.title ? 'border-red-400! bg-red-50!' : '']" />
-            <div class="flex justify-between mt-0.5">
-              <span v-if="fe.title" class="text-red-500 text-[10px]">{{ fe.title }}</span>
+              class="ed-input"
+              :class="{ 'is-error': fe.title }"
+            />
+            <div class="flex justify-between mt-1 items-center">
+              <span v-if="fe.title" class="font-sans text-xs ed-tone-negative">{{ fe.title }}</span>
               <span v-else></span>
-              <span class="text-gray-400 text-[10px]">{{ form.title.length }}/100</span>
+              <span class="ed-eyebrow ed-num" style="font-size: 0.625rem;"><bdi>{{ form.title.length }}/100</bdi></span>
             </div>
           </div>
 
-          <!-- Amount (for expense/revenue) -->
+          <!-- Amount -->
           <div v-if="form.type === 'expense' || form.type === 'revenue'">
-            <label class="block text-xs font-medium text-gray-600 mb-1.5">סכום (ש"ח) *</label>
-            <input v-model.number="form.amount" type="number" placeholder="0" min="1"
+            <label class="ed-label">סכום (₪) *</label>
+            <input
+              v-model.number="form.amount"
+              type="number"
+              placeholder="0"
+              min="1"
               @blur="validateAmount"
-              :class="['w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:border-emerald-400 transition',
-                fe.amount ? 'border-red-400! bg-red-50!' : '']" />
-            <span v-if="fe.amount" class="text-red-500 text-[10px] mt-0.5 block">{{ fe.amount }}</span>
+              class="ed-input ed-num"
+              :class="{ 'is-error': fe.amount }"
+            />
+            <span v-if="fe.amount" class="font-sans text-xs ed-tone-negative mt-1 block">{{ fe.amount }}</span>
           </div>
 
           <!-- Description -->
           <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1.5">פירוט</label>
-            <textarea v-model="form.description" rows="3" placeholder="תיאור מפורט..." maxlength="500"
-              :class="['w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:border-emerald-400 transition resize-none',
-                form.description.length > 500 ? 'border-red-400! bg-red-50!' : '']"></textarea>
-            <div class="flex justify-end mt-0.5">
-              <span :class="['text-[10px]', form.description.length > 480 ? 'text-orange-500' : 'text-gray-400']">{{ form.description.length }}/500</span>
+            <label class="ed-label">פירוט</label>
+            <textarea
+              v-model="form.description"
+              rows="3"
+              placeholder="תיאור מפורט…"
+              maxlength="500"
+              class="ed-input"
+              style="resize: none;"
+            ></textarea>
+            <div class="flex justify-end mt-1">
+              <span
+                class="ed-eyebrow ed-num"
+                :class="form.description.length > 480 ? 'ed-tone-warning' : ''"
+                style="font-size: 0.625rem;"
+              >
+                <bdi>{{ form.description.length }}/500</bdi>
+              </span>
             </div>
           </div>
 
           <!-- Error -->
-          <div v-if="error" class="bg-red-50 text-red-600 text-xs px-3 py-2 rounded-lg">{{ error }}</div>
+          <p v-if="error" class="font-sans text-sm ed-tone-negative">{{ error }}</p>
         </div>
 
         <!-- Footer -->
-        <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
-          <button @click="$emit('close')"
-            class="px-4 py-2 text-sm text-gray-500 hover:text-gray-700 transition">ביטול</button>
-          <button @click="submit" :disabled="!canSubmit || submitting"
-            class="px-6 py-2.5 bg-emerald-700 text-white text-sm font-medium rounded-xl hover:bg-emerald-800 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center gap-2">
-            <svg v-if="submitting" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-            </svg>
-            <span>{{ submitting ? 'שומר...' : 'שמור דיווח' }}</span>
+        <footer class="px-7 py-5 border-t border-rule-strong flex items-center justify-between gap-4">
+          <button @click="$emit('close')" class="ed-link text-sm">ביטול</button>
+          <button
+            @click="submit"
+            :disabled="!canSubmit || submitting"
+            class="ed-btn ed-btn-primary"
+          >
+            {{ submitting ? 'שומר…' : 'שמור דיווח' }} →
           </button>
-        </div>
+        </footer>
       </div>
     </div>
   </Teleport>
@@ -119,10 +141,10 @@ const props = defineProps({
 const emit = defineEmits(['close', 'saved'])
 
 const types = [
-  { id: 'expense', label: 'הוצאה', icon: '💸' },
-  { id: 'revenue', label: 'הכנסה', icon: '💰' },
-  { id: 'issue', label: 'בעיה', icon: '⚠️' },
-  { id: 'note', label: 'הערה', icon: '📝' },
+  { id: 'expense', label: 'הוצאה' },
+  { id: 'revenue', label: 'הכנסה' },
+  { id: 'issue', label: 'בעיה' },
+  { id: 'note', label: 'הערה' },
 ]
 
 const form = reactive({

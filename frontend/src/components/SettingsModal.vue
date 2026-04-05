@@ -1,98 +1,150 @@
 <template>
   <Teleport to="body">
-    <div v-if="show" class="fixed inset-0 z-[80] flex items-center justify-center" dir="rtl">
-      <div class="absolute inset-0 bg-black/40" @click="$emit('close')"></div>
-      <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+    <div v-if="show" class="ui-modal-layer" dir="rtl">
+      <div class="ui-modal-backdrop" @click="$emit('close')"></div>
+      <div class="ui-modal-card ed-fade-up" style="max-width: 48rem;">
         <!-- Header -->
-        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h2 class="text-lg font-bold text-gray-800">הגדרות</h2>
-          <button @click="$emit('close')" class="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-          </button>
-        </div>
+        <header class="px-7 pt-6 pb-4">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <div class="ed-eyebrow mb-1">מערכת</div>
+              <h2 class="font-sans font-semibold text-ink leading-none" style="font-size: clamp(1.75rem, 3vw, 2.25rem);">הגדרות</h2>
+            </div>
+            <button @click="$emit('close')" class="text-ink-muted hover:text-accent transition-colors" aria-label="סגור">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="square" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          <hr class="ed-rule mt-4" />
 
-        <!-- Tabs -->
-        <div class="flex gap-1 px-6 pt-4 border-b border-gray-100">
-          <button v-for="tab in tabs" :key="tab.key" @click="activeTab = tab.key"
-            :class="['px-4 py-2.5 text-sm font-medium rounded-t-lg transition -mb-px', activeTab === tab.key ? 'bg-white border border-gray-100 border-b-white text-gray-900' : 'text-gray-500 hover:text-gray-700']">
-            {{ tab.label }}
-          </button>
-        </div>
+          <!-- Tabs via section markers -->
+          <div class="flex gap-x-8 mt-4">
+            <SectionMarker
+              v-for="tab in tabs"
+              :key="tab.key"
+              :label="tab.label"
+              :active="activeTab === tab.key"
+              @click="activeTab = tab.key"
+            />
+          </div>
+        </header>
 
         <!-- Content -->
-        <div class="px-6 py-5">
+        <div class="flex-1 overflow-y-auto px-7 py-6">
 
           <!-- Users Tab -->
           <div v-if="activeTab === 'users'">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-sm font-semibold text-gray-700">משתמשים רשומים</h3>
-              <button @click="showAddUser = !showAddUser" class="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-medium hover:bg-emerald-700 transition">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                הוסף משתמש
+            <div class="flex items-center justify-between mb-5">
+              <h3 class="font-sans font-semibold text-ink text-xl">משתמשים רשומים</h3>
+              <button @click="showAddUser = !showAddUser" class="ed-link text-sm">
+                + הוסף משתמש
               </button>
             </div>
 
             <!-- Add user form -->
-            <div v-if="showAddUser" class="bg-gray-50 rounded-xl p-4 mb-4 space-y-3">
-              <div class="grid grid-cols-2 gap-3">
+            <div v-if="showAddUser" class="bg-paper-dark/30 border-t border-b border-rule-strong py-5 px-5 mb-6 ed-fade-up">
+              <div class="ed-eyebrow mb-4">משתמש חדש</div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                 <div>
-                  <label class="block text-xs font-medium text-gray-600 mb-1">שם משתמש *</label>
-                  <input v-model="newUser.username" type="text" class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300" />
+                  <label class="ed-label">שם משתמש *</label>
+                  <input v-model="newUser.username" type="text" class="ed-input" />
                 </div>
                 <div>
-                  <label class="block text-xs font-medium text-gray-600 mb-1">סיסמה *</label>
-                  <input v-model="newUser.password" type="password" class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300" />
+                  <label class="ed-label">סיסמה *</label>
+                  <input v-model="newUser.password" type="password" class="ed-input" />
                 </div>
                 <div>
-                  <label class="block text-xs font-medium text-gray-600 mb-1">שם מלא</label>
-                  <input v-model="newUser.full_name" type="text" class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300" />
+                  <label class="ed-label">שם מלא</label>
+                  <input v-model="newUser.full_name" type="text" class="ed-input" />
                 </div>
                 <div>
-                  <label class="block text-xs font-medium text-gray-600 mb-1">אימייל</label>
-                  <input v-model="newUser.email" type="email" dir="ltr" class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-left focus:outline-none focus:ring-2 focus:ring-emerald-300" />
+                  <label class="ed-label">אימייל</label>
+                  <input v-model="newUser.email" type="email" dir="ltr" class="ed-input" />
                 </div>
                 <div>
-                  <label class="block text-xs font-medium text-gray-600 mb-1">תפקיד</label>
-                  <select v-model="newUser.role" class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300">
-                    <option value="מנהל">מנהל</option>
-                    <option value="צופה">צופה</option>
+                  <label class="ed-label">הרשאה</label>
+                  <select v-model="newUser.role" class="ed-select">
+                    <option value="admin">מנהל מערכת</option>
+                    <option value="economist">כלכלנית</option>
+                    <option value="viewer">צופה מלא</option>
+                    <option value="project_manager">מנהל פרויקט</option>
+                  </select>
+                </div>
+                <div v-if="newUser.role === 'project_manager'">
+                  <label class="ed-label">מנהל משויך *</label>
+                  <select v-model="newUser.linked_manager" class="ed-select">
+                    <option value="" disabled>בחר מנהל</option>
+                    <option value="אלון">אלון</option>
+                    <option value="אתי">אתי</option>
+                    <option value="אריאל">אריאל</option>
                   </select>
                 </div>
               </div>
-              <div class="flex justify-end gap-2">
-                <button @click="showAddUser = false" class="px-4 py-2 text-xs font-medium text-gray-500 hover:bg-gray-100 rounded-lg transition">ביטול</button>
-                <button @click="handleCreateUser" :disabled="saving" class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-xs font-medium hover:bg-emerald-700 disabled:opacity-50 transition">צור משתמש</button>
+              <div class="flex justify-end gap-6 mt-6">
+                <button @click="showAddUser = false" class="ed-link text-sm">ביטול</button>
+                <button @click="handleCreateUser" :disabled="saving" class="ed-btn ed-btn-primary">
+                  צור משתמש →
+                </button>
               </div>
             </div>
 
             <!-- Users table -->
             <div class="overflow-x-auto">
-              <table class="w-full text-sm">
+              <table class="ed-table">
                 <thead>
-                  <tr class="border-b border-gray-100">
-                    <th class="text-right py-2.5 px-3 text-xs font-semibold text-gray-500">שם משתמש</th>
-                    <th class="text-right py-2.5 px-3 text-xs font-semibold text-gray-500">שם מלא</th>
-                    <th class="text-right py-2.5 px-3 text-xs font-semibold text-gray-500">אימייל</th>
-                    <th class="text-right py-2.5 px-3 text-xs font-semibold text-gray-500">תפקיד</th>
-                    <th class="text-right py-2.5 px-3 text-xs font-semibold text-gray-500">הרשאות</th>
-                    <th class="py-2.5 px-3"></th>
+                  <tr>
+                    <th>שם משתמש</th>
+                    <th>שם מלא</th>
+                    <th>הרשאה</th>
+                    <th>מנהל משויך</th>
+                    <th style="width: 100px;">פעולות</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="u in users" :key="u.username" class="border-b border-gray-50 hover:bg-gray-50/50">
-                    <td class="py-3 px-3 font-medium text-gray-800">{{ u.username }}</td>
-                    <td class="py-3 px-3 text-gray-600">{{ u.full_name || '-' }}</td>
-                    <td class="py-3 px-3 text-gray-600" dir="ltr">{{ u.email || '-' }}</td>
-                    <td class="py-3 px-3">
-                      <span :class="['px-2.5 py-1 rounded-full text-xs font-medium', u.role === 'מנהל' ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-600']">{{ u.role || 'מנהל' }}</span>
+                  <tr v-for="u in users" :key="u.username">
+                    <td class="font-sans font-semibold">{{ u.username }}</td>
+                    <td>
+                      <template v-if="editingUser === u.username">
+                        <input v-model="editForm.full_name" type="text" class="ed-input" />
+                      </template>
+                      <template v-else>{{ u.full_name || '—' }}</template>
                     </td>
-                    <td class="py-3 px-3">
-                      <span class="text-xs text-gray-400">בקרוב</span>
+                    <td>
+                      <template v-if="editingUser === u.username">
+                        <select v-model="editForm.role" class="ed-select">
+                          <option value="admin">מנהל מערכת</option>
+                          <option value="economist">כלכלנית</option>
+                          <option value="viewer">צופה מלא</option>
+                          <option value="project_manager">מנהל פרויקט</option>
+                        </select>
+                      </template>
+                      <template v-else>
+                        <span class="ed-eyebrow">{{ roleLabel(u.role) }}</span>
+                      </template>
                     </td>
-                    <td class="py-3 px-3">
-                      <button @click="handleDeleteUser(u.username)" class="p-1.5 rounded-lg hover:bg-red-50 text-gray-300 hover:text-red-500 transition" title="מחק">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                      </button>
+                    <td>
+                      <template v-if="editingUser === u.username && editForm.role === 'project_manager'">
+                        <select v-model="editForm.linked_manager" class="ed-select">
+                          <option value="">בחר</option>
+                          <option value="אלון">אלון</option>
+                          <option value="אתי">אתי</option>
+                          <option value="אריאל">אריאל</option>
+                        </select>
+                      </template>
+                      <template v-else>{{ u.linked_manager || '—' }}</template>
+                    </td>
+                    <td>
+                      <div class="flex items-center gap-3">
+                        <template v-if="editingUser === u.username">
+                          <button @click="handleSaveUser" class="ed-link text-xs ed-tone-positive" title="שמור">שמור</button>
+                          <button @click="editingUser = ''" class="ed-link text-xs" title="ביטול">בטל</button>
+                        </template>
+                        <template v-else>
+                          <button @click="startEdit(u)" class="ed-link text-xs" title="ערוך">ערוך</button>
+                          <button @click="handleDeleteUser(u.username)" class="ed-link text-xs ed-tone-negative" title="מחק">מחק</button>
+                        </template>
+                      </div>
                     </td>
                   </tr>
                 </tbody>
@@ -101,27 +153,28 @@
           </div>
 
           <!-- General Settings Tab -->
-          <div v-if="activeTab === 'general'" class="space-y-6">
+          <div v-if="activeTab === 'general'" class="space-y-8">
             <div>
-              <h3 class="text-sm font-semibold text-gray-700 mb-3">שפה</h3>
-              <div class="flex items-center gap-3 bg-gray-50 rounded-xl p-4">
-                <span class="text-sm text-gray-600">עברית</span>
-                <span class="text-xs text-gray-400">(ברירת מחדל)</span>
-              </div>
+              <div class="ed-eyebrow mb-3">שפה</div>
+              <div class="font-display text-ink text-lg">עברית</div>
+              <p class="font-sans text-ink-muted text-sm mt-1">ברירת מחדל של המערכת</p>
             </div>
+            <hr class="ed-rule" />
             <div>
-              <h3 class="text-sm font-semibold text-gray-700 mb-3">ברירות מחדל — תנאי תשלום</h3>
-              <div class="bg-gray-50 rounded-xl p-4 text-sm text-gray-400">בקרוב — הגדרת תנאי תשלום ברירת מחדל לפרויקטים חדשים</div>
-            </div>
-            <div>
-              <h3 class="text-sm font-semibold text-gray-700 mb-3">קטגוריות הוצאות</h3>
-              <div class="bg-gray-50 rounded-xl p-4 text-sm text-gray-400">בקרוב — ניהול וקסטום של קטגוריות הוצאות</div>
+              <div class="ed-eyebrow mb-3">ברירות מחדל — תנאי תשלום</div>
+              <p class="font-sans text-ink-muted text-sm">בקרוב — הגדרת תנאי תשלום ברירת מחדל לפרויקטים חדשים.</p>
             </div>
           </div>
         </div>
 
         <!-- Messages -->
-        <div v-if="message" :class="['mx-6 mb-4 text-sm px-4 py-2.5 rounded-lg', messageType === 'success' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600']">{{ message }}</div>
+        <p
+          v-if="message"
+          class="mx-7 mb-5 font-sans text-sm"
+          :class="messageType === 'success' ? 'ed-tone-positive' : 'ed-tone-negative'"
+        >
+          {{ message }}
+        </p>
       </div>
     </div>
   </Teleport>
@@ -129,10 +182,20 @@
 
 <script setup>
 import { ref, reactive, watch } from 'vue'
-import { getUsers, createUser, deleteUser } from '../services/api'
+import { getUsers, createUser, deleteUser, updateUser } from '../services/api'
+import { SectionMarker } from './editorial'
 
 const props = defineProps({ show: Boolean })
 defineEmits(['close'])
+
+const ROLE_MAP = {
+  admin: 'מנהל מערכת',
+  economist: 'כלכלנית',
+  viewer: 'צופה מלא',
+  project_manager: 'מנהל פרויקט',
+}
+
+function roleLabel(role) { return ROLE_MAP[role] || role || '—' }
 
 const tabs = [
   { key: 'users', label: 'ניהול משתמשים' },
@@ -144,7 +207,9 @@ const showAddUser = ref(false)
 const saving = ref(false)
 const message = ref('')
 const messageType = ref('success')
-const newUser = reactive({ username: '', password: '', full_name: '', email: '', role: 'צופה' })
+const newUser = reactive({ username: '', password: '', full_name: '', email: '', role: 'viewer', linked_manager: '' })
+const editingUser = ref('')
+const editForm = reactive({ full_name: '', role: '', linked_manager: '' })
 
 watch(() => props.show, async (val) => {
   if (val) {
@@ -158,15 +223,39 @@ async function handleCreateUser() {
   if (!newUser.username || !newUser.password) {
     message.value = 'שם משתמש וסיסמה הם שדות חובה'; messageType.value = 'error'; return
   }
+  if (newUser.role === 'project_manager' && !newUser.linked_manager) {
+    message.value = 'יש לבחור מנהל משויך עבור מנהל פרויקט'; messageType.value = 'error'; return
+  }
   saving.value = true; message.value = ''
   try {
     await createUser({ ...newUser })
     message.value = `משתמש '${newUser.username}' נוצר`; messageType.value = 'success'
-    newUser.username = ''; newUser.password = ''; newUser.full_name = ''; newUser.email = ''; newUser.role = 'צופה'
+    Object.assign(newUser, { username: '', password: '', full_name: '', email: '', role: 'viewer', linked_manager: '' })
     showAddUser.value = false
     users.value = await getUsers()
   } catch (e) { message.value = e.message; messageType.value = 'error' }
   saving.value = false
+}
+
+function startEdit(u) {
+  editingUser.value = u.username
+  editForm.full_name = u.full_name || ''
+  editForm.role = u.role || 'viewer'
+  editForm.linked_manager = u.linked_manager || ''
+}
+
+async function handleSaveUser() {
+  message.value = ''
+  try {
+    await updateUser(editingUser.value, {
+      full_name: editForm.full_name,
+      role: editForm.role,
+      linked_manager: editForm.role === 'project_manager' ? editForm.linked_manager : '',
+    })
+    editingUser.value = ''
+    users.value = await getUsers()
+    message.value = 'המשתמש עודכן'; messageType.value = 'success'
+  } catch (e) { message.value = e.message; messageType.value = 'error' }
 }
 
 async function handleDeleteUser(username) {
