@@ -90,17 +90,6 @@
         </template>
       </RuledSection>
 
-      <!-- Quick Actions -->
-      <RuledSection eyebrow="פעולות מערכת">
-        <div class="flex flex-wrap gap-8">
-          <button @click="$emit('new-project')" class="ed-btn ed-btn-primary">
-            צור פרויקט חדש →
-          </button>
-          <button @click="$emit('switch-to-operations')" class="ed-btn">
-            לדשבורד התפעולי →
-          </button>
-        </div>
-      </RuledSection>
     </template>
   </div>
 </template>

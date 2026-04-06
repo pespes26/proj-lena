@@ -168,9 +168,11 @@
                       <span class="text-xs text-ink-faint">%</span>
                     </div>
                     <div v-if="term.type !== 'פעימות תשלום'" class="flex items-center gap-1">
-                      <input :value="fmtNum(form.total_revenue ? Math.round(form.total_revenue * (term.percent || 0) / 100) : 0)"
-                        @input="updateTermAmount(i, $event)" type="text" inputmode="numeric" placeholder="0"
-                        class="w-24 bg-white border border-rule-strong rounded-lg px-2 py-2 text-xs text-center focus:outline-none focus:border-gray-400 focus:ring-0" />
+                      <input type="text" inputmode="numeric"
+                        :value="fmtNum(termAmount(i))"
+                        @input="onTermAmountInput(i, $event)"
+                        placeholder="0"
+                        class="w-28 bg-white border border-rule-strong rounded-lg px-2 py-2 text-xs text-center focus:outline-none focus:border-gray-400 focus:ring-0" />
                       <span class="text-xs text-ink-faint">₪</span>
                     </div>
                     <button v-if="form.revenue_payment_terms.length > 1" @click="form.revenue_payment_terms.splice(i, 1)"
@@ -195,7 +197,7 @@
                         <span class="text-xs text-ink-faint">%</span>
                       </div>
                       <div class="flex items-center gap-1">
-                        <input :value="fmtNum(ms.amount)" @input="e => { ms.amount = parseNum(e.target.value); syncMilestoneFromAmount(mi) }" type="text" inputmode="numeric" placeholder="סכום"
+                        <input :value="fmtNum(ms.amount)" @change="e => { ms.amount = parseNum(e.target.value); syncMilestoneFromAmount(mi) }" @blur="e => { ms.amount = parseNum(e.target.value); syncMilestoneFromAmount(mi) }" type="text" inputmode="numeric" placeholder="סכום"
                           class="w-24 bg-paper-dark border border-rule-strong rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none focus:border-gray-400 focus:ring-0" />
                         <span class="text-xs text-ink-faint">₪</span>
                       </div>
@@ -243,12 +245,10 @@
                     <!-- Editable amount row -->
                     <tr>
                       <td v-for="m in 12" :key="m" class="px-0.5 py-1">
-                        <input type="number" min="0"
-                          :value="revenueAmountForMonth(m)"
-                          @input="setRevenueAmount(m, $event.target.value)"
-                          class="w-full bg-white border border-rule-strong rounded px-1 py-1.5 text-xs text-center focus:outline-none focus:border-accent focus:ring-0"
-                          :class="revenueAmountForMonth(m) > 0 ? 'text-positive font-medium' : 'text-ink-faint'"
-                          placeholder="-" />
+                        <div class="w-full px-1 py-1.5 text-xs text-center"
+                          :class="revenueAmountForMonth(m) > 0 ? 'text-positive font-medium' : 'text-ink-faint'">
+                          {{ revenueAmountForMonth(m) ? revenueAmountForMonth(m).toLocaleString('he-IL') : '-' }}
+                        </div>
                       </td>
                     </tr>
                     <!-- Percentage row (auto-computed) -->
@@ -669,7 +669,7 @@
                             <span class="text-xs text-ink-faint">%</span>
                           </div>
                           <div class="flex items-center gap-1">
-                            <input :value="fmtNum(ms.amount)" @input="e => { ms.amount = parseNum(e.target.value); syncLineMilestoneFromAmount(line, mi) }" type="text" inputmode="numeric" placeholder="סכום"
+                            <input :value="fmtNum(ms.amount)" @change="e => { ms.amount = parseNum(e.target.value); syncLineMilestoneFromAmount(line, mi) }" @blur="e => { ms.amount = parseNum(e.target.value); syncLineMilestoneFromAmount(line, mi) }" type="text" inputmode="numeric" placeholder="סכום"
                               class="w-24 bg-paper-dark border border-rule-strong rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none focus:border-gray-400 focus:ring-0" />
                             <span class="text-xs text-ink-faint">₪</span>
                           </div>
@@ -1183,19 +1183,28 @@ function shotefPaymentMonth(invoiceMonth, invoiceYear, xDays) {
 }
 
 // Revenue forecast helpers: amount ↔ percentage conversion
-function revenueAmountForMonth(m) {
-  const pct = Number(form.revenue_forecast[m]) || 0
-  if (!pct || !form.total_revenue) return 0
-  return Math.round(form.total_revenue * pct / 100)
+// Local amounts array — breaks the reactive loop so typing works freely
+const revenueAmounts = reactive({})
+
+function initRevenueAmounts() {
+  for (let m = 1; m <= 12; m++) {
+    const pct = Number(form.revenue_forecast[m]) || 0
+    revenueAmounts[m] = (pct && form.total_revenue) ? Math.round(form.total_revenue * pct / 100) : 0
+  }
 }
 
-function setRevenueAmount(m, rawValue) {
+function revenueAmountForMonth(m) {
+  return revenueAmounts[m] || 0
+}
+
+function onRevenueAmountInput(m, rawValue) {
   const amount = Number(rawValue) || 0
+  revenueAmounts[m] = amount
   if (!form.total_revenue || form.total_revenue <= 0) {
     form.revenue_forecast[m] = 0
     return
   }
-  form.revenue_forecast[m] = Math.round((amount / form.total_revenue) * 10000) / 100
+  form.revenue_forecast[m] = (amount / form.total_revenue) * 100
 }
 
 const manualForecastTotal = computed(() => {
@@ -1379,11 +1388,25 @@ function clampPaymentTerm(index) {
   form.revenue_payment_terms[index].percent = Math.min(current, max)
 }
 
-function updateTermAmount(index, event) {
-  const amount = parseNum(event.target.value)
+// Term amount: derives ₪ from percentage
+function termAmount(index) {
+  const pct = Number(form.revenue_payment_terms[index].percent) || 0
+  return form.total_revenue ? Math.round(form.total_revenue * pct / 100) : 0
+}
+
+// On typing in the ₪ field: format with commas + sync percentage live
+function onTermAmountInput(index, event) {
+  const el = event.target
+  const raw = parseNum(el.value)
+  // Format with commas and preserve cursor
+  const pos = el.selectionStart
+  const oldLen = el.value.length
+  el.value = raw ? raw.toLocaleString('he-IL') : ''
+  const newLen = el.value.length
+  el.setSelectionRange(pos + newLen - oldLen, pos + newLen - oldLen)
+  // Sync percentage
   if (!form.total_revenue || form.total_revenue <= 0) return
-  const percent = Math.round((amount / form.total_revenue) * 10000) / 100
-  // Don't let total exceed 100%
+  const percent = (raw / form.total_revenue) * 100
   const othersTotal = form.revenue_payment_terms
     .filter((_, i) => i !== index)
     .reduce((a, t) => a + (Number(t.percent) || 0), 0)
@@ -1502,6 +1525,7 @@ watch(() => props.show, async (val) => {
         }
       } catch {}
     }
+    initRevenueAmounts()
     // Restore draft if exists
     const draftKey = `form_draft_${props.newProject ? '__draft__' : props.project}`
     const draft = localStorage.getItem(draftKey)
@@ -1515,6 +1539,7 @@ watch(() => props.show, async (val) => {
       } catch {}
       localStorage.removeItem(draftKey)
     }
+    initRevenueAmounts()
     // Capture snapshot for dirty checking
     originalFormSnapshot.value = JSON.stringify(form)
   }
