@@ -283,6 +283,7 @@
             <div class="bg-blue-50/60 border border-blue-100 rounded-xl p-4 flex items-center gap-4">
               <label class="text-sm font-medium text-ink whitespace-nowrap">תנאי תשלום ברירת מחדל</label>
               <select v-model="form.default_expense_payment_terms"
+                @change="applyDefaultPaymentTerms()"
                 class="bg-white border border-rule-strong rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gray-400 focus:ring-0 flex-1 max-w-[200px]">
                 <option value="מקדמה">מקדמה</option>
                 <option value="שוטף+0">שוטף+0</option>
@@ -292,7 +293,7 @@
                 <option value="שוטף+75">שוטף+75</option>
                 <option value="שוטף+90">שוטף+90</option>
               </select>
-              <span class="text-xs text-ink-faint">יחול על כל שורה חדשה</span>
+              <span class="text-xs text-ink-faint">יחול על כל ההוצאות</span>
             </div>
 
             <!-- Expense categories accordion -->
@@ -438,10 +439,14 @@
                             <option value="שוטף+90">שוטף+90</option>
                           </select>
                           <div class="flex items-center gap-1">
-                            <input v-model.number="term.percent" type="number" min="0" max="100" class="w-16 bg-white border border-rule-strong rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none focus:border-gray-400 focus:ring-0" />
-                            <span class="text-xs text-ink-faint">%</span>
+                            <input type="text" inputmode="numeric"
+                              :value="fmtNum(subTermAmount(sub, ti))"
+                              @input="onSubTermAmountInput(sub, ti, $event)"
+                              placeholder="0"
+                              class="w-24 bg-white border border-rule-strong rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none focus:border-gray-400 focus:ring-0" />
+                            <span class="text-xs text-ink-faint">₪</span>
                           </div>
-                          <span v-if="sub.total_amount && term.percent" class="text-xs text-ink-faint">{{ Math.round(sub.total_amount * term.percent / 100).toLocaleString('he-IL') }} ₪</span>
+                          <span class="text-xs text-ink-faint tabular-nums">{{ sub.total_amount && term.percent ? Math.round(term.percent * 10) / 10 + '%' : '' }}</span>
                           <button @click="sub.payment_terms.splice(ti, 1)" v-if="sub.payment_terms.length > 1"
                             class="text-red-400 hover:text-negative transition">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -1266,6 +1271,54 @@ const subcontractorsTotal = computed(() => {
 function subTermsTotal(sub) {
   if (!Array.isArray(sub.payment_terms)) return 0
   return sub.payment_terms.reduce((sum, t) => sum + (Number(t.percent) || 0), 0)
+}
+
+// Subcontractor term: derive amount from percent
+function subTermAmount(sub, termIndex) {
+  const pct = Number(sub.payment_terms[termIndex].percent) || 0
+  return sub.total_amount ? Math.round(sub.total_amount * pct / 100) : 0
+}
+
+// Subcontractor term: type amount → auto-compute percent
+function onSubTermAmountInput(sub, termIndex, event) {
+  const el = event.target
+  const raw = parseNum(el.value)
+  // Format with commas + preserve cursor
+  const pos = el.selectionStart
+  const oldLen = el.value.length
+  el.value = raw ? raw.toLocaleString('he-IL') : ''
+  const newLen = el.value.length
+  el.setSelectionRange(pos + newLen - oldLen, pos + newLen - oldLen)
+  // Sync percent from amount
+  if (!sub.total_amount || sub.total_amount <= 0) return
+  const percent = (raw / sub.total_amount) * 100
+  // Clamp so total doesn't exceed 100%
+  const othersTotal = sub.payment_terms
+    .filter((_, i) => i !== termIndex)
+    .reduce((a, t) => a + (Number(t.percent) || 0), 0)
+  const max = Math.max(0, 100 - othersTotal)
+  sub.payment_terms[termIndex].percent = Math.min(Math.max(0, percent), max)
+}
+
+// Apply default payment terms to ALL existing expense lines + subcontractors
+function applyDefaultPaymentTerms() {
+  const val = form.default_expense_payment_terms || 'שוטף+30'
+  const cats = ['manpower', 'equipment', 'insurance', 'consultants', 'financing', 'other']
+  for (const cat of cats) {
+    const lines = form['expense_lines_' + cat] || []
+    for (const line of lines) {
+      if (line.payment_terms !== 'פעימות תשלום') {
+        line.payment_terms = val
+      }
+    }
+  }
+  for (const sub of form.subcontractors) {
+    if (Array.isArray(sub.payment_terms)) {
+      for (const term of sub.payment_terms) {
+        term.type = val
+      }
+    }
+  }
 }
 
 function categoryTotal(catKey) {
