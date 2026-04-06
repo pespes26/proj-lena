@@ -1,5 +1,8 @@
 <template>
-  <div v-if="loading" class="font-sans text-ink-muted py-20 text-center">טוען נתונים…</div>
+  <div v-if="loading" class="space-y-6 py-4">
+    <SkeletonLoader variant="kpi" :count="4" />
+    <SkeletonLoader variant="chart" height="200px" />
+  </div>
   <div v-else-if="!formData" class="ed-section text-center py-16">
     <div class="ed-eyebrow mb-3">אין נתונים</div>
     <p class="font-sans text-xl text-ink max-w-md mx-auto">לפרויקט זה אין עדיין נתונים.</p>
@@ -168,7 +171,7 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { Bar, Doughnut } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend, PointElement, LineElement } from 'chart.js'
 import { getProjectForm } from '../services/api'
-import { RuledSection, HeroNumber } from './editorial'
+import { RuledSection, HeroNumber, SkeletonLoader } from './editorial'
 import { COLORS, tooltipConfig, axisConfig } from '../utils/chartDefaults'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend, PointElement, LineElement)

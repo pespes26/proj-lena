@@ -1,0 +1,41 @@
+.git
+.gitignore
+.env
+.env.*
+.vscode
+.idea
+.claude
+.DS_Store
+Thumbs.db
+
+# Dependencies (rebuilt inside Docker)
+node_modules
+frontend/node_modules
+
+# Build output (rebuilt inside Docker)
+frontend/dist
+
+# Python caches
+backend/__pycache__
+**/__pycache__
+**/*.pyc
+
+# Secrets — never bake into image
+backend/service-account.json
+backend/firebase-service-account.json
+**/service-account*.json
+*firebase-adminsdk*.json
+
+# Data files
+*.xlsx
+backups
+contracts
+*.json
+!frontend/package.json
+!frontend/package-lock.json
+!backend/requirements.txt
+!skills-lock.json
+
+# Docs
+*.md
+!CLAUDE.md

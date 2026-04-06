@@ -36,19 +36,39 @@ api.interceptors.response.use(
   }
 )
 
-export const getProjects = () => api.get('/projects').then(r => r.data.projects)
-export const getProjectsDetail = () => api.get('/projects').then(r => r.data.projects_detail)
-export const getPnl = (project) => api.get('/pnl', { params: { project } }).then(r => r.data.data)
-export const getPnlSummary = () => api.get('/pnl/summary').then(r => r.data.data)
-export const getCashflow = () => api.get('/cashflow').then(r => r.data.data)
-export const getDashboard = () => api.get('/dashboard').then(r => r.data.data)
-export const getProjectCashflow = (project) => api.get('/project-cashflow', { params: { project } }).then(r => r.data.data)
+// Simple in-memory TTL cache for GET requests
+const _cache = new Map()
+const DEFAULT_TTL = 60_000 // 1 minute
+
+function cachedGet(key, fetcher, ttl = DEFAULT_TTL) {
+  const hit = _cache.get(key)
+  if (hit && Date.now() - hit.ts < ttl) return Promise.resolve(hit.data)
+  return fetcher().then(data => {
+    _cache.set(key, { data, ts: Date.now() })
+    return data
+  })
+}
+
+export function invalidateCache(prefix) {
+  if (!prefix) { _cache.clear(); return }
+  for (const key of _cache.keys()) {
+    if (key.startsWith(prefix)) _cache.delete(key)
+  }
+}
+
+export const getProjects = () => cachedGet('projects', () => api.get('/projects').then(r => r.data.projects))
+export const getProjectsDetail = () => cachedGet('projects_detail', () => api.get('/projects').then(r => r.data.projects_detail))
+export const getPnl = (project) => cachedGet(`pnl:${project || ''}`, () => api.get('/pnl', { params: { project } }).then(r => r.data.data))
+export const getPnlSummary = () => cachedGet('pnl_summary', () => api.get('/pnl/summary').then(r => r.data.data))
+export const getCashflow = () => cachedGet('cashflow', () => api.get('/cashflow').then(r => r.data.data))
+export const getDashboard = () => cachedGet('dashboard', () => api.get('/dashboard').then(r => r.data.data))
+export const getProjectCashflow = (project) => cachedGet(`proj_cf:${project}`, () => api.get('/project-cashflow', { params: { project } }).then(r => r.data.data))
 export const getReports = (project) => api.get('/reports', { params: { project } }).then(r => r.data.reports)
-export const createReport = (data) => api.post('/reports', data).then(r => r.data)
+export const createReport = (data) => api.post('/reports', data).then(r => { invalidateCache(); return r.data })
 export const getProjectForm = (project) => api.get(`/project-form/${encodeURIComponent(project)}`).then(r => r.data.data)
-export const saveProjectForm = (project, data) => api.post(`/project-form/${encodeURIComponent(project)}`, data).then(r => r.data)
-export const saveProjectActuals = (project, data) => api.post(`/project-form/${encodeURIComponent(project)}/actuals`, data).then(r => r.data)
-export const importExcelProject = (project) => api.post(`/import-excel-project/${encodeURIComponent(project)}`).then(r => r.data)
+export const saveProjectForm = (project, data) => api.post(`/project-form/${encodeURIComponent(project)}`, data).then(r => { invalidateCache(); return r.data })
+export const saveProjectActuals = (project, data) => api.post(`/project-form/${encodeURIComponent(project)}/actuals`, data).then(r => { invalidateCache(); return r.data })
+export const importExcelProject = (project) => api.post(`/import-excel-project/${encodeURIComponent(project)}`).then(r => { invalidateCache(); return r.data })
 export const uploadSubcontractorContract = (project, subIndex, file) => {
   const f = new FormData(); f.append('file', file)
   return api.post(`/project-form/${encodeURIComponent(project)}/upload-contract?sub_index=${subIndex}`, f, { headers: { 'Content-Type': 'multipart/form-data' } }).then(r => r.data)

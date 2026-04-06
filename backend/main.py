@@ -7,7 +7,7 @@ from routers import projects, cashflow, dashboard, reports, project_form, auth, 
 
 ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
 
-app = FastAPI(title="Logfi - P&L & Cash Flow")
+app = FastAPI(title="IFMLogiX - P&L & Cash Flow")
 
 app.add_middleware(
     CORSMiddleware,
@@ -24,6 +24,10 @@ app.include_router(dashboard.router)
 app.include_router(reports.router)
 app.include_router(project_form.router)
 app.include_router(ai.router)
+
+@app.get("/api/health")
+def health_check():
+    return {"status": "ok"}
 
 # Serve frontend static files in production
 STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'frontend', 'dist')

@@ -1,6 +1,13 @@
 <template>
   <div>
-    <div v-if="loading" class="font-sans text-ink-muted py-20 text-center">טוען נתונים…</div>
+    <div v-if="loading" class="space-y-8 py-4">
+      <SkeletonLoader variant="kpi" :count="5" />
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <SkeletonLoader variant="chart" height="220px" />
+        <SkeletonLoader variant="chart" height="220px" />
+      </div>
+      <SkeletonLoader variant="table" :columns="6" :rows="6" />
+    </div>
 
     <!-- No project selected -->
     <div v-else-if="!selectedProject" class="ed-section text-center py-16">
@@ -173,17 +180,29 @@
                 <tr>
                   <th style="width: 32px;"></th>
                   <th>חודש</th>
-                  <th class="num">הכנסה</th>
-                  <th class="num">הוצ׳ תפעול</th>
+                  <th class="num ui-table-sortable" @click="togglePnlSort('revenue')">
+                    <span class="inline-flex items-center gap-1">הכנסה
+                      <svg v-if="pnlSortKey === 'revenue'" class="w-3 h-3 transition-transform" :class="pnlSortDir === 'desc' ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" d="M5 15l7-7 7 7"/></svg>
+                    </span>
+                  </th>
+                  <th class="num ui-table-sortable" @click="togglePnlSort('op_expenses')">
+                    <span class="inline-flex items-center gap-1">הוצ׳ תפעול
+                      <svg v-if="pnlSortKey === 'op_expenses'" class="w-3 h-3 transition-transform" :class="pnlSortDir === 'desc' ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" d="M5 15l7-7 7 7"/></svg>
+                    </span>
+                  </th>
                   <th class="num">רווח גולמי</th>
                   <th class="num">הוצ׳ שכר</th>
-                  <th class="num">רווח תפעולי</th>
+                  <th class="num ui-table-sortable" @click="togglePnlSort('operating_profit')">
+                    <span class="inline-flex items-center gap-1">רווח תפעולי
+                      <svg v-if="pnlSortKey === 'operating_profit'" class="w-3 h-3 transition-transform" :class="pnlSortDir === 'desc' ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" d="M5 15l7-7 7 7"/></svg>
+                    </span>
+                  </th>
                   <th class="num">מרווח</th>
                   <th class="hidden sm:table-cell">הערות</th>
                 </tr>
               </thead>
               <tbody>
-                <template v-for="m in pnlData.months" :key="m.month">
+                <template v-for="m in sortedMonths" :key="m.month">
                   <tr @click="toggleDrilldown(m.month)" class="is-clickable" style="cursor: pointer;">
                     <td>
                       <span class="inline-block transition-transform duration-200 text-ink-faint" :style="{ transform: expandedMonth === m.month ? 'rotate(90deg)' : 'rotate(0)' }">›</span>
@@ -312,7 +331,7 @@ import ExpenseBreakdown from './ExpenseBreakdown.vue'
 import ProjectFormDashboard from './ProjectFormDashboard.vue'
 import ProjectDetailsView from './ProjectDetailsView.vue'
 import MonthlyActualsEditor from './MonthlyActualsEditor.vue'
-import { SectionHeader, SectionMarker, RuledSection, HeroNumber, FootnoteSource, currentHebrewDate } from './editorial'
+import { SectionHeader, SectionMarker, RuledSection, HeroNumber, FootnoteSource, SkeletonLoader, currentHebrewDate } from './editorial'
 
 const props = defineProps({ initialProject: { type: String, default: '' } })
 
@@ -325,6 +344,29 @@ const error = ref(null)
 const fmt = formatNumber
 const selectedPeriod = ref('year')
 const expandedMonth = ref(null)
+const pnlSortKey = ref('')
+const pnlSortDir = ref('asc')
+
+function togglePnlSort(key) {
+  if (pnlSortKey.value === key) {
+    if (pnlSortDir.value === 'asc') pnlSortDir.value = 'desc'
+    else { pnlSortKey.value = ''; pnlSortDir.value = 'asc' }
+  } else {
+    pnlSortKey.value = key
+    pnlSortDir.value = 'asc'
+  }
+}
+
+const sortedMonths = computed(() => {
+  if (!pnlData.value?.months) return []
+  if (!pnlSortKey.value) return pnlData.value.months
+  const key = pnlSortKey.value
+  return [...pnlData.value.months].sort((a, b) => {
+    const av = a[key] ?? 0, bv = b[key] ?? 0
+    const cmp = av < bv ? -1 : av > bv ? 1 : 0
+    return pnlSortDir.value === 'desc' ? -cmp : cmp
+  })
+})
 const showReportModal = ref(false)
 const showProjectForm = ref(false)
 const reports = ref([])

@@ -38,6 +38,9 @@ contracts/
 .claude/settings.local.json
 .claude/launch.json
 
+# Firebase Hosting cache
+.firebase/
+
 # OS
 .DS_Store
 Thumbs.db

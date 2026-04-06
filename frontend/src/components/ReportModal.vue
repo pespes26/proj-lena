@@ -16,7 +16,7 @@
               </h3>
               <p class="font-sans text-ink-muted mt-1.5 text-sm">{{ project }}</p>
             </div>
-            <button @click="$emit('close')" class="text-ink-muted hover:text-accent transition-colors" aria-label="סגור">
+            <button @click="$emit('close')" class="p-2 -m-2 rounded-lg text-ink-muted hover:text-accent hover:bg-surface-muted transition-colors" aria-label="סגור">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="square" d="M6 18L18 6M6 6l12 12"/>
               </svg>

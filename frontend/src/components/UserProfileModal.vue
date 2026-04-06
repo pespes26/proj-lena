@@ -10,7 +10,7 @@
               <div class="ed-eyebrow mb-1">פרופיל אישי</div>
               <h2 class="font-sans font-semibold text-ink leading-none" style="font-size: clamp(1.75rem, 3vw, 2.25rem);">פרטי משתמש</h2>
             </div>
-            <button @click="$emit('close')" class="text-ink-muted hover:text-accent transition-colors" aria-label="סגור">
+            <button @click="$emit('close')" class="p-2 -m-2 rounded-lg text-ink-muted hover:text-accent hover:bg-surface-muted transition-colors" aria-label="סגור">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="square" d="M6 18L18 6M6 6l12 12"/>
               </svg>
@@ -110,9 +110,11 @@ import { ref, reactive, computed, watch } from 'vue'
 import { getProfile, updateProfile } from '../services/api'
 import { auth } from '../firebase'
 import { updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth'
+import { useToast } from '../composables/useToast'
 
 const props = defineProps({ show: Boolean })
 defineEmits(['close'])
+const toast = useToast()
 
 const roleLabels = { admin: 'מנהל מערכת', economist: 'כלכלנית', viewer: 'צופה מלא', project_manager: 'מנהל פרויקט' }
 const form = reactive({ username: '', full_name: '', email: '', role: '', avatar: '' })
@@ -151,7 +153,7 @@ async function handleSave() {
   saving.value = true; message.value = ''
   try {
     await updateProfile({ full_name: form.full_name, email: form.email, role: form.role, avatar: form.avatar })
-    message.value = 'הפרטים נשמרו בהצלחה'; messageType.value = 'success'
+    message.value = 'הפרטים נשמרו בהצלחה'; messageType.value = 'success'; toast.success('הפרטים נשמרו')
   } catch (e) { message.value = e.message; messageType.value = 'error' }
   saving.value = false
 }

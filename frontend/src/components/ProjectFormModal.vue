@@ -14,7 +14,7 @@
               </h3>
               <p class="font-sans text-ink-muted text-sm mt-1.5">שלב <bdi class="ed-num">{{ step + 1 }}</bdi> מתוך <bdi class="ed-num">{{ steps.length }}</bdi></p>
             </div>
-            <button @click="handleClose()" class="text-ink-muted hover:text-accent transition-colors" aria-label="סגור">
+            <button @click="handleClose()" class="p-2 -m-2 rounded-lg text-ink-muted hover:text-accent hover:bg-surface-muted transition-colors" aria-label="סגור">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="square" d="M6 18L18 6M6 6l12 12"/>
               </svg>
@@ -22,7 +22,7 @@
           </div>
           <hr class="ed-rule" />
           <!-- Step markers -->
-          <div class="flex items-center gap-x-7 gap-y-2 overflow-x-auto mt-3 flex-wrap">
+          <div class="flex items-center gap-x-3 sm:gap-x-7 gap-y-2 overflow-x-auto mt-3 flex-nowrap sm:flex-wrap scrollbar-hide">
             <button v-for="(s, i) in steps" :key="i"
               @click="step = i"
               class="ed-marker-step"
@@ -40,19 +40,19 @@
           <div v-if="step === 0" class="space-y-6">
             <!-- Project name + Priority ID + Recurring toggle -->
             <div class="flex flex-col sm:flex-row gap-4 sm:gap-3 sm:items-end">
-              <div v-if="newProject" class="flex-[15]">
+              <div v-if="newProject" class="flex-[15]" data-field="project_name">
                 <label class="ed-label">שם פרויקט *</label>
                 <input v-model="form.project_name" type="text" placeholder="שם הפרויקט"
                   @blur="vf('project_name', form.project_name, { required: true, minLen: 2 })"
                   :class="['w-full ed-input', fc('project_name')]" />
-                <span v-if="fe.project_name" class="font-sans text-xs ed-tone-negative mt-1 block">{{ fe.project_name }}</span>
+                <div v-if="fe.project_name" class="ui-field-error ui-field-error--animate"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>{{ fe.project_name }}</div>
               </div>
-              <div class="flex-[4]">
+              <div class="flex-[4]" data-field="priority_id">
                 <label class="ed-label">מספר Priority *</label>
                 <input v-model="form.priority_id" type="text" placeholder="P-1001"
                   @blur="vf('priority_id', form.priority_id, { required: true, minLen: 2 })"
                   :class="['w-full ed-input ed-num', fc('priority_id')]" />
-                <span v-if="fe.priority_id" class="font-sans text-xs ed-tone-negative mt-1 block">{{ fe.priority_id }}</span>
+                <div v-if="fe.priority_id" class="ui-field-error ui-field-error--animate"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>{{ fe.priority_id }}</div>
               </div>
             </div>
             <!-- Start date + End date -->
@@ -61,13 +61,13 @@
                 <label class="ed-label">תאריך התחלה *</label>
                 <DatePicker v-model="form.start_date"
                   :input-class="'w-full bg-paper-dark/70 border rounded-lg px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-gray-400 focus:ring-0 transition ' + (fe.start_date ? 'is-error' : 'border-rule-strong')" />
-                <span v-if="fe.start_date" class="font-sans text-xs ed-tone-negative mt-1 block">{{ fe.start_date }}</span>
+                <div v-if="fe.start_date" class="ui-field-error ui-field-error--animate"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>{{ fe.start_date }}</div>
               </div>
               <div>
                 <label class="ed-label">צפי סיום פרויקט *</label>
                 <DatePicker v-model="form.expected_end_date" :min-date="form.start_date"
                   :input-class="'w-full bg-paper-dark/70 border rounded-lg px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-gray-400 focus:ring-0 transition ' + (fe.expected_end_date ? 'is-error' : 'border-rule-strong')" />
-                <span v-if="fe.expected_end_date" class="font-sans text-xs ed-tone-negative mt-1 block">{{ fe.expected_end_date }}</span>
+                <div v-if="fe.expected_end_date" class="ui-field-error ui-field-error--animate"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>{{ fe.expected_end_date }}</div>
               </div>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
@@ -79,14 +79,14 @@
                   <option value="" disabled>בחר מנהל פרויקט</option>
                   <option v-for="m in managers" :key="m" :value="m">{{ m }}</option>
                 </select>
-                <span v-if="fe.manager" class="font-sans text-xs ed-tone-negative mt-1 block">{{ fe.manager }}</span>
+                <div v-if="fe.manager" class="ui-field-error ui-field-error--animate"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>{{ fe.manager }}</div>
               </div>
               <div>
                 <label class="ed-label">שם המזמין *</label>
                 <input v-model="form.client" type="text" placeholder="שם החברה/לקוח"
                   @blur="vf('client', form.client, { required: true, minLen: 2 })"
                   :class="['w-full ed-input', fc('client')]" />
-                <span v-if="fe.client" class="font-sans text-xs ed-tone-negative mt-1 block">{{ fe.client }}</span>
+                <div v-if="fe.client" class="ui-field-error ui-field-error--animate"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>{{ fe.client }}</div>
               </div>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
@@ -123,7 +123,7 @@
                 @blur="vf('description', form.description, { required: true, minLen: 5 })"
                 :class="['w-full ed-input resize-none', fc('description')]"></textarea>
               <div class="flex justify-between mt-0.5">
-                <span v-if="fe.description" class="text-negative text-xs">{{ fe.description }}</span>
+                <div v-if="fe.description" class="ui-field-error ui-field-error--animate"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>{{ fe.description }}</div>
                 <span v-else></span>
                 <span class="text-ink-faint text-xs">{{ (form.description || '').length }} תווים</span>
               </div>
@@ -137,7 +137,7 @@
               <input :value="fmtNum(form.total_revenue)" @input="onNumInput(form, 'total_revenue', $event)" type="text" inputmode="numeric" placeholder="0"
                 @blur="vf('total_revenue', form.total_revenue, { required: true, positive: true, max: 999999999 })"
                 :class="['w-full ed-input', fc('total_revenue')]" />
-              <span v-if="fe.total_revenue" class="font-sans text-xs ed-tone-negative mt-1 block">{{ fe.total_revenue }}</span>
+              <div v-if="fe.total_revenue" class="ui-field-error ui-field-error--animate"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>{{ fe.total_revenue }}</div>
             </div>
 
             <!-- Payment terms as dynamic table -->
@@ -930,6 +930,7 @@
 <script setup>
 import { ref, reactive, computed, watch } from 'vue'
 import { getProjectForm, saveProjectForm } from '../services/api'
+import { useToast } from '../composables/useToast'
 import DatePicker from './DatePicker.vue'
 
 // Format number with commas for display
@@ -962,6 +963,7 @@ const props = defineProps({
   newProject: { type: Boolean, default: false }
 })
 const emit = defineEmits(['close', 'saved'])
+const toast = useToast()
 
 const steps = ['פרטי פרויקט', 'צפי הכנסות', 'צפי הוצאות', 'סיכום']
 const step = ref(0)
@@ -1048,6 +1050,10 @@ function vf(name, value, opts = {}) {
   else if (opts.max !== undefined && typeof v === 'number' && v > opts.max) err = `מקסימום ${opts.max.toLocaleString('he-IL')}`
   else if (opts.positive && v !== null && v !== undefined && v !== '' && (isNaN(v) || Number(v) <= 0)) err = 'חייב להיות מספר חיובי'
   fe[name] = err
+  if (err) {
+    const el = document.querySelector(`[data-field="${name}"]`)
+    if (el) { el.classList.remove('ui-shake'); void el.offsetWidth; el.classList.add('ui-shake') }
+  }
   return err
 }
 
@@ -1443,6 +1449,7 @@ async function save() {
     const draftKey = `form_draft_${props.newProject ? '__draft__' : props.project}`
     localStorage.removeItem(draftKey)
     emit('saved', projectKey)
+    toast.success(props.newProject ? 'הפרויקט נוצר בהצלחה' : 'הפרויקט נשמר')
     emit('close')
   } catch (e) {
     error.value = e.message

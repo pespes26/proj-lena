@@ -10,7 +10,7 @@
               <div class="ed-eyebrow mb-1">מערכת</div>
               <h2 class="font-sans font-semibold text-ink leading-none" style="font-size: clamp(1.75rem, 3vw, 2.25rem);">הגדרות</h2>
             </div>
-            <button @click="$emit('close')" class="text-ink-muted hover:text-accent transition-colors" aria-label="סגור">
+            <button @click="$emit('close')" class="p-2 -m-2 rounded-lg text-ink-muted hover:text-accent hover:bg-surface-muted transition-colors" aria-label="סגור">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="square" d="M6 18L18 6M6 6l12 12"/>
               </svg>
@@ -184,9 +184,11 @@
 import { ref, reactive, watch } from 'vue'
 import { getUsers, createUser, deleteUser, updateUser } from '../services/api'
 import { SectionMarker } from './editorial'
+import { useToast } from '../composables/useToast'
 
 const props = defineProps({ show: Boolean })
 defineEmits(['close'])
+const toast = useToast()
 
 const ROLE_MAP = {
   admin: 'מנהל מערכת',
@@ -229,7 +231,7 @@ async function handleCreateUser() {
   saving.value = true; message.value = ''
   try {
     await createUser({ ...newUser })
-    message.value = `משתמש '${newUser.username}' נוצר`; messageType.value = 'success'
+    message.value = `משתמש '${newUser.username}' נוצר`; messageType.value = 'success'; toast.success(`משתמש '${newUser.username}' נוצר`)
     Object.assign(newUser, { username: '', password: '', full_name: '', email: '', role: 'viewer', linked_manager: '' })
     showAddUser.value = false
     users.value = await getUsers()
@@ -254,7 +256,7 @@ async function handleSaveUser() {
     })
     editingUser.value = ''
     users.value = await getUsers()
-    message.value = 'המשתמש עודכן'; messageType.value = 'success'
+    message.value = 'המשתמש עודכן'; messageType.value = 'success'; toast.success('המשתמש עודכן')
   } catch (e) { message.value = e.message; messageType.value = 'error' }
 }
 
@@ -263,7 +265,7 @@ async function handleDeleteUser(username) {
   try {
     await deleteUser(username)
     users.value = await getUsers()
-    message.value = `משתמש '${username}' נמחק`; messageType.value = 'success'
+    message.value = `משתמש '${username}' נמחק`; messageType.value = 'success'; toast.success(`משתמש '${username}' נמחק`)
   } catch (e) { message.value = e.message; messageType.value = 'error' }
 }
 </script>

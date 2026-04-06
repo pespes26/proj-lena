@@ -1,6 +1,9 @@
 <template>
   <div>
-    <div v-if="loading" class="font-sans text-ink-muted py-20 text-center">טוען נתונים…</div>
+    <div v-if="loading" class="space-y-6 py-4">
+      <SkeletonLoader variant="kpi" :count="2" />
+      <SkeletonLoader variant="cards" :count="3" />
+    </div>
     <p v-if="error" class="font-sans ed-tone-negative mb-6">{{ error }}</p>
 
     <template v-if="!loading && myProjects.length > 0">
@@ -84,7 +87,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { getPnl, getProjectsDetail, getProfile, formatNumber } from '../services/api'
-import { SectionHeader, currentHebrewDate } from './editorial'
+import { SectionHeader, SkeletonLoader, currentHebrewDate } from './editorial'
 
 defineEmits(['select-project'])
 

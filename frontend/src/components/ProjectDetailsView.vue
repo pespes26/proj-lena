@@ -1,5 +1,8 @@
 <template>
-  <div v-if="loading" class="font-sans text-ink-muted text-center py-12">טוען פרטי פרויקט…</div>
+  <div v-if="loading" class="space-y-6 py-4">
+    <SkeletonLoader variant="kpi" :count="3" />
+    <SkeletonLoader variant="table" :columns="4" :rows="4" />
+  </div>
   <div v-else-if="!formData" class="ed-section text-center py-16">
     <div class="ed-eyebrow mb-3">אין נתונים</div>
     <p class="font-sans text-xl text-ink max-w-md mx-auto">לא נמצאו נתוני טופס לפרויקט זה.</p>
@@ -23,7 +26,7 @@
       <!-- PDF header (visible only inside generated PDF) -->
       <div class="pdf-header" style="display:none">
         <div style="text-align:center; margin-bottom:24px; padding-bottom:16px; border-bottom:2px solid #0f172a;">
-          <h1 style="font-family: 'DM Sans', 'Rubik', sans-serif; font-size:26px; font-weight:700; color:#0f172a; margin:0; letter-spacing:-0.02em;">Logfi</h1>
+          <h1 style="font-family: 'DM Sans', 'Rubik', sans-serif; font-size:26px; font-weight:700; color:#0f172a; margin:0; letter-spacing:-0.02em;">IFMLogiX</h1>
           <p style="font-family: 'DM Sans', 'Rubik', sans-serif; font-size:11px; color:#475569; margin:4px 0 10px; font-weight:500;">ניהול פיננסי חכם</p>
           <h2 style="font-family: 'DM Sans', 'Rubik', sans-serif; font-size:20px; font-weight:700; color:#0f172a; margin:10px 0 4px;">{{ formData.project_name || project }}</h2>
           <p style="font-family: 'DM Sans', 'Rubik', sans-serif; font-size:11px; color:#475569;">מספר עדיפות: {{ formData.priority_id || '—' }} · מנהל: {{ formData.manager || '—' }} · ציר: {{ formData.axis || '—' }} — {{ formData.area || '—' }}</p>
@@ -194,7 +197,7 @@
 
       <!-- PDF footer -->
       <div class="pdf-footer" style="display:none; text-align:center; margin-top:24px; padding-top:12px; border-top:1px solid #d8cfbe; font-size:10px; color:#928a7e;">
-        מסמך זה הופק ממערכת Logfi · {{ new Date().toLocaleDateString('he-IL') }} {{ new Date().toLocaleTimeString('he-IL', {hour:'2-digit', minute:'2-digit'}) }}
+        מסמך זה הופק ממערכת IFMLogiX · {{ new Date().toLocaleDateString('he-IL') }} {{ new Date().toLocaleTimeString('he-IL', {hour:'2-digit', minute:'2-digit'}) }}
       </div>
 
     </div><!-- /pdfContent -->
@@ -205,7 +208,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { getProjectForm, formatNumber } from '../services/api'
 import html2pdf from 'html2pdf.js'
-import { RuledSection, HeroNumber } from './editorial'
+import { RuledSection, HeroNumber, SkeletonLoader } from './editorial'
 
 const props = defineProps({
   project: { type: String, required: true }

@@ -85,11 +85,13 @@
 import { ref, computed, watch } from 'vue'
 import { saveProjectActuals, getProjectForm } from '../services/api'
 import { HeroNumber } from './editorial'
+import { useToast } from '../composables/useToast'
 
 const props = defineProps({
   project: { type: String, required: true },
 })
 const emit = defineEmits(['saved'])
+const toast = useToast()
 
 const monthNames = ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר']
 const selectedMonth = ref(new Date().getMonth() + 1)
@@ -150,6 +152,7 @@ async function save() {
   try {
     await saveProjectActuals(props.project, { month: selectedMonth.value, ...form.value })
     success.value = `ביצוע בפועל לחודש ${monthNames[selectedMonth.value - 1]} נשמר`
+    toast.success(`נתוני חודש ${monthNames[selectedMonth.value - 1]} נשמרו`)
     emit('saved')
     await loadFormData()
   } catch (e) { success.value = null; alert(e.message) }

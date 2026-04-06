@@ -13,7 +13,7 @@
         </svg>
       </div>
       <div class="ui-chat-launcher__text">
-        <div class="ui-chat-launcher__eyebrow">Logfi AI</div>
+        <div class="ui-chat-launcher__eyebrow">IFMLogiX AI</div>
         <div class="ui-chat-launcher__label">עוזר פיננסי</div>
       </div>
     </button>
@@ -30,7 +30,7 @@
               </svg>
             </div>
             <div>
-              <div class="font-sans font-semibold text-ink text-sm leading-none">Logfi AI</div>
+              <div class="font-sans font-semibold text-ink text-sm leading-none">IFMLogiX AI</div>
               <div class="text-[11px] text-ink-muted font-medium mt-0.5">עוזר פיננסי חכם</div>
             </div>
           </div>
@@ -59,7 +59,7 @@
             </div>
             <h4 class="font-sans font-semibold text-ink text-base leading-tight">שלום 👋</h4>
             <p class="text-sm text-ink-muted mt-1.5 leading-relaxed">
-              אני Logfi AI — העוזר הפיננסי שלך. שאל אותי על הפרויקטים, התזרים, או הרווחיות של הקבוצה.
+              אני IFMLogiX AI — העוזר הפיננסי שלך. שאל אותי על הפרויקטים, התזרים, או הרווחיות של הקבוצה.
             </p>
             <div class="mt-5 space-y-1.5">
               <div class="text-[11px] font-semibold text-ink-faint uppercase tracking-wider mb-2">שאלות נפוצות</div>

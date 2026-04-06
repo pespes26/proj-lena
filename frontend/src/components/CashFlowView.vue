@@ -8,7 +8,11 @@
     />
 
     <p v-if="error" class="font-sans ed-tone-negative mb-6">{{ error }}</p>
-    <div v-if="loading" class="font-sans text-ink-muted py-20 text-center">טוען נתונים…</div>
+    <div v-if="loading" class="space-y-8 py-4">
+      <SkeletonLoader variant="kpi" :count="4" />
+      <SkeletonLoader variant="chart" height="260px" />
+      <SkeletonLoader variant="cards" :count="6" />
+    </div>
 
     <template v-if="cfData">
       <!-- KPI strip -->
@@ -109,56 +113,28 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 mt-2">
         <RuledSection eyebrow="חודשי ומצטבר" title="פירוט חודשי">
           <div class="max-h-[420px] overflow-y-auto">
-            <table class="ed-table">
-              <thead>
-                <tr>
-                  <th>חודש</th>
-                  <th class="num">הכנסה</th>
-                  <th class="num">הוצאה</th>
-                  <th class="num">נטו</th>
-                  <th class="num">מצטבר</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(m, i) in cfData.monthly_net" :key="i">
-                  <td>{{ m.month }}</td>
-                  <td class="num"><bdi class="ed-num">{{ fmt(cfData.totals[i]?.revenue) }}</bdi></td>
-                  <td class="num"><bdi class="ed-num">{{ fmt(cfData.totals[i]?.expenses) }}</bdi></td>
-                  <td class="num" :class="m.value >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'">
-                    <bdi class="ed-num">{{ fmt(m.value) }}</bdi>
-                  </td>
-                  <td class="num" :class="cfData.cumulative[i].value >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'">
-                    <bdi class="ed-num">{{ fmt(cfData.cumulative[i].value) }}</bdi>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <DataTable
+              :columns="monthlyTableCols"
+              :rows="monthlyTableRows"
+              :sticky-header="true"
+            >
+              <template #cell-net="{ row }">
+                <bdi class="ui-num" :class="row.net >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'">{{ fmt(row.net) }}</bdi>
+              </template>
+              <template #cell-cumulative="{ row }">
+                <bdi class="ui-num" :class="row.cumulative >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'">{{ fmt(row.cumulative) }}</bdi>
+              </template>
+            </DataTable>
           </div>
         </RuledSection>
 
         <RuledSection eyebrow="מטריצת פרויקטים" title="נטו לפי פרויקט">
           <div class="max-h-[420px] overflow-auto">
-            <table class="ed-table" style="min-width: 600px;">
-              <thead>
-                <tr>
-                  <th>חודש</th>
-                  <th v-for="pname in Object.keys(cfData.projects)" :key="pname" class="num">{{ pname }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(label, i) in cfData.month_labels" :key="label">
-                  <td>{{ label }}</td>
-                  <td
-                    v-for="pname in Object.keys(cfData.projects)"
-                    :key="pname"
-                    class="num"
-                    :class="cfData.projects[pname][i].profit >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'"
-                  >
-                    <bdi class="ed-num">{{ fmt(cfData.projects[pname][i].profit) }}</bdi>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <DataTable
+              :columns="matrixTableCols"
+              :rows="matrixTableRows"
+              :sticky-header="true"
+            />
           </div>
         </RuledSection>
       </div>
@@ -173,7 +149,7 @@ import CashFlowChart from './CashFlowChart.vue'
 import RevenueExpenseChart from './RevenueExpenseChart.vue'
 import MonthlyNetChart from './MonthlyNetChart.vue'
 import ProjectNetChart from './ProjectNetChart.vue'
-import { SectionHeader, RuledSection, HeroNumber, FootnoteSource, currentHebrewDate } from './editorial'
+import { SectionHeader, RuledSection, HeroNumber, DataTable, FootnoteSource, SkeletonLoader, currentHebrewDate } from './editorial'
 
 const cfData = ref(null)
 const loading = ref(true)
@@ -199,6 +175,45 @@ const totalNet = computed(() => totalRevenue.value - totalExpenses.value)
 const lastCumulative = computed(() => {
   const c = cfData.value?.cumulative
   return c?.length ? c[c.length - 1].value : 0
+})
+
+// Monthly detail table
+const monthlyTableCols = [
+  { key: 'month', label: 'חודש' },
+  { key: 'revenue', label: 'הכנסה', align: 'end', format: 'number' },
+  { key: 'expenses', label: 'הוצאה', align: 'end', format: 'number' },
+  { key: 'net', label: 'נטו', align: 'end' },
+  { key: 'cumulative', label: 'מצטבר', align: 'end' },
+]
+const monthlyTableRows = computed(() => {
+  if (!cfData.value) return []
+  return cfData.value.monthly_net.map((m, i) => ({
+    month: m.month,
+    revenue: cfData.value.totals[i]?.revenue || 0,
+    expenses: cfData.value.totals[i]?.expenses || 0,
+    net: m.value,
+    cumulative: cfData.value.cumulative[i]?.value || 0,
+  }))
+})
+
+// Project matrix table (dynamic columns)
+const matrixTableCols = computed(() => {
+  if (!cfData.value) return []
+  return [
+    { key: 'month', label: 'חודש' },
+    ...Object.keys(cfData.value.projects).map(pname => ({
+      key: pname, label: pname, align: 'end', format: 'number',
+    })),
+  ]
+})
+const matrixTableRows = computed(() => {
+  if (!cfData.value) return []
+  const pnames = Object.keys(cfData.value.projects)
+  return cfData.value.month_labels.map((label, i) => {
+    const row = { month: label }
+    for (const pname of pnames) row[pname] = cfData.value.projects[pname][i]?.profit || 0
+    return row
+  })
 })
 
 function projectTotal(months) { return months.reduce((a, m) => a + m.profit, 0) }

@@ -16,7 +16,7 @@ if os.path.exists(_env_path):
 
 client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY", ""))
 
-SYSTEM_PROMPT = """אתה Logfi AI — אנליסט פיננסי בכיר בחברת לוגי גרופ / מנרב IFM.
+SYSTEM_PROMPT = """אתה IFMLogiX AI — אנליסט פיננסי בכיר בחברת לוגי גרופ / מנרב IFM.
 אתה מנתח פרויקטי בנייה, תחזוקה וניהול מתקנים (FM).
 
 ## כלל קריטי — אל תמציא!

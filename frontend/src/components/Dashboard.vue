@@ -8,7 +8,11 @@
     />
 
     <p v-if="error" class="font-sans ed-tone-negative mb-6">{{ error }}</p>
-    <div v-if="loading" class="font-sans text-ink-muted py-20 text-center">טוען נתונים…</div>
+    <div v-if="loading" class="space-y-8 py-4">
+      <SkeletonLoader variant="kpi" :count="4" />
+      <SkeletonLoader variant="chart" height="240px" />
+      <SkeletonLoader variant="table" :columns="5" :rows="6" />
+    </div>
 
     <template v-if="data">
       <!-- Hero KPI — massive total revenue with secondary ruled strip -->
@@ -162,39 +166,26 @@
 
       <!-- Project table -->
       <RuledSection eyebrow="פירוט" title="טבלת פרויקטים">
-        <div class="overflow-x-auto">
-          <table class="ed-table" style="min-width: 600px;">
-            <thead>
-              <tr>
-                <th>פרויקט</th>
-                <th class="hidden sm:table-cell">ציר</th>
-                <th class="num">הכנסות</th>
-                <th class="num">הוצאות</th>
-                <th class="num">רווח</th>
-                <th class="num">מרווח</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(summary, name) in data.project_summaries" :key="name">
-                <td>
-                  <div class="font-sans font-semibold text-ink">{{ name }}</div>
-                  <div class="ed-eyebrow mt-0.5" style="font-size: 0.625rem;">
-                    <bdi lang="en">{{ summary.meta?.priority_id || '—' }}</bdi>
-                  </div>
-                </td>
-                <td class="hidden sm:table-cell text-ink-muted text-xs">{{ summary.meta?.axis || '—' }}</td>
-                <td class="num"><bdi class="ed-num">{{ fmt(summary.total_revenue) }}</bdi></td>
-                <td class="num"><bdi class="ed-num">{{ fmt(summary.total_op_expenses + summary.total_salary_expenses) }}</bdi></td>
-                <td class="num" :class="summary.total_operating_profit >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'">
-                  <bdi class="ed-num">{{ fmt(summary.total_operating_profit) }}</bdi>
-                </td>
-                <td class="num" :class="marginTone(summary.margin)">
-                  <bdi class="ed-num">{{ summary.margin != null ? summary.margin + '%' : '—' }}</bdi>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <DataTable
+          :columns="projectTableCols"
+          :rows="projectTableRows"
+          :searchable="true"
+          :sticky-header="true"
+          :page-size="15"
+          default-sort="profit"
+          default-sort-dir="desc"
+        >
+          <template #cell-name="{ row }">
+            <div class="font-sans font-semibold text-ink">{{ row.name }}</div>
+            <div class="ed-eyebrow mt-0.5" style="font-size: 0.625rem;"><bdi lang="en">{{ row.priority_id }}</bdi></div>
+          </template>
+          <template #cell-profit="{ row }">
+            <bdi class="ui-num" :class="row.profit >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'">{{ fmt(row.profit) }}</bdi>
+          </template>
+          <template #cell-margin="{ row }">
+            <bdi class="ui-num" :class="marginTone(row.margin)">{{ row.margin != null ? row.margin + '%' : '—' }}</bdi>
+          </template>
+        </DataTable>
       </RuledSection>
     </template>
   </div>
@@ -206,7 +197,7 @@ import { getDashboard, getPnl, formatNumber } from '../services/api'
 import { Doughnut, Bar } from 'vue-chartjs'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from 'chart.js'
 import ProjectCompareChart from './ProjectCompareChart.vue'
-import { SectionHeader, RuledSection, HeroNumber, FootnoteSource, currentHebrewDate } from './editorial'
+import { SectionHeader, RuledSection, HeroNumber, DataTable, FootnoteSource, SkeletonLoader, currentHebrewDate } from './editorial'
 import { COLORS, tooltipConfig, axisConfig } from '../utils/chartDefaults'
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement)
@@ -255,6 +246,28 @@ function revenueBarPct(p) {
   const total = p.revenue + p.expenses
   return total > 0 ? Math.round(p.revenue / total * 100) : 50
 }
+
+const projectTableCols = [
+  { key: 'name', label: 'פרויקט', sortable: true },
+  { key: 'axis', label: 'ציר', hideMobile: true, sortable: true },
+  { key: 'revenue', label: 'הכנסות', align: 'end', format: 'number', sortable: true },
+  { key: 'expenses', label: 'הוצאות', align: 'end', format: 'number', sortable: true },
+  { key: 'profit', label: 'רווח', align: 'end', sortable: true },
+  { key: 'margin', label: 'מרווח', align: 'end', sortable: true },
+]
+
+const projectTableRows = computed(() => {
+  if (!data.value?.project_summaries) return []
+  return Object.entries(data.value.project_summaries).map(([name, s]) => ({
+    name,
+    priority_id: s.meta?.priority_id || '—',
+    axis: s.meta?.axis || '—',
+    revenue: s.total_revenue,
+    expenses: s.total_op_expenses + s.total_salary_expenses,
+    profit: s.total_operating_profit,
+    margin: s.margin,
+  }))
+})
 
 function marginTone(m) {
   if (m == null) return 'ed-tone-muted'

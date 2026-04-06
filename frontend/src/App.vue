@@ -3,7 +3,7 @@
   <div v-if="!authReady" class="min-h-screen flex items-center justify-center bg-bg">
     <div class="flex items-center gap-3">
       <div class="ui-logo-mark"></div>
-      <div class="ui-wordmark">Logfi</div>
+      <div class="ui-wordmark">IFMLogiX</div>
     </div>
   </div>
   <LoginPage v-else-if="!isLoggedIn" />
@@ -16,16 +16,16 @@
       <div class="max-w-app mx-auto px-4 sm:px-8">
         <div class="flex items-center gap-4 sm:gap-6 h-16">
           <!-- Brand -->
-          <button @click="goHome" class="flex items-center gap-2.5 group flex-shrink-0" aria-label="Logfi home">
+          <button @click="goHome" class="flex items-center gap-2.5 group flex-shrink-0" aria-label="IFMLogiX home">
             <div class="ui-logo-mark group-hover:scale-105 transition-transform"></div>
             <div class="hidden sm:block">
-              <div class="font-sans font-semibold text-ink text-lg leading-none tracking-tight">Logfi</div>
+              <div class="font-sans font-semibold text-ink text-lg leading-none tracking-tight">IFMLogiX</div>
               <div class="text-[11px] text-ink-faint font-medium mt-0.5">ניהול פיננסי</div>
             </div>
           </button>
 
           <!-- Hamburger (mobile) -->
-          <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden ms-auto p-2 -me-2 text-ink-muted hover:text-ink transition-colors">
+          <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden ms-auto p-3 -me-3 rounded-lg text-ink-muted hover:text-ink hover:bg-surface-muted transition-colors">
             <svg v-if="!mobileMenuOpen" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
               <path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/>
             </svg>
@@ -80,7 +80,7 @@
           <div class="hidden md:flex items-center gap-2 flex-shrink-0">
             <!-- Alerts bell -->
             <div class="relative" ref="alertsBtn">
-              <button @click="showAlertsModal = !showAlertsModal" class="relative p-2 rounded-lg text-ink-muted hover:text-ink hover:bg-surface-muted transition-colors" aria-label="התראות">
+              <button @click="showAlertsModal = !showAlertsModal" class="relative p-2.5 rounded-lg text-ink-muted hover:text-ink hover:bg-surface-muted transition-colors" aria-label="התראות">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                 </svg>
@@ -133,7 +133,7 @@
     <!-- Mobile menu -->
     <transition name="slide-down">
       <div v-if="mobileMenuOpen" class="fixed inset-0 top-16 z-20 bg-bg md:hidden overflow-y-auto" dir="rtl">
-        <div class="max-w-app mx-auto px-6 py-5 flex flex-col gap-1.5">
+        <div class="max-w-app mx-auto px-6 py-5 flex flex-col gap-1.5 ui-safe-bottom">
           <button @click="mobileNav('dashboard')" class="ui-mobile-nav-item" :class="{ 'is-active': activeTab === 'dashboard' }">דשבורד</button>
           <button v-if="isAdmin" @click="mobileNav('operations')" class="ui-mobile-nav-item" :class="{ 'is-active': activeTab === 'operations' }">תפעול</button>
           <button v-if="userProfile?.role === 'project_manager'" @click="mobileNav('my-projects')" class="ui-mobile-nav-item" :class="{ 'is-active': activeTab === 'my-projects' }">הפרויקטים שלי</button>
@@ -161,21 +161,26 @@
 
     <!-- Page content -->
     <main class="px-4 sm:px-8 py-6 sm:py-10 max-w-app mx-auto">
-      <ExecutiveDashboard v-if="activeTab === 'dashboard' && userProfile?.role === 'admin'"
-        @switch-to-operations="activeTab = 'operations'"
-        @new-project="showNewProjectModal = true" />
-      <Dashboard v-else-if="activeTab === 'dashboard' || activeTab === 'operations'" />
-      <MyProjectsView v-else-if="activeTab === 'my-projects'"
-        @select-project="(p) => { selectedProject = p; activeTab = 'pnl' }" />
-      <CashFlowView v-else-if="activeTab === 'cashflow'" />
-      <PnlView v-else-if="activeTab === 'pnl'" :initialProject="selectedProject" />
+      <Transition name="view-fade" mode="out-in">
+        <KeepAlive :max="5">
+          <ExecutiveDashboard v-if="activeTab === 'dashboard' && userProfile?.role === 'admin'"
+            :key="'exec'"
+            @switch-to-operations="activeTab = 'operations'"
+            @new-project="showNewProjectModal = true" />
+          <Dashboard v-else-if="activeTab === 'dashboard' || activeTab === 'operations'" :key="'dash'" />
+          <MyProjectsView v-else-if="activeTab === 'my-projects'" :key="'myproj'"
+            @select-project="(p) => { selectedProject = p; activeTab = 'pnl' }" />
+          <CashFlowView v-else-if="activeTab === 'cashflow'" :key="'cf'" />
+          <PnlView v-else-if="activeTab === 'pnl'" :key="'pnl-' + selectedProject" :initialProject="selectedProject" />
+        </KeepAlive>
+      </Transition>
     </main>
 
     <!-- Footer -->
     <footer class="max-w-app mx-auto px-4 sm:px-8 py-8 mt-8">
       <hr class="border-border" />
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-5 text-[12px] text-ink-faint font-medium">
-        <div>Logfi · ניהול פיננסי חכם · © {{ new Date().getFullYear() }}</div>
+        <div>IFMLogiX · ניהול פיננסי חכם · © {{ new Date().getFullYear() }}</div>
         <div>{{ userRoleLabel }} · {{ userDisplayName }}</div>
       </div>
     </footer>
@@ -191,12 +196,24 @@
     <UserProfileModal :show="showUserProfile" @close="showUserProfile = false; getProfile().then(p => userProfile = p).catch(() => {})" />
     <SettingsModal :show="showSettings" @close="showSettings = false" />
 
+    <!-- Toast notifications -->
     <Teleport to="body">
-      <transition name="fade">
-        <div v-if="showRecurringToast" class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] bg-ink text-white px-5 py-3 rounded-xl shadow-lg text-sm font-medium" dir="rtl">
-          פיצ'ר פרויקט מחזורי עוד בפיתוח
-        </div>
-      </transition>
+      <div class="fixed top-5 left-1/2 -translate-x-1/2 z-[200] flex flex-col gap-2.5 w-full max-w-sm px-4" dir="rtl">
+        <TransitionGroup name="toast">
+          <div v-for="t in toasts" :key="t.id"
+            class="ui-toast"
+            :class="'ui-toast--' + t.type"
+            @click="dismissToast(t.id)">
+            <div class="flex items-start gap-2.5">
+              <svg v-if="t.type === 'success'" class="w-4.5 h-4.5 text-accent mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              <svg v-else-if="t.type === 'error'" class="w-4.5 h-4.5 text-negative mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+              <svg v-else-if="t.type === 'warning'" class="w-4.5 h-4.5 text-warning mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+              <svg v-else class="w-4.5 h-4.5 text-ink-muted mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span class="font-sans text-sm font-medium text-ink leading-snug">{{ t.message }}</span>
+            </div>
+          </div>
+        </TransitionGroup>
+      </div>
     </Teleport>
 
     <Teleport to="body">
@@ -255,7 +272,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, defineAsyncComponent } from 'vue'
 import { auth } from './firebase'
 import { onAuthStateChanged, signOut } from 'firebase/auth'
 import LoginPage from './components/LoginPage.vue'
@@ -264,12 +281,14 @@ import ExecutiveDashboard from './components/ExecutiveDashboard.vue'
 import MyProjectsView from './components/MyProjectsView.vue'
 import PnlView from './components/PnlView.vue'
 import CashFlowView from './components/CashFlowView.vue'
-import ProjectFormModal from './components/ProjectFormModal.vue'
-import UserProfileModal from './components/UserProfileModal.vue'
-import SettingsModal from './components/SettingsModal.vue'
-import AiChat from './components/AiChat.vue'
 import { SectionMarker } from './components/editorial'
 import { getPnl, getProjects, getProjectsDetail, getProfile } from './services/api'
+import { createToastProvider, setGlobalToast } from './composables/useToast'
+
+const ProjectFormModal = defineAsyncComponent(() => import('./components/ProjectFormModal.vue'))
+const UserProfileModal = defineAsyncComponent(() => import('./components/UserProfileModal.vue'))
+const SettingsModal = defineAsyncComponent(() => import('./components/SettingsModal.vue'))
+const AiChat = defineAsyncComponent(() => import('./components/AiChat.vue'))
 
 const isLoggedIn = ref(false)
 const authReady = ref(false)
@@ -305,7 +324,8 @@ const showNewProjectModal = ref(false)
 const showUserMenu = ref(false)
 const showUserProfile = ref(false)
 const showSettings = ref(false)
-const showRecurringToast = ref(false)
+const { toasts, toast, dismiss: dismissToast } = createToastProvider()
+setGlobalToast(toast)
 const showAlertsModal = ref(false)
 const userProfile = ref({ username: '', full_name: '', role: '', avatar: '' })
 const alerts = ref([])
@@ -325,7 +345,7 @@ const userInitials = computed(() => {
 })
 
 const ROLE_LABELS = { admin: 'מנהל מערכת', economist: 'כלכלנית', viewer: 'צופה מלא', project_manager: 'מנהל פרויקט' }
-const userRoleLabel = computed(() => ROLE_LABELS[userProfile.value.role] || userProfile.value.role || 'Logfi')
+const userRoleLabel = computed(() => ROLE_LABELS[userProfile.value.role] || userProfile.value.role || 'IFMLogiX')
 const isAdmin = computed(() => userProfile.value.role === 'admin')
 const isEditor = computed(() => ['admin', 'economist'].includes(userProfile.value.role))
 const canEdit = computed(() => isEditor.value)
@@ -536,12 +556,29 @@ function loadAppData() {
   min-height: 0;
 }
 
-/* Fade transition for toast */
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
+/* Toast notifications */
+.ui-toast {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border-inline-start: 3px solid var(--ink-muted);
 }
-.fade-enter-from, .fade-leave-to {
-  opacity: 0;
-  transform: translate(-50%, -8px);
-}
+.ui-toast--success { border-inline-start-color: var(--accent); }
+.ui-toast--error   { border-inline-start-color: var(--negative); }
+.ui-toast--warning { border-inline-start-color: var(--warning); }
+
+.toast-enter-active { transition: opacity 0.25s ease, transform 0.25s ease; }
+.toast-leave-active { transition: opacity 0.2s ease, transform 0.2s ease; }
+.toast-move { transition: transform 0.25s ease; }
+.toast-enter-from { opacity: 0; transform: translateY(-12px) scale(0.95); }
+.toast-leave-to   { opacity: 0; transform: translateY(-8px) scale(0.97); }
+
+/* View transition (tab switching) */
+.view-fade-enter-active { transition: opacity 0.15s ease, transform 0.15s ease; }
+.view-fade-leave-active { transition: opacity 0.1s ease; }
+.view-fade-enter-from { opacity: 0; transform: translateY(6px); }
+.view-fade-leave-to   { opacity: 0; }
 </style>

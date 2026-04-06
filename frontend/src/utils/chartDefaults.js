@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════
-// Shared Chart.js configuration — Logfi Executive Cockpit
+// Shared Chart.js configuration — IFMLogiX Executive Cockpit
 // Modern fintech SaaS palette: slate ink + emerald accent
 // ═══════════════════════════════════════════════════════════════════
 
@@ -123,6 +123,10 @@ export function applyEditorialDefaults() {
   ChartJS.defaults.borderColor = BORDER
   ChartJS.defaults.animation.duration = 700
   ChartJS.defaults.animation.easing = 'easeOutCubic'
+  // Smoother data-update transitions
+  if (ChartJS.defaults.transitions) {
+    ChartJS.defaults.transitions.active = { animation: { duration: 300 } }
+  }
   if (ChartJS.defaults.elements && ChartJS.defaults.elements.bar) {
     ChartJS.defaults.elements.bar.borderRadius = 6
     ChartJS.defaults.elements.bar.borderSkipped = false

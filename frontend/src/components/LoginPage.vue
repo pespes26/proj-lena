@@ -8,7 +8,7 @@
       <div class="flex items-center justify-center gap-3 mb-8 ed-fade-up">
         <div class="ui-logo-mark"></div>
         <div>
-          <div class="font-sans font-semibold text-ink text-xl leading-none tracking-tight">Logfi</div>
+          <div class="font-sans font-semibold text-ink text-xl leading-none tracking-tight">IFMLogiX</div>
           <div class="text-[12px] text-ink-muted font-medium mt-1">ניהול פיננסי חכם</div>
         </div>
       </div>
@@ -112,7 +112,7 @@
 
       <!-- Footer -->
       <div class="text-center mt-6 text-[11px] text-ink-faint font-medium ed-fade-up-delay-2">
-        Logfi · © {{ new Date().getFullYear() }} · FM Group
+        IFMLogiX · © {{ new Date().getFullYear() }} · FM Group
       </div>
     </div>
   </div>
