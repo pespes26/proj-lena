@@ -16,16 +16,16 @@
       <div class="max-w-app mx-auto px-4 sm:px-8">
         <div class="flex items-center gap-4 sm:gap-6 h-16">
           <!-- Brand -->
-          <button @click="goHome" class="flex items-center gap-2.5 group flex-shrink-0" aria-label="IFMLogiX home">
-            <div class="ui-logo-mark group-hover:scale-105 transition-transform"></div>
-            <div class="hidden sm:block">
-              <div class="font-sans font-semibold text-ink text-lg leading-none tracking-tight">IFMLogiX</div>
-              <div class="text-[11px] text-ink-faint font-medium mt-0.5">ניהול פיננסי</div>
+          <button @click="goHome" class="ui-brand-btn flex-shrink-0" aria-label="IFMLogiX home">
+            <div class="ui-logo-mark"></div>
+            <div class="hidden sm:block text-right">
+              <div class="ui-brand-name">IFMLogiX</div>
+              <div class="ui-brand-tagline">ניהול פיננסי</div>
             </div>
           </button>
 
           <!-- Hamburger (mobile) -->
-          <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden ms-auto p-3 -me-3 rounded-lg text-ink-muted hover:text-ink hover:bg-surface-muted transition-colors">
+          <button @click="mobileMenuOpen = !mobileMenuOpen" class="ui-icon-btn md:hidden ms-auto" aria-label="פתח תפריט">
             <svg v-if="!mobileMenuOpen" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
               <path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/>
             </svg>
@@ -37,37 +37,36 @@
           <!-- Divider -->
           <div class="hidden md:block w-px h-8 bg-border"></div>
 
-          <!-- Nav tabs -->
-          <nav class="hidden md:flex items-center gap-1.5 overflow-x-auto flex-nowrap flex-1 min-w-0">
-            <SectionMarker label="דשבורד" :active="activeTab === 'dashboard'" @click="activeTab = 'dashboard'; selectedProject = ''" />
-            <SectionMarker v-if="isAdmin" label="תפעול" :active="activeTab === 'operations'" @click="activeTab = 'operations'; selectedProject = ''" />
-            <SectionMarker v-if="userProfile?.role === 'project_manager'" label="הפרויקטים שלי" :active="activeTab === 'my-projects'" @click="activeTab = 'my-projects'; selectedProject = ''" />
-            <SectionMarker label="תזרים מזומנים" :active="activeTab === 'cashflow'" @click="activeTab = 'cashflow'" />
+          <!-- Nav tabs (instant — keyboard/click, done many times per day) -->
+          <nav class="hidden md:flex items-center gap-1 overflow-x-auto flex-nowrap flex-1 min-w-0">
+            <button type="button" class="ui-nav-pill" :class="{ 'is-active': activeTab === 'dashboard' }" @click="activeTab = 'dashboard'; selectedProject = ''">דשבורד</button>
+            <button v-if="isAdmin" type="button" class="ui-nav-pill" :class="{ 'is-active': activeTab === 'operations' }" @click="activeTab = 'operations'; selectedProject = ''">תפעול</button>
+            <button v-if="userProfile?.role === 'project_manager'" type="button" class="ui-nav-pill" :class="{ 'is-active': activeTab === 'my-projects' }" @click="activeTab = 'my-projects'; selectedProject = ''">הפרויקטים שלי</button>
+            <button type="button" class="ui-nav-pill" :class="{ 'is-active': activeTab === 'cashflow' }" @click="activeTab = 'cashflow'">תזרים מזומנים</button>
 
             <!-- Projects dropdown trigger -->
             <div class="relative" ref="projectsBtn">
-              <SectionMarker label="פרויקטים" :active="activeTab === 'pnl'" @click="pnlOpen = !pnlOpen" />
+              <button type="button" class="ui-nav-pill" :class="{ 'is-active': activeTab === 'pnl' }" @click="pnlOpen = !pnlOpen">
+                פרויקטים
+                <svg class="w-3 h-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" d="M19 9l-7 7-7-7"/></svg>
+              </button>
             </div>
 
             <Teleport to="body">
               <div v-if="pnlOpen" class="ui-dropdown-backdrop" @click="pnlOpen = false"></div>
               <div v-if="pnlOpen" dir="rtl"
-                class="ui-dropdown ed-fade-up"
+                class="ui-dropdown ui-popover"
                 :style="dropdownStyle">
-                <div class="px-4 pb-2 mb-1 border-b border-slate-200">
-                  <span class="text-xs font-semibold text-slate-600">רשימת פרויקטים</span>
+                <div class="px-4 pb-2 mb-1 border-b border-[color:var(--border)]">
+                  <span class="ui-label">רשימת פרויקטים</span>
                 </div>
                 <button
                   v-for="p in projects" :key="p"
+                  type="button"
                   @click="selectProject(p); pnlOpen = false"
-                  :class="[
-                    'w-full flex items-center gap-2.5 px-4 py-2.5 transition-colors text-[14px]',
-                    activeTab === 'pnl' && selectedProject === p
-                      ? 'bg-emerald-50 text-emerald-700 font-semibold'
-                      : 'text-slate-900 hover:bg-slate-50'
-                  ]">
-                  <span class="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                    :class="activeTab === 'pnl' && selectedProject === p ? 'bg-emerald-600' : 'bg-slate-300'"></span>
+                  class="ui-dropdown-item ui-press"
+                  :class="{ 'is-active': activeTab === 'pnl' && selectedProject === p }">
+                  <span class="ui-dropdown-dot"></span>
                   <span class="flex-1 truncate text-right font-medium">{{ p }}</span>
                   <span v-if="getProjectStatus(p) === 'completed'" class="ui-pill ui-pill-neutral text-[10px]">הושלם</span>
                   <span v-else-if="getProjectStatus(p) === 'on-hold'" class="ui-pill ui-pill-warning text-[10px]">מושהה</span>
@@ -80,11 +79,11 @@
           <div class="hidden md:flex items-center gap-2 flex-shrink-0">
             <!-- Alerts bell -->
             <div class="relative" ref="alertsBtn">
-              <button @click="showAlertsModal = !showAlertsModal" class="relative p-2.5 rounded-lg text-ink-muted hover:text-ink hover:bg-surface-muted transition-colors" aria-label="התראות">
+              <button @click="showAlertsModal = !showAlertsModal" class="ui-icon-btn relative" aria-label="התראות">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                 </svg>
-                <span v-if="alertCount > 0" class="absolute top-1 left-1 min-w-[16px] h-4 px-1 bg-negative text-white text-[10px] font-bold rounded-full flex items-center justify-center ui-num">{{ alertCount }}</span>
+                <span v-if="alertCount > 0" class="ui-alert-badge ui-num">{{ alertCount }}</span>
               </button>
             </div>
 
@@ -97,29 +96,29 @@
 
             <!-- User menu -->
             <div class="relative ms-1">
-              <button @click="showUserMenu = !showUserMenu" class="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-surface-muted transition-colors">
-                <div class="w-8 h-8 rounded-full bg-accent-soft flex items-center justify-center overflow-hidden ring-1 ring-border">
+              <button @click="showUserMenu = !showUserMenu" class="ui-user-btn" aria-label="תפריט משתמש">
+                <div class="ui-user-avatar">
                   <img v-if="userProfile.avatar" :src="userProfile.avatar" class="w-full h-full object-cover" alt="" />
-                  <span v-else class="font-sans font-semibold text-xs text-accent">{{ userInitials }}</span>
+                  <span v-else>{{ userInitials }}</span>
                 </div>
                 <div class="hidden lg:block text-right">
-                  <div class="font-display font-semibold text-[13px] text-ink leading-tight">{{ userDisplayName }}</div>
-                  <div class="text-[11px] text-ink-faint leading-tight mt-0.5">{{ userRoleLabel }}</div>
+                  <div class="ui-user-name">{{ userDisplayName }}</div>
+                  <div class="ui-user-role">{{ userRoleLabel }}</div>
                 </div>
                 <svg class="w-3.5 h-3.5 text-ink-faint hidden lg:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" d="M19 9l-7 7-7-7"/></svg>
               </button>
               <div v-if="showUserMenu" class="fixed inset-0 z-40" @click="showUserMenu = false"></div>
-              <div v-if="showUserMenu" class="absolute left-0 top-full mt-2 bg-surface border border-border rounded-xl shadow-lg py-1.5 min-w-[220px] z-50 ed-fade-up" dir="rtl">
-                <button @click="showUserProfile = true; showUserMenu = false" class="w-full text-right px-4 py-2.5 text-sm text-ink hover:bg-surface-muted transition-colors flex items-center gap-3 font-medium">
-                  <svg class="w-4 h-4 text-ink-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+              <div v-if="showUserMenu" class="ui-user-menu ui-popover" dir="rtl">
+                <button type="button" @click="showUserProfile = true; showUserMenu = false" class="ui-menu-item ui-press">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                   פרטי משתמש
                 </button>
-                <button v-if="isAdmin" @click="showSettings = true; showUserMenu = false" class="w-full text-right px-4 py-2.5 text-sm text-ink hover:bg-surface-muted transition-colors flex items-center gap-3 font-medium">
-                  <svg class="w-4 h-4 text-ink-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                <button v-if="isAdmin" type="button" @click="showSettings = true; showUserMenu = false" class="ui-menu-item ui-press">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                   הגדרות
                 </button>
-                <hr class="border-border my-1" />
-                <button @click="logout(); showUserMenu = false" class="w-full text-right px-4 py-2.5 text-sm text-negative hover:bg-negative-soft transition-colors flex items-center gap-3 font-medium">
+                <hr class="ui-divider my-1" />
+                <button type="button" @click="logout(); showUserMenu = false" class="ui-menu-item ui-menu-item--danger ui-press">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                   התנתקות
                 </button>
@@ -219,16 +218,16 @@
     <Teleport to="body">
       <div v-if="showAlertsModal" class="ui-dropdown-backdrop" @click="showAlertsModal = false"></div>
       <div v-if="showAlertsModal" dir="rtl"
-        class="ui-alerts-panel ed-fade-up"
+        class="ui-alerts-panel ui-popover"
         :style="alertsPanelStyle">
-        <div class="flex items-center justify-between px-5 py-4 border-b border-border">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-[color:var(--border)]">
           <div>
-            <h3 class="font-sans font-semibold text-ink text-base leading-tight">התראות</h3>
-            <p class="text-[11px] text-ink-muted mt-0.5">{{ alerts.length }} התראות פעילות</p>
+            <h3 class="ui-alerts-title">התראות</h3>
+            <p class="ui-alerts-sub">{{ alerts.length }} התראות פעילות</p>
           </div>
-          <div class="flex items-center gap-3">
-            <button v-if="alerts.length > 0" @click="alerts = []; alertCount = 0" class="text-[11px] text-ink-muted hover:text-ink font-medium transition-colors">נקה הכל</button>
-            <button @click="showAlertsModal = false" class="text-ink-muted hover:text-ink transition-colors" aria-label="סגור">
+          <div class="flex items-center gap-2">
+            <button v-if="alerts.length > 0" type="button" @click="alerts = []; alertCount = 0" class="ed-link text-[11px]">נקה הכל</button>
+            <button type="button" @click="showAlertsModal = false" class="ui-icon-btn" aria-label="סגור">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                 <path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/>
               </svg>
@@ -237,30 +236,31 @@
         </div>
         <div class="ui-alerts-panel__body">
           <div v-if="alerts.length === 0" class="py-14 text-center px-6">
-            <div class="w-11 h-11 bg-accent-soft rounded-full flex items-center justify-center mx-auto mb-3">
-              <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            <div class="ui-alerts-empty-icon">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
             </div>
-            <h4 class="font-sans font-semibold text-ink text-sm">הכל תקין</h4>
-            <p class="text-[12px] text-ink-muted mt-1">כל הפרויקטים פועלים בטווח הצפוי</p>
+            <h4 class="ui-alerts-empty-title">הכל תקין</h4>
+            <p class="ui-alerts-empty-text">כל הפרויקטים פועלים בטווח הצפוי</p>
           </div>
           <button v-for="(alert, i) in alerts" :key="i"
+            type="button"
             @click="goToAlertProject(alert.project)"
-            class="w-full text-right px-5 py-3.5 border-b border-border hover:bg-surface-muted transition-colors group flex items-start gap-3">
-            <div class="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center mt-0.5"
-              :class="alert.severity === 'high' ? 'bg-negative-soft text-negative' : 'bg-warning-soft text-warning'">
+            class="ui-alert-item ui-press">
+            <div class="ui-alert-icon"
+              :class="alert.severity === 'high' ? 'ui-alert-icon--high' : 'ui-alert-icon--medium'">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
               <div class="flex items-baseline gap-2 mb-0.5 flex-wrap">
-                <span class="font-sans font-semibold text-ink text-[13px] group-hover:text-accent transition-colors">{{ alert.project }}</span>
+                <span class="ui-alert-project">{{ alert.project }}</span>
                 <span class="ui-pill" :class="alert.severity === 'high' ? 'ui-pill-negative' : 'ui-pill-warning'">
                   {{ alert.severity === 'high' ? 'חמור' : 'בינוני' }}
                 </span>
               </div>
-              <div class="text-[12px] text-ink-muted leading-snug">{{ alert.message }}</div>
-              <div v-if="alert.detail" class="text-[10.5px] text-ink-faint mt-1">{{ alert.detail }}</div>
+              <div class="ui-alert-msg">{{ alert.message }}</div>
+              <div v-if="alert.detail" class="ui-alert-detail">{{ alert.detail }}</div>
             </div>
           </button>
         </div>
@@ -281,7 +281,6 @@ import ExecutiveDashboard from './components/ExecutiveDashboard.vue'
 import MyProjectsView from './components/MyProjectsView.vue'
 import PnlView from './components/PnlView.vue'
 import CashFlowView from './components/CashFlowView.vue'
-import { SectionMarker } from './components/editorial'
 import { getPnl, getProjects, getProjectsDetail, getProfile } from './services/api'
 import { createToastProvider, setGlobalToast } from './composables/useToast'
 
@@ -460,10 +459,11 @@ function loadAppData() {
   width: 32px;
   height: 32px;
   border-radius: 9px;
-  background: linear-gradient(135deg, #059669 0%, #0f172a 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--ink) 100%);
   box-shadow: 0 2px 6px rgba(5, 150, 105, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.12);
   position: relative;
   flex-shrink: 0;
+  transition: transform var(--dur-press) var(--ease-out);
 }
 .ui-logo-mark::after {
   content: "L";
@@ -473,15 +473,76 @@ function loadAppData() {
   align-items: center;
   justify-content: center;
   color: #ffffff;
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--font-display);
   font-weight: 700;
   font-size: 15px;
   letter-spacing: -0.02em;
 }
 
+/* Brand button — press feedback on whole thing */
+.ui-brand-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  background: transparent;
+  border: 0;
+  padding: 0.25rem;
+  margin: -0.25rem;
+  cursor: pointer;
+  border-radius: var(--radius-lg);
+  transition: transform var(--dur-press) var(--ease-out);
+}
+.ui-brand-btn:active { transform: scale(0.97); }
+.ui-brand-name {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  color: var(--ink);
+  font-size: 1.125rem;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+.ui-brand-tagline {
+  font-size: 0.6875rem;
+  color: var(--ink-faint);
+  font-weight: 500;
+  margin-top: 0.125rem;
+}
+
+/* Top nav pill — instant, no hover animation on touch, quick press */
+.ui-nav-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.875rem;
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ink-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+  transition: color 160ms var(--ease-out), background 160ms var(--ease-out), transform var(--dur-press) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .ui-nav-pill:hover {
+    color: var(--ink);
+    background: var(--surface-muted);
+  }
+}
+.ui-nav-pill:active { transform: scale(0.97); }
+.ui-nav-pill.is-active {
+  color: var(--ink);
+  background: var(--surface-muted);
+  font-weight: 600;
+}
+
 /* Mobile nav item */
 .ui-mobile-nav-item {
-  display: block;
+  display: flex;
+  align-items: center;
   width: 100%;
   text-align: right;
   padding: 0.75rem 1rem;
@@ -493,26 +554,25 @@ function loadAppData() {
   border: 1px solid transparent;
   border-radius: var(--radius-lg);
   cursor: pointer;
-  transition: background 0.18s ease, color 0.18s ease;
+  transition: background 180ms var(--ease-out), color 180ms var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
-.ui-mobile-nav-item:hover {
-  background: var(--surface-muted);
+.ui-mobile-nav-item:active { transform: scale(0.98); }
+@media (hover: hover) and (pointer: fine) {
+  .ui-mobile-nav-item:hover { background: var(--surface-muted); }
 }
 .ui-mobile-nav-item.is-active {
   background: var(--ink);
   color: #ffffff;
   font-weight: 600;
 }
-.ui-mobile-nav-item--danger {
-  color: var(--negative);
-}
-.ui-mobile-nav-item--danger:hover {
-  background: var(--negative-soft);
+.ui-mobile-nav-item--danger { color: var(--negative); }
+@media (hover: hover) and (pointer: fine) {
+  .ui-mobile-nav-item--danger:hover { background: var(--negative-soft); }
 }
 
 /* Top nav bar — fully opaque, never translucent */
 .ui-topbar {
-  background: #ffffff;
+  background: var(--surface);
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
@@ -526,21 +586,162 @@ function loadAppData() {
 .ui-dropdown {
   position: fixed;
   z-index: 100;
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
-  padding: 0.5rem 0;
+  padding: 0.625rem 0;
   min-width: 280px;
   max-height: 20rem;
   overflow-y: auto;
+  transform-origin: top center;
+}
+.ui-dropdown-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.625rem 1rem;
+  background: transparent;
+  border: 0;
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 160ms var(--ease-out), color 160ms var(--ease-out), transform var(--dur-press) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .ui-dropdown-item:hover { background: var(--surface-muted); }
+}
+.ui-dropdown-item.is-active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+.ui-dropdown-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--border-strong);
+  flex-shrink: 0;
+}
+.ui-dropdown-item.is-active .ui-dropdown-dot { background: var(--accent); }
+
+/* Alerts bell badge */
+.ui-alert-badge {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  background: var(--negative);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* User button + avatar */
+.ui-user-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.5rem;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: background 180ms var(--ease-out), border-color 180ms var(--ease-out), transform var(--dur-press) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .ui-user-btn:hover {
+    background: var(--surface-muted);
+    border-color: var(--border);
+  }
+}
+.ui-user-btn:active { transform: scale(0.97); }
+.ui-user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px;
+  background: var(--accent-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px var(--border);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.75rem;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.ui-user-name {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  color: var(--ink);
+  line-height: 1.15;
+}
+.ui-user-role {
+  font-size: 0.6875rem;
+  color: var(--ink-faint);
+  line-height: 1.15;
+  margin-top: 0.125rem;
+}
+
+/* User dropdown menu */
+.ui-user-menu {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  margin-top: 0.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: 0.375rem;
+  min-width: 220px;
+  z-index: 50;
+  transform-origin: top left;
+}
+.ui-menu-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0.875rem;
+  text-align: right;
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 160ms var(--ease-out), color 160ms var(--ease-out), transform var(--dur-press) var(--ease-out);
+}
+.ui-menu-item svg { color: var(--ink-muted); }
+@media (hover: hover) and (pointer: fine) {
+  .ui-menu-item:hover { background: var(--surface-muted); }
+}
+.ui-menu-item--danger { color: var(--negative); }
+.ui-menu-item--danger svg { color: var(--negative); }
+@media (hover: hover) and (pointer: fine) {
+  .ui-menu-item--danger:hover { background: var(--negative-soft); }
 }
 
 /* Alerts panel — anchored dropdown beneath the bell */
 .ui-alerts-panel {
   position: fixed;
   z-index: 100;
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-lg);
@@ -549,36 +750,120 @@ function loadAppData() {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  transform-origin: top left;
 }
 .ui-alerts-panel__body {
   flex: 1;
   overflow-y: auto;
   min-height: 0;
 }
+.ui-alerts-title {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.2;
+}
+.ui-alerts-sub {
+  font-size: 0.6875rem;
+  color: var(--ink-muted);
+  margin-top: 0.125rem;
+}
+.ui-alerts-empty-icon {
+  width: 2.75rem;
+  height: 2.75rem;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.75rem;
+}
+.ui-alerts-empty-title {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  color: var(--ink);
+  font-size: 0.875rem;
+}
+.ui-alerts-empty-text {
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+  margin-top: 0.25rem;
+}
+.ui-alert-item {
+  width: 100%;
+  text-align: right;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.875rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  border-top: 0;
+  border-inline: 0;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: background 160ms var(--ease-out), transform var(--dur-press) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .ui-alert-item:hover { background: var(--surface-muted); }
+}
+.ui-alert-icon {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.125rem;
+  flex-shrink: 0;
+}
+.ui-alert-icon--high { background: var(--negative-soft); color: var(--negative); }
+.ui-alert-icon--medium { background: var(--warning-soft); color: var(--warning); }
+.ui-alert-project {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  color: var(--ink);
+  font-size: 0.8125rem;
+}
+.ui-alert-msg {
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+  line-height: 1.45;
+}
+.ui-alert-detail {
+  font-size: 0.6875rem;
+  color: var(--ink-faint);
+  margin-top: 0.25rem;
+}
 
 /* Toast notifications */
 .ui-toast {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   padding: 0.75rem 1rem;
   cursor: pointer;
   border-inline-start: 3px solid var(--ink-muted);
+  transition: transform var(--dur-press) var(--ease-out);
 }
+.ui-toast:active { transform: scale(0.98); }
 .ui-toast--success { border-inline-start-color: var(--accent); }
 .ui-toast--error   { border-inline-start-color: var(--negative); }
 .ui-toast--warning { border-inline-start-color: var(--warning); }
 
-.toast-enter-active { transition: opacity 0.25s ease, transform 0.25s ease; }
-.toast-leave-active { transition: opacity 0.2s ease, transform 0.2s ease; }
-.toast-move { transition: transform 0.25s ease; }
-.toast-enter-from { opacity: 0; transform: translateY(-12px) scale(0.95); }
+/* Toast animation — opacity + transform only, ease-out */
+.toast-enter-active { transition: opacity 220ms var(--ease-out), transform 220ms var(--ease-out); }
+.toast-leave-active { transition: opacity 180ms var(--ease-out), transform 180ms var(--ease-out); }
+.toast-move { transition: transform 220ms var(--ease-out); }
+.toast-enter-from { opacity: 0; transform: translateY(-12px) scale(0.96); }
 .toast-leave-to   { opacity: 0; transform: translateY(-8px) scale(0.97); }
 
-/* View transition (tab switching) */
-.view-fade-enter-active { transition: opacity 0.15s ease, transform 0.15s ease; }
-.view-fade-leave-active { transition: opacity 0.1s ease; }
+/* View transition (tab switching) — fast opacity + transform */
+.view-fade-enter-active { transition: opacity 150ms var(--ease-out), transform 150ms var(--ease-out); }
+.view-fade-leave-active { transition: opacity 100ms var(--ease-out); }
 .view-fade-enter-from { opacity: 0; transform: translateY(6px); }
 .view-fade-leave-to   { opacity: 0; }
 </style>

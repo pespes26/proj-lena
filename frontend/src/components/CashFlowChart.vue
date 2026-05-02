@@ -1,5 +1,7 @@
 <template>
-  <Line :data="chartData" :options="chartOptions" style="max-height: 320px;" />
+  <div class="ui-chart-container ui-chart-container--lg">
+    <Line :data="chartData" :options="chartOptions" />
+  </div>
 </template>
 
 <script setup>

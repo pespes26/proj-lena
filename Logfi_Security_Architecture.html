@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Logfi — מסמך ארכיטקטורה ואבטחת מידע</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Heebo', sans-serif;
+    color: #334155;
+    background: #fff;
+    line-height: 1.7;
+    font-size: 14px;
+  }
+
+  @media print {
+    body { font-size: 12px; }
+    .page-break { page-break-before: always; }
+    .no-print { display: none; }
+    @page { margin: 2cm; }
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px;
+  }
+
+  /* Title page */
+  .title-page {
+    min-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 0;
+  }
+  .logo {
+    width: 80px;
+    height: 80px;
+    background: #0f172a;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 32px;
+    letter-spacing: 1px;
+  }
+  .title-page h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 8px;
+  }
+  .title-page .subtitle {
+    font-size: 16px;
+    color: #64748b;
+    margin-bottom: 40px;
+  }
+  .meta-table {
+    text-align: right;
+    border-collapse: collapse;
+    margin-top: 24px;
+  }
+  .meta-table td {
+    padding: 4px 16px;
+    font-size: 13px;
+  }
+  .meta-table .label {
+    font-weight: 600;
+    color: #475569;
+  }
+  .meta-table .value {
+    color: #64748b;
+  }
+  .badge-confidential {
+    display: inline-block;
+    background: #fef2f2;
+    color: #ef4444;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 6px;
+    border: 1px solid #fecaca;
+  }
+
+  /* Sections */
+  h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 48px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 28px 0 12px;
+  }
+  p {
+    margin-bottom: 12px;
+    color: #475569;
+  }
+  ul {
+    margin: 8px 0 16px 0;
+    padding-right: 24px;
+  }
+  li {
+    margin-bottom: 6px;
+    color: #475569;
+  }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 24px;
+    font-size: 13px;
+  }
+  thead th {
+    background: #f8fafc;
+    font-weight: 600;
+    color: #1e293b;
+    padding: 10px 14px;
+    text-align: right;
+    border-bottom: 2px solid #e2e8f0;
+  }
+  tbody td {
+    padding: 8px 14px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #475569;
+  }
+  tbody tr:hover { background: #f8fafc; }
+
+  /* Severity badges */
+  .sev-critical { color: #dc2626; font-weight: 600; }
+  .sev-high { color: #ea580c; font-weight: 600; }
+  .sev-medium { color: #ca8a04; font-weight: 600; }
+  .sev-low { color: #16a34a; font-weight: 600; }
+  .sev-none { color: #64748b; font-weight: 600; }
+
+  /* Footer */
+  .doc-footer {
+    margin-top: 60px;
+    padding-top: 24px;
+    border-top: 1px solid #e2e8f0;
+    font-size: 11px;
+    color: #94a3b8;
+    text-align: center;
+  }
+
+  /* Signature */
+  .signature-block {
+    margin-top: 48px;
+    padding: 24px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #f8fafc;
+  }
+  .signature-line {
+    margin: 20px 0 8px;
+    border-bottom: 1px solid #94a3b8;
+    width: 300px;
+    height: 32px;
+  }
+  .signature-label {
+    font-size: 12px;
+    color: #94a3b8;
+  }
+
+  /* Print button */
+  .print-btn {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    background: #0f172a;
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-family: 'Heebo', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 100;
+  }
+  .print-btn:hover { background: #1e293b; }
+</style>
+</head>
+<body>
+
+<button class="print-btn no-print" onclick="window.print()">📄 שמור כ-PDF</button>
+
+<div class="container">
+
+<!-- TITLE PAGE -->
+<div class="title-page">
+  <div class="logo">Logfi</div>
+  <h1>מסמך ארכיטקטורה ואבטחת מידע</h1>
+  <div class="subtitle">מערכת ניהול פיננסי לפרויקטי בנייה ותחזוקה</div>
+  <div style="width:80px; height:1px; background:#e2e8f0; margin:16px auto;"></div>
+  <table class="meta-table">
+    <tr><td class="label">גרסה:</td><td class="value">1.0</td></tr>
+    <tr><td class="label">תאריך:</td><td class="value">29 במרץ 2026</td></tr>
+    <tr><td class="label">מחבר:</td><td class="value">בר פסו — לוגי גרופ</td></tr>
+    <tr><td class="label">סיווג:</td><td class="value"><span class="badge-confidential">סודי — לשימוש פנימי בלבד</span></td></tr>
+    <tr><td class="label">סטטוס:</td><td class="value">ממתין לאישור אבטחת מידע</td></tr>
+  </table>
+</div>
+
+<!-- TOC -->
+<div class="page-break"></div>
+<h2>תוכן עניינים</h2>
+<ul>
+  <li>1. סקירה כללית של המערכת</li>
+  <li>2. ארכיטקטורה טכנית</li>
+  <li>3. אבטחת מידע — אימות והרשאות</li>
+  <li>4. אבטחת מידע — אחסון נתונים</li>
+  <li>5. אבטחת מידע — תקשורת</li>
+  <li>6. בקרת גישה — מטריצת הרשאות</li>
+  <li>7. שירותי ענן — Google Cloud Platform</li>
+  <li>8. בינה מלאכותית (AI)</li>
+  <li>9. סיכונים וצעדי מיטיגציה</li>
+  <li>10. תאימות רגולטורית</li>
+  <li>11. המלצות לאישור</li>
+</ul>
+
+<!-- 1 -->
+<div class="page-break"></div>
+<h2>1. סקירה כללית של המערכת</h2>
+<p>Logfi היא מערכת ניהול פיננסי פנימית שנבנתה עבור לוגי גרופ / מנרב IFM. המערכת מנהלת את הצד הכספי של פרויקטי בנייה, תחזוקה וניהול מתקנים — כולל דוחות רווח והפסד, תזרים מזומנים, ניהול קבלני משנה, תנאי תשלום וניתוח סיכונים.</p>
+
+<h3>סוגי נתונים במערכת</h3>
+<ul>
+  <li>נתוני פרויקטים: שם, תאריכים, הכנסות, הוצאות, תנאי תשלום</li>
+  <li>נתוני ספקים: שם, פרטי קשר, סכומי התחייבות, תנאי תשלום</li>
+  <li>עלויות שכר: סכומים חודשיים לפרויקט (לא שכר אישי של עובדים)</li>
+  <li>דוחות פיננסיים: רווח והפסד, תזרים מזומנים, ניתוח סיכונים</li>
+  <li>נתוני משתמשים: שם, אימייל, תפקיד, הרשאות</li>
+</ul>
+
+<h3>משתמשי המערכת</h3>
+<table>
+  <thead><tr><th>תפקיד</th><th>כמות</th><th>רמת גישה</th></tr></thead>
+  <tbody>
+    <tr><td>מנהל מערכת (מנכ"ל)</td><td>1</td><td>מלאה — כולל ניהול משתמשים</td></tr>
+    <tr><td>כלכלנית</td><td>1</td><td>מלאה — ללא ניהול משתמשים</td></tr>
+    <tr><td>צופה מלא</td><td>1-3</td><td>צפייה בלבד</td></tr>
+    <tr><td>מנהל פרויקט</td><td>3</td><td>צפייה בפרויקטים שלו בלבד</td></tr>
+  </tbody>
+</table>
+
+<!-- 2 -->
+<div class="page-break"></div>
+<h2>2. ארכיטקטורה טכנית</h2>
+
+<h3>רכיבי המערכת</h3>
+<table>
+  <thead><tr><th>רכיב</th><th>טכנולוגיה</th><th>תפקיד</th></tr></thead>
+  <tbody>
+    <tr><td>Frontend</td><td>Vue 3 + Tailwind CSS</td><td>ממשק משתמש (SPA)</td></tr>
+    <tr><td>Backend</td><td>FastAPI (Python)</td><td>שרת API — לוגיקה עסקית</td></tr>
+    <tr><td>Database</td><td>Google Firestore</td><td>בסיס נתונים NoSQL</td></tr>
+    <tr><td>Authentication</td><td>Firebase Authentication</td><td>אימות משתמשים + 2FA</td></tr>
+    <tr><td>Hosting</td><td>GCP Cloud Run</td><td>שרת Serverless</td></tr>
+    <tr><td>AI</td><td>Google Gemini API</td><td>צ'אטבוט ניתוח פיננסי</td></tr>
+  </tbody>
+</table>
+
+<h3>תרשים זרימה</h3>
+<p>Browser (Vue SPA) → HTTPS → Cloud Run (FastAPI) → Firestore</p>
+<p>Browser → Firebase Auth SDK → Firebase Auth Service → JWT Token</p>
+<p>Cloud Run → Firebase Admin SDK → אימות טוקן</p>
+<p>Cloud Run → Gemini API → ניתוח AI (ללא נתונים אישיים)</p>
+
+<!-- 3 -->
+<div class="page-break"></div>
+<h2>3. אבטחת מידע — אימות והרשאות</h2>
+
+<h3>אימות (Authentication)</h3>
+<ul>
+  <li>אימות מבוסס Firebase Authentication</li>
+  <li>התחברות באמצעות אימייל + סיסמה</li>
+  <li>אימות דו-שלבי (2FA) באמצעות Google Authenticator — פרוטוקול TOTP</li>
+  <li>טוקן JWT נוצר על ידי Firebase, מאומת בצד השרת עם Firebase Admin SDK</li>
+  <li>תוקף טוקן: 60 דקות — מתחדש אוטומטית</li>
+  <li>סיסמאות מאוחסנות ב-Firebase בלבד — לא בקוד ולא בבסיס נתונים של המערכת</li>
+</ul>
+
+<h3>הרשאות (Authorization)</h3>
+<ul>
+  <li>4 רמות הרשאה: מנהל מערכת, כלכלנית, צופה, מנהל פרויקט</li>
+  <li>כל בקשת API מאומתת — טוקן נבדק בכל endpoint</li>
+  <li>מנהל פרויקט רואה אך ורק פרויקטים שמשויכים אליו</li>
+  <li>בדיקת הרשאות מתבצעת בצד השרת — לא ניתן לעקוף מצד הלקוח</li>
+  <li>CORS מוגבל לדומיין המערכת בלבד</li>
+</ul>
+
+<!-- 4 -->
+<h2>4. אבטחת מידע — אחסון נתונים</h2>
+<ul>
+  <li>כל הנתונים מאוחסנים ב-Google Firestore</li>
+  <li>הצפנה בדיסק (Encryption at Rest) — AES-256, מנוהל על ידי Google</li>
+  <li>אין גישה ישירה ל-Firestore מהדפדפן — רק דרך ה-Backend</li>
+  <li>Service Account עם הרשאות מינימליות (Principle of Least Privilege)</li>
+  <li>קבצי Service Account לא נשמרים ב-Git (כלולים ב-gitignore)</li>
+  <li>נתונים רגישים (סיסמאות, מפתחות) מנוהלים ב-Firebase/GCP — לא בקוד</li>
+</ul>
+
+<h3>סיווג נתונים</h3>
+<table>
+  <thead><tr><th>סוג נתון</th><th>רגישות</th><th>מיקום אחסון</th><th>הגנה</th></tr></thead>
+  <tbody>
+    <tr><td>נתוני פרויקטים</td><td>גבוהה</td><td>Firestore</td><td>AES-256 + HTTPS</td></tr>
+    <tr><td>נתוני ספקים</td><td>בינונית</td><td>Firestore</td><td>AES-256 + HTTPS</td></tr>
+    <tr><td>עלויות שכר</td><td>גבוהה</td><td>Firestore</td><td>AES-256 + בקרת גישה</td></tr>
+    <tr><td>סיסמאות</td><td>קריטית</td><td>Firebase Auth</td><td>bcrypt hash</td></tr>
+    <tr><td>מפתחות API</td><td>קריטית</td><td>Environment Variables</td><td>gitignore + Secret Manager</td></tr>
+  </tbody>
+</table>
+
+<!-- 5 -->
+<div class="page-break"></div>
+<h2>5. אבטחת מידע — תקשורת</h2>
+<ul>
+  <li>כל התקשורת מוצפנת ב-HTTPS/TLS — אין תעבורה ב-HTTP</li>
+  <li>Cloud Run מספק תעודת SSL אוטומטית (מנוהלת על ידי Google)</li>
+  <li>CORS מוגבל — רק הדומיין המורשה יכול לתקשר עם ה-API</li>
+  <li>Firebase Auth tokens מועברים בכותרת Authorization: Bearer</li>
+  <li>אין אחסון של מידע רגיש ב-cookies או localStorage</li>
+  <li>אין API חיצוני שמקבל מידע מזהה אישית (PII)</li>
+</ul>
+
+<!-- 6 -->
+<h2>6. בקרת גישה — מטריצת הרשאות</h2>
+<table>
+  <thead><tr><th>פעולה</th><th>מנהל מערכת</th><th>כלכלנית</th><th>צופה</th><th>מנהל פרויקט</th></tr></thead>
+  <tbody>
+    <tr><td>צפייה בכל הפרויקטים</td><td>✓</td><td>✓</td><td>✓</td><td>רק שלו</td></tr>
+    <tr><td>יצירת פרויקט</td><td>✓</td><td>✓</td><td>✗</td><td>✗</td></tr>
+    <tr><td>עריכת פרויקט</td><td>✓</td><td>✓</td><td>✗</td><td>✗</td></tr>
+    <tr><td>עדכון ביצוע בפועל</td><td>✓</td><td>✓</td><td>✗</td><td>רק שלו</td></tr>
+    <tr><td>ניהול משתמשים</td><td>✓</td><td>✗</td><td>✗</td><td>✗</td></tr>
+    <tr><td>צ'אטבוט AI</td><td>כל הנתונים</td><td>כל הנתונים</td><td>צפייה</td><td>רק שלו</td></tr>
+    <tr><td>ייצוא PDF</td><td>✓</td><td>✓</td><td>✓</td><td>רק שלו</td></tr>
+    <tr><td>תצוגת דשבורד</td><td>דשבורד מנכ"ל</td><td>תפעולי</td><td>תפעולי</td><td>הפרויקטים שלי</td></tr>
+  </tbody>
+</table>
+
+<!-- 7 -->
+<div class="page-break"></div>
+<h2>7. שירותי ענן — Google Cloud Platform</h2>
+
+<h3>שירותים בשימוש</h3>
+<table>
+  <thead><tr><th>שירות</th><th>תפקיד</th><th>אזור</th></tr></thead>
+  <tbody>
+    <tr><td>Cloud Run</td><td>שרת האפליקציה (Serverless)</td><td>us-central1</td></tr>
+    <tr><td>Firestore</td><td>בסיס נתונים</td><td>us-east1</td></tr>
+    <tr><td>Firebase Auth</td><td>אימות משתמשים + 2FA</td><td>גלובלי</td></tr>
+    <tr><td>Cloud Build</td><td>בניית Docker Images</td><td>us-central1</td></tr>
+  </tbody>
+</table>
+
+<h3>בקרות אבטחה ב-GCP</h3>
+<ul>
+  <li>GCP Project ID: minlog-491211</li>
+  <li>Billing Account עם Budget Alerts מוגדרים</li>
+  <li>IAM — Service Account עם הרשאות מינימליות בלבד</li>
+  <li>אין גישה ציבורית ל-Firestore — רק דרך Service Account</li>
+  <li>Cloud Run — אימות ברמת האפליקציה (Firebase JWT)</li>
+  <li>Docker Images נבנים דרך Cloud Build (לא builds מקומיים בפרודקשן)</li>
+</ul>
+
+<h3>הסמכות GCP</h3>
+<ul>
+  <li>SOC 1, SOC 2, SOC 3</li>
+  <li>ISO 27001 — ניהול אבטחת מידע</li>
+  <li>ISO 27017 — אבטחת מידע בענן</li>
+  <li>ISO 27018 — הגנה על מידע אישי בענן</li>
+</ul>
+
+<!-- 8 -->
+<h2>8. בינה מלאכותית (AI)</h2>
+<p>המערכת כוללת צ'אטבוט לניתוח פיננסי מבוסס Google Gemini API.</p>
+
+<h3>מדיניות נתונים ב-AI</h3>
+<ul>
+  <li>הצ'אטבוט מקבל רק סיכומי פרויקטים (שם, הכנסות, הוצאות, מרג'ין)</li>
+  <li>לא נשלחים נתוני שכר, פרטי ספקים או מידע אישי</li>
+  <li>Gemini API — הנתונים לא משמשים לאימון מודלים (לפי מדיניות Google)</li>
+  <li>בפיתוח: מעבר ל-Vertex AI שבו הנתונים נשארים בתוך ה-GCP Project</li>
+  <li>חישובים פיננסיים (What-If, Risk Score) מתבצעים בקוד Python — ללא AI</li>
+  <li>תשובות ה-AI הן ייעוציות בלבד — אין החלטות פיננסיות אוטומטיות</li>
+</ul>
+
+<!-- 9 -->
+<div class="page-break"></div>
+<h2>9. סיכונים וצעדי מיטיגציה</h2>
+<table>
+  <thead><tr><th>סיכון</th><th>חומרה</th><th>מיטיגציה</th></tr></thead>
+  <tbody>
+    <tr><td>דליפת סיסמאות</td><td class="sev-critical">קריטי</td><td>Firebase Auth + 2FA + bcrypt hash</td></tr>
+    <tr><td>גישה לא מורשית</td><td class="sev-high">גבוה</td><td>JWT + בקרת גישה לפי תפקיד + אימות בצד שרת</td></tr>
+    <tr><td>דליפת נתונים</td><td class="sev-high">גבוה</td><td>הצפנה at rest + HTTPS + CORS</td></tr>
+    <tr><td>חשיפת מפתחות API</td><td class="sev-medium">בינוני</td><td>.env + gitignore + Secret Manager</td></tr>
+    <tr><td>AI Hallucination</td><td class="sev-low">נמוך</td><td>פרומפטים מבוקרים + טמפרטורה 0.25</td></tr>
+    <tr><td>מתקפת DDoS</td><td class="sev-low">נמוך</td><td>Cloud Run Auto-Scaling + תשתית Google</td></tr>
+    <tr><td>SQL Injection</td><td class="sev-none">אין</td><td>Firestore NoSQL — אין שאילתות SQL</td></tr>
+    <tr><td>XSS</td><td class="sev-low">נמוך</td><td>Vue.js auto-escaping + ללא v-html על קלט משתמש</td></tr>
+  </tbody>
+</table>
+
+<!-- 10 -->
+<h2>10. תאימות רגולטורית</h2>
+<p>Google Cloud Platform עומד בתקנים הבאים:</p>
+<ul>
+  <li>SOC 1, SOC 2, SOC 3 — בקרות ארגון שירות</li>
+  <li>ISO 27001 — מערכת ניהול אבטחת מידע</li>
+  <li>ISO 27017 — אבטחת מידע ספציפית לענן</li>
+  <li>ISO 27018 — הגנה על מידע אישי בענן ציבורי</li>
+  <li>GDPR — תאימות לרגולציה האירופית</li>
+  <li>Google Cloud DPA (הסכם עיבוד נתונים) — זמין לחתימה</li>
+</ul>
+
+<!-- 11 -->
+<div class="page-break"></div>
+<h2>11. המלצות לאישור</h2>
+<p>על מנת לקבל אישור לפריסה בענן, מומלץ לבצע את הצעדים הבאים:</p>
+<ul>
+  <li>1. אישור ארכיטקטורה — סקירת מסמך זה על ידי אחראי אבטחת מידע</li>
+  <li>2. הגדרת מדיניות סיסמאות — אורך מינימלי, מורכבות, תוקף</li>
+  <li>3. הפעלת 2FA חובה לכל המשתמשים</li>
+  <li>4. הגדרת Budget Alerts ב-GCP — התראה על חריגה</li>
+  <li>5. הגדרת Audit Log — מעקב אחרי פעולות רגישות</li>
+  <li>6. סקירת קוד (Code Review) — אימות שאין חשיפת מידע</li>
+  <li>7. בדיקת חדירות (Penetration Test) — אופציונלי</li>
+  <li>8. הגדרת תהליך גיבוי ושחזור (RPO/RTO)</li>
+  <li>9. חתימה על DPA עם Google</li>
+  <li>10. אישור סופי מאחראי אבטחת מידע</li>
+</ul>
+
+<!-- SIGNATURE -->
+<div class="signature-block">
+  <h3>אישור</h3>
+  <p>לשאלות או הבהרות: בר פסו — bar@logigroup.co</p>
+
+  <div style="display:flex; gap:48px; margin-top:24px;">
+    <div>
+      <div class="signature-line"></div>
+      <div class="signature-label">חתימת אחראי אבטחת מידע</div>
+    </div>
+    <div>
+      <div class="signature-line"></div>
+      <div class="signature-label">תאריך</div>
+    </div>
+  </div>
+</div>
+
+<div class="doc-footer">
+  מסמך זה הופק ממערכת Logfi | גרסה 1.0 | מרץ 2026<br>
+  סודי — לשימוש פנימי בלבד
+</div>
+
+</div>
+</body>
+</html>

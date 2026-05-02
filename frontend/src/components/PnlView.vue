@@ -10,37 +10,52 @@
     </div>
 
     <!-- No project selected -->
-    <div v-else-if="!selectedProject" class="ed-section text-center py-16">
-      <div class="ed-eyebrow mb-3">פרויקט</div>
-      <p class="font-sans text-2xl text-ink leading-tight max-w-lg mx-auto">
+    <div v-else-if="!selectedProject" class="ui-card text-center py-16 animate-fade-up">
+      <div class="ui-label mb-3">פרויקט</div>
+      <p class="ui-display max-w-lg mx-auto">
         אין פרויקט נבחר.
       </p>
-      <div class="ed-eyebrow mt-3 ed-tone-muted">יש לבחור פרויקט מהרשימה במסדר העליון</div>
+      <div class="ui-label mt-3 ed-tone-muted">יש לבחור פרויקט מהרשימה במסדר העליון</div>
     </div>
 
     <template v-else>
       <!-- Header -->
-      <SectionHeader
-        eyebrow="פרויקט"
-        :kicker="dateLabel"
-        :title="selectedProject"
-      />
+      <header class="ui-card animate-fade-up mb-6">
+        <div class="flex items-start justify-between flex-wrap gap-4">
+          <div class="min-w-0">
+            <div class="ui-label mb-2">פרויקט · {{ dateLabel }}</div>
+            <h1 class="ui-display leading-tight">{{ selectedProject }}</h1>
+          </div>
+          <div class="flex items-center gap-2">
+            <button @click="showReportModal = true" class="ui-btn">+ דיווח נקודתי</button>
+          </div>
+        </div>
+      </header>
 
       <!-- Section markers for tabs -->
-      <div class="flex gap-x-8 gap-y-2 flex-wrap items-center mb-8 pb-2 border-b border-rule-strong ed-fade-up">
-        <SectionMarker label="דו״ח P&L" :active="viewMode === 'pnl'" @click="viewMode = 'pnl'" />
-        <SectionMarker
-          label="ניהול פרויקט"
-          :active="viewMode === 'dashboard'"
-          :badge="formDataStatus === 'incomplete' || formDataStatus === 'empty' ? '!' : null"
+      <nav class="flex gap-x-8 gap-y-2 flex-wrap items-center mb-8 pb-2" style="border-bottom: 1px solid var(--border-strong);">
+        <button
+          type="button"
+          class="ed-link text-sm"
+          :class="{ 'is-active': viewMode === 'pnl' }"
+          @click="viewMode = 'pnl'"
+        >דו״ח P&amp;L</button>
+        <button
+          type="button"
+          class="ed-link text-sm"
+          :class="{ 'is-active': viewMode === 'dashboard' }"
           @click="viewMode = 'dashboard'"
-        />
-        <SectionMarker label="פרטי פרויקט" :active="viewMode === 'details'" @click="viewMode = 'details'" />
-
-        <div class="mr-auto flex gap-4">
-          <button @click="showReportModal = true" class="ed-link text-sm">+ דיווח נקודתי</button>
-        </div>
-      </div>
+        >
+          ניהול פרויקט
+          <span v-if="formDataStatus === 'incomplete' || formDataStatus === 'empty'" class="ui-pill ui-pill-warning" style="margin-inline-start: 0.5rem;">!</span>
+        </button>
+        <button
+          type="button"
+          class="ed-link text-sm"
+          :class="{ 'is-active': viewMode === 'details' }"
+          @click="viewMode = 'details'"
+        >פרטי פרויקט</button>
+      </nav>
 
       <!-- Dashboard view -->
       <div v-if="viewMode === 'dashboard'">
@@ -58,22 +73,22 @@
       <!-- P&L view -->
       <template v-else-if="pnlData">
         <!-- Project meta strip -->
-        <section class="ed-section-top mb-6">
-          <div class="flex flex-wrap gap-x-10 gap-y-4 ed-col-rule">
+        <section class="ui-card mb-6">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-x-8 gap-y-4">
             <div>
-              <div class="ed-eyebrow mb-1">מס׳ עדיפות</div>
-              <div class="font-sans font-semibold text-ink"><bdi lang="en" class="ed-num">{{ pnlData.meta?.priority_id || '—' }}</bdi></div>
+              <div class="ui-label mb-1">מס׳ עדיפות</div>
+              <div class="ui-num font-semibold text-ink"><bdi lang="en">{{ pnlData.meta?.priority_id || '—' }}</bdi></div>
             </div>
             <div>
-              <div class="ed-eyebrow mb-1">מנהל פרויקט</div>
+              <div class="ui-label mb-1">מנהל פרויקט</div>
               <div class="font-sans font-semibold text-ink">{{ pnlData.meta?.manager || '—' }}</div>
             </div>
             <div>
-              <div class="ed-eyebrow mb-1">תחום</div>
+              <div class="ui-label mb-1">תחום</div>
               <div class="font-sans font-semibold text-ink">{{ pnlData.meta?.area || '—' }}</div>
             </div>
             <div>
-              <div class="ed-eyebrow mb-1">ציר</div>
+              <div class="ui-label mb-1">ציר</div>
               <div class="font-sans font-semibold text-ink">{{ pnlData.meta?.axis || '—' }}</div>
             </div>
           </div>
@@ -100,35 +115,34 @@
         </RuledSection>
 
         <!-- KPI hero strip -->
-        <section class="ed-section ed-fade-up-delay-1">
-          <div class="flex flex-wrap gap-y-8 ed-col-rule">
-            <div class="flex-1" style="min-width: 160px;">
-              <HeroNumber label="הכנסות שנתיות" :value="pnlData.summary.total_revenue" prefix="₪" size="md" />
+        <section class="ui-stagger grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+          <div class="ui-mini-card">
+            <div class="ui-label mb-2">הכנסות שנתיות</div>
+            <div class="ui-num font-semibold text-ink text-xl"><bdi>₪ {{ fmt(pnlData.summary.total_revenue) }}</bdi></div>
+          </div>
+          <div class="ui-mini-card">
+            <div class="ui-label mb-2">הוצאות תפעול</div>
+            <div class="ui-num font-semibold text-ink text-xl"><bdi>₪ {{ fmt(pnlData.summary.total_op_expenses) }}</bdi></div>
+          </div>
+          <div class="ui-mini-card">
+            <div class="ui-label mb-2">הוצאות שכר</div>
+            <div class="ui-num font-semibold text-ink text-xl"><bdi>₪ {{ fmt(pnlData.summary.total_salary_expenses) }}</bdi></div>
+          </div>
+          <div class="ui-mini-card">
+            <div class="ui-label mb-2">רווח תפעולי</div>
+            <div class="ui-num font-semibold text-xl" :class="pnlData.summary.total_operating_profit >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'">
+              <bdi>₪ {{ fmt(pnlData.summary.total_operating_profit) }}</bdi>
             </div>
-            <div class="flex-1" style="min-width: 160px;">
-              <HeroNumber label="הוצאות תפעול" :value="pnlData.summary.total_op_expenses" prefix="₪" size="md" />
-            </div>
-            <div class="flex-1" style="min-width: 160px;">
-              <HeroNumber label="הוצאות שכר" :value="pnlData.summary.total_salary_expenses" prefix="₪" size="md" />
-            </div>
-            <div class="flex-1" style="min-width: 160px;">
-              <HeroNumber
-                label="רווח תפעולי"
-                :value="pnlData.summary.total_operating_profit"
-                prefix="₪"
-                :tone="pnlData.summary.total_operating_profit >= 0 ? 'positive' : 'negative'"
-                size="md"
-              />
-            </div>
-            <div class="flex-1" style="min-width: 160px;">
-              <HeroNumber
-                label="מרווח תפעולי"
-                :value="pnlData.summary.margin != null ? pnlData.summary.margin : 0"
-                suffix="%"
-                format="percent"
-                :tone="pnlData.summary.margin >= 20 ? 'positive' : 'warning'"
-                size="md"
-              />
+          </div>
+          <div class="ui-mini-card">
+            <div class="ui-label mb-2">מרווח תפעולי</div>
+            <div class="flex items-baseline gap-2">
+              <span class="ui-num font-semibold text-xl" :class="pnlData.summary.margin >= 20 ? 'ed-tone-positive' : 'ed-tone-warning'">
+                {{ pnlData.summary.margin != null ? pnlData.summary.margin : 0 }}%
+              </span>
+              <span class="ui-pill" :class="pnlData.summary.margin >= 20 ? 'ui-pill-positive' : 'ui-pill-warning'">
+                {{ pnlData.summary.margin >= 20 ? 'חזק' : 'לבדוק' }}
+              </span>
             </div>
           </div>
         </section>
@@ -175,26 +189,26 @@
             <span class="ed-eyebrow">לחץ על שורה לפירוט הוצאות</span>
           </template>
           <div class="overflow-x-auto">
-            <table class="ed-table" style="min-width: 700px;">
+            <table class="ui-table" style="min-width: 700px;">
               <thead>
                 <tr>
                   <th style="width: 32px;"></th>
                   <th>חודש</th>
                   <th class="num ui-table-sortable" @click="togglePnlSort('revenue')">
                     <span class="inline-flex items-center gap-1">הכנסה
-                      <svg v-if="pnlSortKey === 'revenue'" class="w-3 h-3 transition-transform" :class="pnlSortDir === 'desc' ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" d="M5 15l7-7 7 7"/></svg>
+                      <svg v-if="pnlSortKey === 'revenue'" class="w-3 h-3" :class="pnlSortDir === 'desc' ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" d="M5 15l7-7 7 7"/></svg>
                     </span>
                   </th>
                   <th class="num ui-table-sortable" @click="togglePnlSort('op_expenses')">
                     <span class="inline-flex items-center gap-1">הוצ׳ תפעול
-                      <svg v-if="pnlSortKey === 'op_expenses'" class="w-3 h-3 transition-transform" :class="pnlSortDir === 'desc' ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" d="M5 15l7-7 7 7"/></svg>
+                      <svg v-if="pnlSortKey === 'op_expenses'" class="w-3 h-3" :class="pnlSortDir === 'desc' ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" d="M5 15l7-7 7 7"/></svg>
                     </span>
                   </th>
                   <th class="num">רווח גולמי</th>
                   <th class="num">הוצ׳ שכר</th>
                   <th class="num ui-table-sortable" @click="togglePnlSort('operating_profit')">
                     <span class="inline-flex items-center gap-1">רווח תפעולי
-                      <svg v-if="pnlSortKey === 'operating_profit'" class="w-3 h-3 transition-transform" :class="pnlSortDir === 'desc' ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" d="M5 15l7-7 7 7"/></svg>
+                      <svg v-if="pnlSortKey === 'operating_profit'" class="w-3 h-3" :class="pnlSortDir === 'desc' ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" d="M5 15l7-7 7 7"/></svg>
                     </span>
                   </th>
                   <th class="num">מרווח</th>
@@ -205,23 +219,23 @@
                 <template v-for="m in sortedMonths" :key="m.month">
                   <tr @click="toggleDrilldown(m.month)" class="is-clickable" style="cursor: pointer;">
                     <td>
-                      <span class="inline-block transition-transform duration-200 text-ink-faint" :style="{ transform: expandedMonth === m.month ? 'rotate(90deg)' : 'rotate(0)' }">›</span>
+                      <span class="inline-block text-ink-faint" :style="{ transform: expandedMonth === m.month ? 'rotate(90deg)' : 'rotate(0)', transition: 'transform 180ms var(--ease-out)' }">›</span>
                     </td>
                     <td>
                       <span class="font-sans font-semibold">{{ m.month }}</span>
-                      <span v-if="m.is_actual" class="ed-eyebrow ed-tone-positive" style="font-size: 0.5625rem; margin-inline-start: 0.35rem;">● בפועל</span>
+                      <span v-if="m.is_actual" class="ui-pill ui-pill-positive" style="margin-inline-start: 0.5rem;">● בפועל</span>
                     </td>
-                    <td class="num"><bdi class="ed-num">{{ fmt(m.revenue) }}</bdi></td>
-                    <td class="num"><bdi class="ed-num">{{ fmt(m.op_expenses) }}</bdi></td>
+                    <td class="num"><bdi class="ui-num">{{ fmt(m.revenue) }}</bdi></td>
+                    <td class="num"><bdi class="ui-num">{{ fmt(m.op_expenses) }}</bdi></td>
                     <td class="num" :class="m.gross_profit >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'">
-                      <bdi class="ed-num">{{ fmt(m.gross_profit) }}</bdi>
+                      <bdi class="ui-num">{{ fmt(m.gross_profit) }}</bdi>
                     </td>
-                    <td class="num"><bdi class="ed-num">{{ fmt(m.salary_expenses) }}</bdi></td>
+                    <td class="num"><bdi class="ui-num">{{ fmt(m.salary_expenses) }}</bdi></td>
                     <td class="num" :class="m.operating_profit >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'">
-                      <bdi class="ed-num">{{ fmt(m.operating_profit) }}</bdi>
+                      <bdi class="ui-num">{{ fmt(m.operating_profit) }}</bdi>
                     </td>
                     <td class="num">
-                      <span v-if="m.margin != null" class="ed-eyebrow" :class="m.margin_alert ? 'ed-tone-negative' : 'ed-tone-positive'">
+                      <span v-if="m.margin != null" class="ui-pill" :class="m.margin_alert ? 'ui-pill-negative' : 'ui-pill-positive'">
                         {{ m.margin }}%
                       </span>
                       <span v-else class="ed-tone-faint">—</span>
@@ -230,42 +244,42 @@
                   </tr>
                   <!-- Drill-down row -->
                   <tr v-if="expandedMonth === m.month">
-                    <td colspan="9" class="bg-paper-dark/30 py-5 px-4">
+                    <td colspan="9" style="background: var(--surface-muted); padding: 1.25rem 1rem;">
                       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div>
-                          <div class="ed-eyebrow mb-3 ed-tone-warning">
-                            הוצאות תפעול · <bdi class="ed-num">{{ fmt(m.op_expenses) }}</bdi>
+                          <div class="ui-label mb-3 ed-tone-warning">
+                            הוצאות תפעול · <bdi class="ui-num">{{ fmt(m.op_expenses) }}</bdi>
                           </div>
-                          <div v-if="breakdownForMonth(m.month).op_components?.length" class="space-y-2 border-t border-rule">
-                            <div v-for="(comp, i) in breakdownForMonth(m.month).op_components" :key="i" class="flex items-baseline justify-between py-2 border-b border-rule">
+                          <div v-if="breakdownForMonth(m.month).op_components?.length" class="space-y-2" style="border-top: 1px solid var(--border);">
+                            <div v-for="(comp, i) in breakdownForMonth(m.month).op_components" :key="i" class="flex items-baseline justify-between py-2" style="border-bottom: 1px solid var(--border);">
                               <span class="font-sans text-sm text-ink">{{ comp.name }}</span>
-                              <span class="font-sans text-sm font-bold text-ink ed-num"><bdi>{{ comp.amount != null ? fmt(comp.amount) : 'משתנה' }}</bdi></span>
+                              <span class="font-sans text-sm font-bold text-ink ui-num"><bdi>{{ comp.amount != null ? fmt(comp.amount) : 'משתנה' }}</bdi></span>
                             </div>
                           </div>
                           <p v-else class="font-sans text-ink-faint text-sm">אין הוצאות בחודש זה</p>
                         </div>
                         <div>
-                          <div class="ed-eyebrow mb-3 ed-tone-negative">
-                            הוצאות שכר · <bdi class="ed-num">{{ fmt(m.salary_expenses) }}</bdi>
+                          <div class="ui-label mb-3 ed-tone-negative">
+                            הוצאות שכר · <bdi class="ui-num">{{ fmt(m.salary_expenses) }}</bdi>
                           </div>
-                          <div v-if="breakdownForMonth(m.month).salary_components?.length" class="space-y-2 border-t border-rule">
-                            <div v-for="(comp, i) in breakdownForMonth(m.month).salary_components" :key="i" class="flex items-baseline justify-between py-2 border-b border-rule">
+                          <div v-if="breakdownForMonth(m.month).salary_components?.length" class="space-y-2" style="border-top: 1px solid var(--border);">
+                            <div v-for="(comp, i) in breakdownForMonth(m.month).salary_components" :key="i" class="flex items-baseline justify-between py-2" style="border-bottom: 1px solid var(--border);">
                               <span class="font-sans text-sm text-ink">{{ comp.name }}</span>
-                              <span class="font-sans text-sm font-bold text-ink ed-num"><bdi>{{ fmt(comp.amount) }}</bdi></span>
+                              <span class="font-sans text-sm font-bold text-ink ui-num"><bdi>{{ fmt(comp.amount) }}</bdi></span>
                             </div>
                           </div>
                           <p v-else class="font-sans text-ink-faint text-sm">אין הוצאות שכר</p>
                         </div>
                         <div v-if="breakdownForMonth(m.month).milestones?.length" class="md:col-span-2">
-                          <div class="ed-eyebrow mb-3">פעימות תשלום</div>
+                          <div class="ui-label mb-3">פעימות תשלום</div>
                           <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <div v-for="(ms, i) in breakdownForMonth(m.month).milestones" :key="i" class="py-3 border-t border-rule-strong border-b border-rule">
+                            <div v-for="(ms, i) in breakdownForMonth(m.month).milestones" :key="i" class="ui-mini-card">
                               <div class="font-sans font-semibold text-ink text-sm mb-1">{{ ms.name }}</div>
-                              <div class="flex justify-between text-[0.6875rem] ed-num">
+                              <div class="flex justify-between text-[0.6875rem] ui-num">
                                 <span class="ed-tone-positive">הכנסה <bdi>{{ fmt(ms.revenue) }}</bdi></span>
                                 <span class="ed-tone-negative">הוצאה <bdi>{{ fmt(ms.expense) }}</bdi></span>
                               </div>
-                              <div class="ed-eyebrow mt-1" style="font-size: 0.5625rem;">{{ ms.month }}</div>
+                              <div class="ui-label mt-1" style="font-size: 0.5625rem;">{{ ms.month }}</div>
                             </div>
                           </div>
                         </div>
@@ -278,15 +292,15 @@
                 <tr>
                   <td></td>
                   <td>סה״כ</td>
-                  <td class="num"><bdi class="ed-num">{{ fmt(pnlData.summary.total_revenue) }}</bdi></td>
-                  <td class="num"><bdi class="ed-num">{{ fmt(pnlData.summary.total_op_expenses) }}</bdi></td>
-                  <td class="num"><bdi class="ed-num">{{ fmt(pnlData.summary.total_gross_profit) }}</bdi></td>
-                  <td class="num"><bdi class="ed-num">{{ fmt(pnlData.summary.total_salary_expenses) }}</bdi></td>
+                  <td class="num"><bdi class="ui-num">{{ fmt(pnlData.summary.total_revenue) }}</bdi></td>
+                  <td class="num"><bdi class="ui-num">{{ fmt(pnlData.summary.total_op_expenses) }}</bdi></td>
+                  <td class="num"><bdi class="ui-num">{{ fmt(pnlData.summary.total_gross_profit) }}</bdi></td>
+                  <td class="num"><bdi class="ui-num">{{ fmt(pnlData.summary.total_salary_expenses) }}</bdi></td>
                   <td class="num" :class="pnlData.summary.total_operating_profit >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'">
-                    <bdi class="ed-num">{{ fmt(pnlData.summary.total_operating_profit) }}</bdi>
+                    <bdi class="ui-num">{{ fmt(pnlData.summary.total_operating_profit) }}</bdi>
                   </td>
                   <td class="num">
-                    <span v-if="pnlData.summary.margin != null" class="ed-eyebrow ed-tone-positive">
+                    <span v-if="pnlData.summary.margin != null" class="ui-pill ui-pill-positive">
                       {{ pnlData.summary.margin }}%
                     </span>
                   </td>
@@ -302,12 +316,12 @@
       </template>
 
       <!-- No P&L data -->
-      <div v-else class="ed-section text-center py-16">
-        <div class="ed-eyebrow mb-3">אין נתוני P&L</div>
-        <p class="font-sans text-xl text-ink max-w-md mx-auto">
+      <div v-else class="ui-card text-center py-16">
+        <div class="ui-label mb-3">אין נתוני P&L</div>
+        <p class="ui-display max-w-md mx-auto">
           לא נמצאו נתוני P&L מקובץ Excel לפרויקט זה.
         </p>
-        <button @click="viewMode = 'dashboard'" class="ed-btn ed-btn-primary mt-6">
+        <button @click="viewMode = 'dashboard'" class="ui-btn ui-btn-primary mt-6">
           עבור לניהול פרויקט →
         </button>
       </div>
@@ -331,7 +345,7 @@ import ExpenseBreakdown from './ExpenseBreakdown.vue'
 import ProjectFormDashboard from './ProjectFormDashboard.vue'
 import ProjectDetailsView from './ProjectDetailsView.vue'
 import MonthlyActualsEditor from './MonthlyActualsEditor.vue'
-import { SectionHeader, SectionMarker, RuledSection, HeroNumber, FootnoteSource, SkeletonLoader, currentHebrewDate } from './editorial'
+import { RuledSection, FootnoteSource, SkeletonLoader, currentHebrewDate } from './editorial'
 
 const props = defineProps({ initialProject: { type: String, default: '' } })
 

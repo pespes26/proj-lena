@@ -17,40 +17,41 @@ const SURFACE_MUTED = '#f1f5f9' // slate-100
 const BORDER = '#e2e8f0'        // slate-200
 const BORDER_STRONG = '#cbd5e1' // slate-300
 
+// Dark tokenized tooltip — emerald-600 accent line, slate-900 body
 export const tooltipConfig = {
   rtl: true,
-  backgroundColor: SURFACE,
-  titleColor: INK,
-  bodyColor: INK_MUTED,
-  borderColor: BORDER_STRONG,
+  backgroundColor: 'rgba(15, 23, 42, 0.95)',
+  titleColor: '#ffffff',
+  bodyColor: '#ffffff',
+  borderColor: '#334155',
   borderWidth: 1,
   cornerRadius: 10,
-  padding: 12,
+  padding: 10,
   boxPadding: 6,
   usePointStyle: true,
-  titleFont: { family: CHART_FONT, size: 13, weight: '600' },
+  titleFont: { family: CHART_FONT, size: 12, weight: '600' },
   bodyFont: { family: CHART_FONT, size: 12, weight: '500' },
   displayColors: true,
 }
 
 export const axisConfig = {
   x: {
-    grid: { display: false },
+    grid: { display: false, drawBorder: false },
     ticks: {
       font: { family: CHART_FONT, size: 11, weight: '500' },
-      color: INK_FAINT,
+      color: INK_MUTED,
     },
     border: { display: false },
   },
   y: {
     grid: {
-      color: SURFACE_MUTED,
+      color: BORDER,
       drawBorder: false,
       drawTicks: false,
     },
     ticks: {
       font: { family: CHART_FONT, size: 11, weight: '500' },
-      color: INK_FAINT,
+      color: INK_MUTED,
       padding: 10,
       callback: v => Number(v).toLocaleString('he-IL'),
     },

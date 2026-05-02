@@ -7,65 +7,69 @@
     <p v-if="error" class="font-sans ed-tone-negative mb-6">{{ error }}</p>
 
     <template v-if="!loading && myProjects.length > 0">
-      <SectionHeader
-        eyebrow="אזור אישי"
-        :kicker="dateLabel"
-        :title="'שלום ' + userName"
-        :subtitle="myProjects.length + ' פרויקטים פעילים תחת אחריותך'"
-      />
+      <section class="ui-card animate-fade-up mb-8">
+        <div class="ui-label ed-tone-muted mb-2">שלום {{ userName }}</div>
+        <div class="ui-display" style="font-size: clamp(2rem, 4vw, 2.75rem); line-height: 1.05;">
+          {{ myProjects.length }} פרויקטים
+        </div>
+        <div class="font-sans ed-tone-muted text-sm mt-2">
+          פעילים תחת אחריותך · {{ dateLabel }}
+        </div>
+      </section>
 
-      <!-- Project list — ruled rows, not cards -->
-      <div class="border-t border-rule-strong">
+      <!-- Project cards grid -->
+      <div class="ui-stagger grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <article
           v-for="proj in myProjects"
           :key="proj.name"
-          class="py-6 border-b border-rule group"
+          class="ui-card"
         >
-          <div class="flex items-start justify-between gap-6 flex-wrap">
-            <!-- Title column -->
-            <div class="flex-1 min-w-0" style="min-width: 260px;">
-              <div class="ed-eyebrow mb-2" v-if="proj.priority_id">
-                <bdi lang="en">עדיפות {{ proj.priority_id }}</bdi>
-              </div>
-              <h3 class="font-sans font-semibold text-ink leading-tight" style="font-size: clamp(1.5rem, 2.5vw, 2rem);">
+          <div class="flex items-start justify-between gap-4 mb-4">
+            <div class="flex-1 min-w-0">
+              <h3 class="font-sans font-semibold text-ink leading-tight" style="font-size: clamp(1.125rem, 1.8vw, 1.375rem);">
                 {{ proj.name }}
               </h3>
-              <div class="mt-2">
-                <span class="ed-eyebrow" :class="marginToneClass(proj.margin)">
-                  מרווח {{ proj.margin != null ? proj.margin.toFixed(1) + '%' : '—' }}
-                </span>
+              <div class="ui-label ed-tone-faint mt-1" v-if="proj.priority_id">
+                <bdi lang="en">עדיפות {{ proj.priority_id }}</bdi>
               </div>
             </div>
+            <span class="ui-pill" :class="marginPillClass(proj.margin)">
+              מרווח {{ proj.margin != null ? proj.margin.toFixed(1) + '%' : '—' }}
+            </span>
+          </div>
 
-            <!-- KPI column (hero numbers) -->
-            <div class="flex items-start gap-8 flex-wrap ed-col-rule">
-              <div>
-                <div class="ed-eyebrow mb-1">הכנסות</div>
-                <div class="font-sans font-semibold text-ink ed-num" style="font-size: clamp(1.375rem, 2.2vw, 1.875rem); line-height: 1;">
-                  <bdi>{{ formatNumber(proj.revenue) }}</bdi>
-                </div>
+          <!-- Mini summary row -->
+          <div class="grid grid-cols-3 gap-4 py-4 border-t border-border">
+            <div>
+              <div class="ui-label ed-tone-muted mb-1">הכנסות</div>
+              <div class="ui-num font-semibold text-ink text-base">
+                <bdi>{{ formatNumber(proj.revenue) }}</bdi>
               </div>
-              <div>
-                <div class="ed-eyebrow mb-1">הוצאות</div>
-                <div class="font-sans font-semibold text-ink ed-num" style="font-size: clamp(1.375rem, 2.2vw, 1.875rem); line-height: 1;">
-                  <bdi>{{ formatNumber(proj.expenses) }}</bdi>
-                </div>
+            </div>
+            <div>
+              <div class="ui-label ed-tone-muted mb-1">הוצאות</div>
+              <div class="ui-num font-semibold text-ink text-base">
+                <bdi>{{ formatNumber(proj.expenses) }}</bdi>
               </div>
-              <div>
-                <div class="ed-eyebrow mb-1">רווח</div>
-                <div class="font-sans font-semibold ed-num" :class="proj.profit >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'" style="font-size: clamp(1.375rem, 2.2vw, 1.875rem); line-height: 1;">
-                  <bdi>{{ formatNumber(proj.profit) }}</bdi>
-                </div>
+            </div>
+            <div>
+              <div class="ui-label ed-tone-muted mb-1">רווח</div>
+              <div class="ui-num font-semibold text-base" :class="proj.profit >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'">
+                <bdi>{{ formatNumber(proj.profit) }}</bdi>
               </div>
             </div>
           </div>
 
           <!-- Actions -->
-          <div class="mt-5 flex flex-wrap gap-6">
-            <button class="ed-link text-sm">עדכן ביצוע →</button>
-            <button class="ed-link text-sm">הוסף הערה →</button>
-            <button @click="$emit('select-project', proj.name)" class="ed-link text-sm font-bold">
-              צפה בפרויקט המלא →
+          <div class="pt-4 border-t border-border flex flex-wrap gap-2">
+            <button class="ui-btn" style="padding: 0.5rem 0.875rem; font-size: 0.8125rem;">
+              עדכן ביצוע
+            </button>
+            <button class="ui-btn" style="padding: 0.5rem 0.875rem; font-size: 0.8125rem;">
+              הוסף הערה
+            </button>
+            <button class="ui-btn ui-btn-primary" style="padding: 0.5rem 0.875rem; font-size: 0.8125rem;" @click="$emit('select-project', proj.name)">
+              צפה בפרויקט
             </button>
           </div>
         </article>
@@ -73,12 +77,12 @@
     </template>
 
     <template v-if="!loading && myProjects.length === 0 && !error">
-      <div class="ed-section text-center py-16">
-        <div class="ed-eyebrow mb-3">האזור האישי שלך</div>
-        <p class="font-sans text-2xl text-ink leading-tight max-w-lg mx-auto">
+      <div class="ui-card text-center py-16">
+        <div class="ui-label ed-tone-muted mb-3">האזור האישי שלך</div>
+        <p class="ui-display text-ink" style="font-size: clamp(1.5rem, 3vw, 2rem);">
           אין פרויקטים משויכים.
         </p>
-        <div class="ed-eyebrow mt-3 ed-tone-muted">פנה למנהל המערכת לשיוך פרויקטים</div>
+        <div class="ui-label ed-tone-muted mt-3">פנה למנהל המערכת לשיוך פרויקטים</div>
       </div>
     </template>
   </div>
@@ -87,7 +91,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { getPnl, getProjectsDetail, getProfile, formatNumber } from '../services/api'
-import { SectionHeader, SkeletonLoader, currentHebrewDate } from './editorial'
+import { SkeletonLoader, currentHebrewDate } from './editorial'
 
 defineEmits(['select-project'])
 
@@ -123,6 +127,13 @@ function marginToneClass(margin) {
   if (margin >= 20) return 'ed-tone-positive'
   if (margin >= 10) return 'ed-tone-warning'
   return 'ed-tone-negative'
+}
+
+function marginPillClass(margin) {
+  if (margin == null) return 'ui-pill-neutral'
+  if (margin >= 20) return 'ui-pill-positive'
+  if (margin >= 10) return 'ui-pill-warning'
+  return 'ui-pill-negative'
 }
 
 onMounted(async () => {

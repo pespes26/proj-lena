@@ -1,90 +1,100 @@
 <template>
-  <section class="ed-section">
+  <section class="ui-card">
     <div class="flex items-start justify-between mb-6 flex-wrap gap-4">
       <div>
-        <div class="ed-eyebrow mb-1">עדכון ידני</div>
-        <h3 class="font-sans font-semibold text-ink text-2xl leading-none">ביצוע בפועל</h3>
-        <p class="font-sans text-ink-muted text-sm mt-1.5">הזן הכנסות והוצאות בפועל לחודש נבחר</p>
+        <div class="ui-label mb-1">עדכון ידני</div>
+        <h3 class="ui-display" style="color: var(--ink);">ביצוע בפועל</h3>
+        <p class="font-sans text-sm mt-1.5 ed-tone-muted">הזן הכנסות והוצאות בפועל לחודש נבחר</p>
       </div>
       <div>
-        <label class="ed-label">חודש</label>
-        <select v-model="selectedMonth" class="ed-select" style="min-width: 180px;">
+        <label class="ui-form-label">חודש</label>
+        <select v-model="selectedMonth" class="ui-select" style="min-width: 180px;">
           <option v-for="m in 12" :key="m" :value="m">{{ monthNames[m - 1] }}</option>
         </select>
       </div>
     </div>
 
-    <div v-if="saving" class="font-sans text-ink-muted text-center py-8">שומר…</div>
+    <div v-if="saving" class="font-sans text-center py-8 ed-tone-muted">שומר…</div>
     <p
       v-else-if="success"
-      class="font-sans ed-tone-positive mb-5 pb-3 border-b border-rule"
+      class="font-sans ed-tone-positive mb-5 pb-3"
+      style="border-bottom: 1px solid var(--border);"
     >
       ✓ {{ success }}
     </p>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-8">
       <div>
-        <label class="ed-label">הכנסה בפועל (₪)</label>
-        <input v-model.number="form.revenue" type="number" min="0" step="0.01" class="ed-input ed-num" />
-        <div v-if="forecastRevenue" class="ed-eyebrow mt-1.5" style="font-size: 0.625rem;">
-          תחזית: <bdi class="ed-num">{{ forecastRevenue.toLocaleString('he-IL') }}</bdi>
+        <label class="ui-form-label">הכנסה בפועל (₪)</label>
+        <input v-model.number="form.revenue" type="number" min="0" step="0.01" class="ui-input ui-num" />
+        <div v-if="forecastRevenue" class="ui-label mt-1.5" style="font-size: 0.625rem;">
+          תחזית: <bdi class="ui-num">{{ forecastRevenue.toLocaleString('he-IL') }}</bdi>
         </div>
       </div>
       <div>
-        <label class="ed-label">הוצאות תפעול בפועל (₪)</label>
-        <input v-model.number="form.op_expenses" type="number" min="0" step="0.01" class="ed-input ed-num" />
+        <label class="ui-form-label">הוצאות תפעול בפועל (₪)</label>
+        <input v-model.number="form.op_expenses" type="number" min="0" step="0.01" class="ui-input ui-num" />
       </div>
       <div>
-        <label class="ed-label">הוצאות שכר בפועל (₪)</label>
-        <input v-model.number="form.salary_expenses" type="number" min="0" step="0.01" class="ed-input ed-num" />
+        <label class="ui-form-label">הוצאות שכר בפועל (₪)</label>
+        <input v-model.number="form.salary_expenses" type="number" min="0" step="0.01" class="ui-input ui-num" />
       </div>
       <div>
-        <label class="ed-label">הערות</label>
-        <input
+        <label class="ui-form-label">הערות</label>
+        <textarea
           v-model="form.notes"
-          type="text"
           maxlength="200"
-          class="ed-input"
+          rows="2"
+          class="ui-input"
           placeholder="הערה לחודש…"
-        />
+          style="resize: none; background: var(--surface); border-color: var(--border);"
+        ></textarea>
       </div>
     </div>
 
     <!-- Variance -->
-    <div v-if="forecastRevenue || form.revenue" class="flex flex-wrap gap-y-6 ed-col-rule border-t border-rule-strong pt-6 mb-6">
-      <div class="flex-1" style="min-width: 140px;">
-        <HeroNumber label="רווח תחזית" :value="forecastProfit" prefix="₪" size="sm" />
+    <div
+      v-if="forecastRevenue || form.revenue"
+      class="ui-stagger grid grid-cols-1 sm:grid-cols-3 gap-3 pt-6 mb-6"
+      style="border-top: 1px solid var(--border-strong);"
+    >
+      <div class="ui-mini-card">
+        <div class="ed-eyebrow mb-1.5">רווח תחזית</div>
+        <div class="ui-num font-semibold text-lg" style="color: var(--ink);">
+          <bdi>₪{{ forecastProfit.toLocaleString('he-IL') }}</bdi>
+        </div>
       </div>
-      <div class="flex-1" style="min-width: 140px;">
-        <HeroNumber
-          label="רווח בפועל"
-          :value="actualProfit"
-          prefix="₪"
-          :tone="actualProfit >= 0 ? 'positive' : 'negative'"
-          size="sm"
-        />
+      <div class="ui-mini-card">
+        <div class="ed-eyebrow mb-1.5">רווח בפועל</div>
+        <div
+          class="ui-num font-semibold text-lg"
+          :class="actualProfit >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'"
+        >
+          <bdi>₪{{ actualProfit.toLocaleString('he-IL') }}</bdi>
+        </div>
       </div>
-      <div class="flex-1" style="min-width: 140px;">
-        <HeroNumber
-          label="סטייה"
-          :value="variance"
-          prefix="₪"
-          :tone="variance >= 0 ? 'positive' : 'negative'"
-          size="sm"
-        />
+      <div class="ui-mini-card">
+        <div class="ed-eyebrow mb-1.5">סטייה</div>
+        <div
+          class="ui-num font-semibold text-lg"
+          :class="variance >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'"
+        >
+          <bdi>₪{{ variance.toLocaleString('he-IL') }}</bdi>
+        </div>
       </div>
     </div>
 
-    <button @click="save" :disabled="saving" class="ed-btn ed-btn-primary">
-      שמור ביצוע בפועל →
-    </button>
+    <div class="flex items-center gap-3">
+      <button @click="save" :disabled="saving" class="ui-btn-primary">
+        שמור ביצוע בפועל
+      </button>
+    </div>
   </section>
 </template>
 
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { saveProjectActuals, getProjectForm } from '../services/api'
-import { HeroNumber } from './editorial'
 import { useToast } from '../composables/useToast'
 
 const props = defineProps({

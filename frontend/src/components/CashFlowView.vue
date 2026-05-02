@@ -15,32 +15,36 @@
     </div>
 
     <template v-if="cfData">
-      <!-- KPI strip -->
-      <section class="ed-section ed-fade-up">
-        <div class="flex flex-wrap gap-y-8 ed-col-rule">
-          <div class="flex-1" style="min-width: 180px;">
-            <HeroNumber label="סך הכנסות" :value="totalRevenue" prefix="₪" size="md" />
+      <!-- KPI grid -->
+      <section class="ui-stagger grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="ui-card">
+          <div class="ed-eyebrow mb-2">סך הכנסות</div>
+          <div class="ui-display ui-num" style="color: var(--ink);">
+            <bdi>₪{{ fmt(totalRevenue) }}</bdi>
           </div>
-          <div class="flex-1" style="min-width: 180px;">
-            <HeroNumber label="סך הוצאות" :value="totalExpenses" prefix="₪" size="md" />
+        </div>
+        <div class="ui-card">
+          <div class="ed-eyebrow mb-2">סך הוצאות</div>
+          <div class="ui-display ui-num" style="color: var(--ink);">
+            <bdi>₪{{ fmt(totalExpenses) }}</bdi>
           </div>
-          <div class="flex-1" style="min-width: 180px;">
-            <HeroNumber
-              label="נטו תקופתי"
-              :value="totalNet"
-              prefix="₪"
-              :tone="totalNet >= 0 ? 'positive' : 'negative'"
-              size="md"
-            />
+        </div>
+        <div class="ui-card">
+          <div class="ed-eyebrow mb-2">נטו תקופתי</div>
+          <div
+            class="ui-display ui-num"
+            :class="totalNet >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'"
+          >
+            <bdi>₪{{ fmt(totalNet) }}</bdi>
           </div>
-          <div class="flex-1" style="min-width: 180px;">
-            <HeroNumber
-              label="יתרה מצטברת"
-              :value="lastCumulative"
-              prefix="₪"
-              :tone="lastCumulative >= 0 ? 'positive' : 'negative'"
-              size="md"
-            />
+        </div>
+        <div class="ui-card">
+          <div class="ed-eyebrow mb-2">יתרה מצטברת</div>
+          <div
+            class="ui-display ui-num"
+            :class="lastCumulative >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'"
+          >
+            <bdi>₪{{ fmt(lastCumulative) }}</bdi>
           </div>
         </div>
       </section>
@@ -82,59 +86,63 @@
 
       <!-- Per-project breakdown (3-col card grid) -->
       <RuledSection eyebrow="סיכום" title="סה״כ לפי פרויקט">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="ui-stagger grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[520px] overflow-y-auto">
           <div
             v-for="(months, pname) in cfData.projects"
             :key="pname"
             class="ui-mini-card"
           >
             <div class="flex items-baseline justify-between gap-3 mb-3">
-              <span class="font-sans font-semibold text-ink text-sm tracking-tight truncate">{{ pname }}</span>
+              <span class="font-sans font-semibold text-sm tracking-tight truncate" style="color: var(--ink);">{{ pname }}</span>
               <span
-                class="font-sans font-semibold text-base ed-num flex-shrink-0"
-                :class="projectTotal(months) >= 0 ? 'text-positive' : 'text-negative'"
+                class="font-sans font-semibold text-base ui-num flex-shrink-0"
+                :class="projectTotal(months) >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'"
               >
                 <bdi>{{ fmt(projectTotal(months)) }}</bdi>
               </span>
             </div>
-            <div class="flex h-1.5 overflow-hidden bg-slate-100 rounded-full">
-              <div class="bg-accent transition-all" :style="{ width: projectRevenuePercent(months) + '%' }"></div>
-              <div class="bg-warning transition-all" :style="{ width: projectExpensePercent(months) + '%' }"></div>
+            <div class="flex h-1.5 overflow-hidden rounded-full" style="background: var(--surface-muted);">
+              <div style="background: var(--positive); transition: width 180ms cubic-bezier(0.4, 0, 0.2, 1);" :style="{ width: projectRevenuePercent(months) + '%' }"></div>
+              <div style="background: var(--warning); transition: width 180ms cubic-bezier(0.4, 0, 0.2, 1);" :style="{ width: projectExpensePercent(months) + '%' }"></div>
             </div>
-            <div class="flex justify-between mt-2 text-[11px] font-medium text-ink-muted">
-              <span>הכנסה <bdi class="ed-num font-semibold">{{ fmt(projectRevSum(months)) }}</bdi></span>
-              <span>הוצאה <bdi class="ed-num font-semibold">{{ fmt(projectExpSum(months)) }}</bdi></span>
+            <div class="flex justify-between mt-2 text-[11px] font-medium" style="color: var(--ink-muted);">
+              <span>הכנסה <bdi class="ui-num font-semibold">{{ fmt(projectRevSum(months)) }}</bdi></span>
+              <span>הוצאה <bdi class="ui-num font-semibold">{{ fmt(projectExpSum(months)) }}</bdi></span>
             </div>
           </div>
         </div>
       </RuledSection>
 
       <!-- Tables -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 mt-2">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-2">
         <RuledSection eyebrow="חודשי ומצטבר" title="פירוט חודשי">
-          <div class="max-h-[420px] overflow-y-auto">
-            <DataTable
-              :columns="monthlyTableCols"
-              :rows="monthlyTableRows"
-              :sticky-header="true"
-            >
-              <template #cell-net="{ row }">
-                <bdi class="ui-num" :class="row.net >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'">{{ fmt(row.net) }}</bdi>
-              </template>
-              <template #cell-cumulative="{ row }">
-                <bdi class="ui-num" :class="row.cumulative >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'">{{ fmt(row.cumulative) }}</bdi>
-              </template>
-            </DataTable>
+          <div class="ui-card" style="padding: 0;">
+            <div class="max-h-[420px] overflow-y-auto">
+              <DataTable
+                :columns="monthlyTableCols"
+                :rows="monthlyTableRows"
+                :sticky-header="true"
+              >
+                <template #cell-net="{ row }">
+                  <bdi class="ui-num" :class="row.net >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'">{{ fmt(row.net) }}</bdi>
+                </template>
+                <template #cell-cumulative="{ row }">
+                  <bdi class="ui-num" :class="row.cumulative >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'">{{ fmt(row.cumulative) }}</bdi>
+                </template>
+              </DataTable>
+            </div>
           </div>
         </RuledSection>
 
         <RuledSection eyebrow="מטריצת פרויקטים" title="נטו לפי פרויקט">
-          <div class="max-h-[420px] overflow-auto">
-            <DataTable
-              :columns="matrixTableCols"
-              :rows="matrixTableRows"
-              :sticky-header="true"
-            />
+          <div class="ui-card" style="padding: 0;">
+            <div class="max-h-[420px] overflow-auto">
+              <DataTable
+                :columns="matrixTableCols"
+                :rows="matrixTableRows"
+                :sticky-header="true"
+              />
+            </div>
           </div>
         </RuledSection>
       </div>

@@ -1,5 +1,7 @@
 <template>
-  <Bar :data="chartData" :options="chartOptions" style="height: 380px;" />
+  <div class="ui-chart-container ui-chart-container--xl">
+    <Bar :data="chartData" :options="chartOptions" />
+  </div>
 </template>
 
 <script setup>

@@ -16,7 +16,7 @@
 
     <template v-if="data">
       <!-- Hero KPI — massive total revenue with secondary ruled strip -->
-      <section class="ed-section ed-fade-up">
+      <section class="ui-card animate-fade-up mb-8">
         <HeroNumber
           label="הכנסה שנתית כוללת"
           :value="data.total_revenue"
@@ -25,7 +25,7 @@
           footnote="אלפי ש״ח · שנתי · מאוחד מכל הפרויקטים"
         />
 
-        <div class="mt-8 flex flex-wrap gap-y-8 ed-col-rule ed-fade-up-delay-1">
+        <div class="mt-8 flex flex-wrap gap-y-8 ed-col-rule">
           <div class="flex-1" style="min-width: 180px;">
             <HeroNumber label="הוצאות" :value="data.total_expenses" prefix="₪" size="md" />
           </div>
@@ -71,7 +71,9 @@
             </button>
           </div>
         </template>
-        <ProjectCompareChart :summaries="data.project_summaries" :mode="chartMode" />
+        <div class="ui-chart-container ui-chart-container--lg">
+          <ProjectCompareChart :summaries="data.project_summaries" :mode="chartMode" />
+        </div>
         <template #footnote>
           <FootnoteSource label="מקור:" text="הנהלת חשבונות FM" :updated="updatedLabel" />
         </template>
@@ -85,7 +87,7 @@
       >
         <div class="grid grid-cols-1 lg:grid-cols-5 gap-10 items-center">
           <div class="lg:col-span-2 flex justify-center">
-            <div class="w-full max-w-xs">
+            <div class="ui-chart-container ui-chart-container--md w-full max-w-xs">
               <Doughnut :data="axisPieData" :options="doughnutOptions" />
             </div>
           </div>
@@ -93,9 +95,9 @@
             <div v-for="axis in axes" :key="axis" class="flex items-baseline justify-between gap-4 pb-3 border-b border-border">
               <div>
                 <div class="font-sans font-semibold text-ink text-[15px] leading-tight">{{ axis }}</div>
-                <div class="font-sans text-ink-muted text-xs mt-0.5">{{ axisProjects(axis).length }} פרויקטים</div>
+                <div class="ui-label ed-tone-muted mt-0.5">{{ axisProjects(axis).length }} פרויקטים</div>
               </div>
-              <div class="font-sans font-medium ed-num tracking-tight" :class="axisTotal(axis) >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'" style="font-size: clamp(1.375rem, 2.6vw, 1.875rem); line-height: 1;">
+              <div class="font-sans font-medium ui-num tracking-tight" :class="axisTotal(axis) >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'" style="font-size: clamp(1.375rem, 2.6vw, 1.875rem); line-height: 1;">
                 <bdi>{{ fmt(axisTotal(axis)) }}</bdi>
               </div>
             </div>
@@ -104,38 +106,38 @@
       </RuledSection>
 
       <!-- Per-axis detail (3 columns) -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-2">
-        <div v-for="axis in axes" :key="axis" class="flex flex-col gap-3">
+      <div class="ui-stagger grid grid-cols-1 md:grid-cols-3 gap-8 mt-2 mb-8">
+        <div v-for="axis in axes" :key="axis" class="ui-card flex flex-col gap-3">
           <div class="border-b border-border-strong pb-4">
             <div class="flex items-baseline justify-between mb-1">
               <div class="font-sans font-semibold text-ink text-[15px]">{{ axis }}</div>
-              <div class="font-sans text-ink-faint text-[11px] font-medium">{{ axisProjects(axis).length }} פרויקטים</div>
+              <div class="ui-label ed-tone-faint">{{ axisProjects(axis).length }} פרויקטים</div>
             </div>
-            <div class="font-sans font-medium ed-num tracking-tight" :class="axisTotal(axis) >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'" style="font-size: clamp(1.375rem, 2.4vw, 1.75rem); line-height: 1.05;">
+            <div class="font-sans font-medium ui-num tracking-tight" :class="axisTotal(axis) >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'" style="font-size: clamp(1.375rem, 2.4vw, 1.75rem); line-height: 1.05;">
               <bdi>{{ fmt(axisTotal(axis)) }}</bdi>
             </div>
           </div>
-          <div v-if="axisProjects(axis).length === 0" class="font-sans text-ink-faint text-sm py-4">אין פרויקטים בציר זה</div>
+          <div v-if="axisProjects(axis).length === 0" class="font-sans ed-tone-faint text-sm py-4">אין פרויקטים בציר זה</div>
           <div
             v-for="p in axisProjects(axis)"
             :key="p.name"
-            class="py-3 border-b border-border"
+            class="ui-mini-card"
           >
             <div class="flex items-baseline justify-between gap-2 mb-1.5">
               <span class="font-sans font-semibold text-ink text-sm truncate">{{ p.name }}</span>
               <span
-                class="font-sans font-medium ed-num tracking-tight text-[15px] flex-shrink-0"
+                class="font-sans font-medium ui-num tracking-tight text-[15px] flex-shrink-0"
                 :class="p.profit >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'"
               >
                 <bdi>{{ fmt(p.profit) }}</bdi>
               </span>
             </div>
-            <div class="flex items-center gap-2 text-[11px] font-sans font-medium text-ink-faint">
-              <span>הכנסה <bdi class="ed-num text-ink-muted">{{ fmt(p.revenue) }}</bdi></span>
-              <div class="flex-1 h-[2px] bg-slate-100 overflow-hidden rounded-full">
-                <div class="h-full bg-ink rounded-full" :style="{ width: revenueBarPct(p) + '%' }"></div>
+            <div class="flex items-center gap-2 text-[11px] font-sans font-medium ed-tone-faint">
+              <span>הכנסה <bdi class="ui-num ed-tone-muted">{{ fmt(p.revenue) }}</bdi></span>
+              <div class="flex-1 h-[2px] overflow-hidden rounded-full" style="background: var(--surface-muted);">
+                <div class="h-full rounded-full" :style="{ width: revenueBarPct(p) + '%', background: 'var(--positive)' }"></div>
               </div>
-              <span>הוצאה <bdi class="ed-num text-ink-muted">{{ fmt(p.expenses) }}</bdi></span>
+              <span>הוצאה <bdi class="ui-num ed-tone-muted">{{ fmt(p.expenses) }}</bdi></span>
             </div>
             <div class="mt-2">
               <span class="ui-pill" :class="marginPillClass(p.margin)">
@@ -153,14 +155,18 @@
           title="צפי חודשי"
           caption="סך הכנסות צפויות מכל הפרויקטים לפי חודש."
         >
-          <Bar :data="monthlyRevenueChartData" :options="barChartOptions" />
+          <div class="ui-chart-container ui-chart-container--md">
+            <Bar :data="monthlyRevenueChartData" :options="barChartOptions" />
+          </div>
         </RuledSection>
         <RuledSection
           eyebrow="תחזית הוצאות"
           title="צפי חודשי"
           caption="סך הוצאות צפויות מכל הפרויקטים לפי חודש."
         >
-          <Bar :data="monthlyExpenseChartData" :options="barChartOptions" />
+          <div class="ui-chart-container ui-chart-container--md">
+            <Bar :data="monthlyExpenseChartData" :options="barChartOptions" />
+          </div>
         </RuledSection>
       </div>
 
@@ -177,13 +183,15 @@
         >
           <template #cell-name="{ row }">
             <div class="font-sans font-semibold text-ink">{{ row.name }}</div>
-            <div class="ed-eyebrow mt-0.5" style="font-size: 0.625rem;"><bdi lang="en">{{ row.priority_id }}</bdi></div>
+            <div class="ui-label ed-tone-faint mt-0.5" style="font-size: 0.625rem;"><bdi lang="en">{{ row.priority_id }}</bdi></div>
           </template>
           <template #cell-profit="{ row }">
             <bdi class="ui-num" :class="row.profit >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'">{{ fmt(row.profit) }}</bdi>
           </template>
           <template #cell-margin="{ row }">
-            <bdi class="ui-num" :class="marginTone(row.margin)">{{ row.margin != null ? row.margin + '%' : '—' }}</bdi>
+            <span class="ui-pill" :class="marginPillClass(row.margin)">
+              <bdi>{{ row.margin != null ? row.margin + '%' : '—' }}</bdi>
+            </span>
           </template>
         </DataTable>
       </RuledSection>

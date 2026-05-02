@@ -10,73 +10,99 @@
         <button
           v-if="!loading && alerts.length > 0"
           @click="clearAlerts"
-          class="ed-link text-sm"
+          class="ui-btn ed-tone-muted"
+          type="button"
         >
-          איפוס התראות ←
+          איפוס התראות
         </button>
       </template>
     </SectionHeader>
 
-    <div v-if="loading" class="font-sans text-ink-muted py-20 text-center">טוען נתונים…</div>
+    <div v-if="loading" class="font-sans py-20 text-center" style="color: var(--ink-muted);">טוען נתונים…</div>
 
     <template v-if="!loading">
       <!-- Empty state -->
-      <div v-if="alerts.length === 0" class="ed-section text-center py-16">
-        <div class="ed-eyebrow mb-3">—</div>
-        <p class="font-sans text-2xl text-ink leading-tight max-w-lg mx-auto">
-          כל הפרויקטים פועלים בטווח התקין.
-        </p>
-        <div class="ed-eyebrow mt-4">אין התראות פתוחות כרגע</div>
+      <div v-if="alerts.length === 0" class="ui-card text-center py-16">
+        <div class="mx-auto mb-4 flex items-center justify-center" style="width: 56px; height: 56px; border-radius: 9999px; background: var(--positive-soft); color: var(--positive);">
+          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+          </svg>
+        </div>
+        <div class="ui-display" style="color: var(--ink);">כל הפרויקטים פועלים בטווח התקין.</div>
+        <div class="ed-tone-faint mt-3 font-sans text-sm">אין התראות פתוחות כרגע</div>
       </div>
 
       <div v-else class="space-y-6">
         <!-- Summary strip -->
-        <div class="ed-section flex flex-wrap gap-8 ed-col-rule ed-fade-up">
-          <div>
+        <div class="ui-stagger grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="ui-card">
             <div class="ed-eyebrow mb-2">סה״כ התראות</div>
-            <div class="font-sans font-semibold text-ink ed-num" style="font-size: clamp(2rem, 4vw, 3rem); line-height: 1;">{{ alerts.length }}</div>
+            <div class="ui-display ui-num" style="color: var(--ink);">{{ alerts.length }}</div>
           </div>
-          <div>
-            <div class="ed-eyebrow mb-2 ed-tone-accent">חמור</div>
-            <div class="font-sans font-semibold ed-tone-accent ed-num" style="font-size: clamp(2rem, 4vw, 3rem); line-height: 1;">{{ highCount }}</div>
+          <div class="ui-card">
+            <div class="ed-eyebrow mb-2 ed-tone-negative">חמור</div>
+            <div class="ui-display ui-num ed-tone-negative">{{ highCount }}</div>
           </div>
-          <div>
+          <div class="ui-card">
             <div class="ed-eyebrow mb-2 ed-tone-warning">בינוני</div>
-            <div class="font-sans font-semibold ed-tone-warning ed-num" style="font-size: clamp(2rem, 4vw, 3rem); line-height: 1;">{{ mediumCount }}</div>
+            <div class="ui-display ui-num ed-tone-warning">{{ mediumCount }}</div>
           </div>
         </div>
 
-        <!-- High-severity: pull-quote treatment -->
+        <!-- High-severity -->
         <template v-if="highAlerts.length > 0">
-          <div class="ed-eyebrow mb-2">חריגות חמורות</div>
-          <PullQuote
-            v-for="(alert, i) in highAlerts"
-            :key="'high-' + i"
-            severity="high"
-            :eyebrow="alert.project"
-          >
-            {{ alert.message }}
-            <template #cite>
-              {{ alert.detail }}
-            </template>
-          </PullQuote>
+          <div class="ed-eyebrow mt-8 mb-3">חריגות חמורות</div>
+          <div class="ui-stagger space-y-3">
+            <article
+              v-for="(alert, i) in highAlerts"
+              :key="'high-' + i"
+              class="ui-card"
+              :style="{ background: 'var(--negative-soft)', borderColor: 'var(--negative)' }"
+            >
+              <div class="flex items-start gap-4">
+                <div class="flex-shrink-0 ed-tone-negative mt-0.5">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                  </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-baseline gap-3 mb-1 flex-wrap">
+                    <span class="ui-pill ui-pill-negative">חמור</span>
+                    <h3 class="font-sans font-semibold text-lg leading-tight" style="color: var(--ink);">{{ alert.project }}</h3>
+                  </div>
+                  <p class="font-sans ed-tone-muted text-[0.9375rem] leading-relaxed mt-1">{{ alert.message }}</p>
+                  <p v-if="alert.detail" class="ui-footnote mt-2">{{ alert.detail }}</p>
+                </div>
+              </div>
+            </article>
+          </div>
         </template>
 
-        <!-- Medium-severity: hairline list -->
+        <!-- Medium-severity -->
         <template v-if="mediumAlerts.length > 0">
-          <div class="ed-eyebrow mt-8 mb-2">התראות לתשומת לב</div>
-          <div class="border-t border-rule-strong">
+          <div class="ed-eyebrow mt-8 mb-3">התראות לתשומת לב</div>
+          <div class="ui-stagger space-y-3">
             <article
               v-for="(alert, i) in mediumAlerts"
               :key="'med-' + i"
-              class="py-5 border-b border-rule"
+              class="ui-mini-card"
+              :style="{ background: 'var(--warning-soft)', borderColor: 'var(--warning)' }"
             >
-              <div class="flex items-baseline gap-3 mb-2 flex-wrap">
-                <span class="ed-eyebrow ed-tone-warning">בינוני</span>
-                <h3 class="font-sans font-semibold text-ink text-xl leading-tight">{{ alert.project }}</h3>
+              <div class="flex items-start gap-4">
+                <div class="flex-shrink-0 ed-tone-warning mt-0.5">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                  </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-baseline gap-3 mb-1 flex-wrap">
+                    <span class="ui-pill ui-pill-warning">בינוני</span>
+                    <h3 class="font-sans font-semibold text-base leading-tight" style="color: var(--ink);">{{ alert.project }}</h3>
+                  </div>
+                  <p class="font-sans ed-tone-muted text-[0.9375rem] leading-relaxed mt-1">{{ alert.message }}</p>
+                  <p v-if="alert.detail" class="ui-footnote mt-2">{{ alert.detail }}</p>
+                </div>
               </div>
-              <p class="font-sans text-ink text-[0.9375rem] leading-relaxed">{{ alert.message }}</p>
-              <p v-if="alert.detail" class="ed-footnote mt-1.5" style="padding-top: 0; border-top: 0;">{{ alert.detail }}</p>
             </article>
           </div>
         </template>
@@ -88,7 +114,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { getPnl } from '../services/api'
-import { SectionHeader, PullQuote, currentHebrewDate } from './editorial'
+import { SectionHeader, currentHebrewDate } from './editorial'
 
 const emit = defineEmits(['alertsCleared'])
 

@@ -1,25 +1,25 @@
 <template>
-  <div class="min-h-screen bg-bg text-ink flex items-center justify-center p-4 sm:p-6" dir="rtl">
+  <div class="ui-login-shell" dir="rtl">
     <!-- Subtle gradient backdrop -->
     <div class="ui-login-gradient" aria-hidden="true"></div>
 
     <div class="relative w-full max-w-[440px]">
       <!-- Brand bar -->
-      <div class="flex items-center justify-center gap-3 mb-8 ed-fade-up">
+      <div class="flex items-center justify-center gap-3 mb-8 animate-fade-up">
         <div class="ui-logo-mark"></div>
         <div>
-          <div class="font-sans font-semibold text-ink text-xl leading-none tracking-tight">IFMLogiX</div>
-          <div class="text-[12px] text-ink-muted font-medium mt-1">ניהול פיננסי חכם</div>
+          <div class="ui-brand-title">IFMLogiX</div>
+          <div class="ui-brand-sub">ניהול פיננסי חכם</div>
         </div>
       </div>
 
       <!-- Card -->
-      <div class="bg-surface border border-border rounded-2xl shadow-lg p-7 sm:p-9 ed-fade-up-delay-1">
+      <div class="ui-card ui-login-card ed-fade-up-delay-1">
         <!-- Step 1: email + password -->
         <form v-if="step === 'login'" @submit.prevent="handleLogin" class="flex flex-col gap-5">
           <div class="text-center mb-1">
-            <h1 class="font-sans font-semibold text-ink text-2xl leading-tight">כניסה למערכת</h1>
-            <p class="text-sm text-ink-muted mt-1.5">הזן את פרטי המשתמש שלך להמשך</p>
+            <h1 class="ui-login-title">כניסה למערכת</h1>
+            <p class="ui-login-hint">הזן את פרטי המשתמש שלך להמשך</p>
           </div>
 
           <div>
@@ -28,7 +28,7 @@
               id="email"
               v-model="email"
               type="email"
-              class="ui-input"
+              :class="['ui-input', { 'is-error': !!errorMsg }]"
               placeholder="name@company.com"
               autofocus
               dir="ltr"
@@ -41,17 +41,20 @@
               id="password"
               v-model="password"
               type="password"
-              class="ui-input"
+              :class="['ui-input', { 'is-error': !!errorMsg }]"
               placeholder="••••••••"
             />
           </div>
 
-          <p v-if="errorMsg" class="text-sm font-medium text-negative text-center bg-negative-soft border border-negative/20 rounded-lg py-2 px-3 -mb-1">{{ errorMsg }}</p>
+          <div v-if="errorMsg" class="ui-field-error ui-field-error--animate" role="alert">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M5.062 19h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            <span>{{ errorMsg }}</span>
+          </div>
 
           <button
             type="submit"
             :disabled="loading"
-            class="ui-btn ui-btn-accent w-full mt-1 py-3 text-base"
+            class="ed-btn ed-btn-primary w-full mt-1 ui-login-submit"
           >
             {{ loading ? 'מתחבר…' : 'כניסה' }}
             <svg v-if="!loading" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
@@ -61,15 +64,15 @@
         </form>
 
         <!-- Step 2: TOTP -->
-        <div v-else-if="step === 'totp'" class="flex flex-col gap-5 ed-fade-up">
+        <div v-else-if="step === 'totp'" class="flex flex-col gap-5 animate-fade-up">
           <div class="text-center">
-            <div class="w-12 h-12 rounded-xl bg-accent-soft flex items-center justify-center mx-auto mb-3">
-              <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <div class="ui-totp-icon">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
               </svg>
             </div>
-            <h1 class="font-sans font-semibold text-ink text-xl leading-tight">אימות דו-שלבי</h1>
-            <p class="text-sm text-ink-muted mt-1.5">הזן את הקוד מאפליקציית ה-Authenticator</p>
+            <h1 class="ui-login-title">אימות דו-שלבי</h1>
+            <p class="ui-login-hint">הזן את הקוד מאפליקציית ה-Authenticator</p>
           </div>
 
           <div>
@@ -80,8 +83,7 @@
               type="text"
               inputmode="numeric"
               maxlength="6"
-              class="ui-input text-center ui-num"
-              style="font-size: 1.75rem; font-weight: 600; letter-spacing: 0.35em; padding-block: 0.875rem;"
+              :class="['ui-input', 'ui-num', 'ui-totp-input', { 'is-error': !!errorMsg }]"
               placeholder="000000"
               autofocus
               @keyup.enter="verifyTotp"
@@ -89,12 +91,15 @@
             />
           </div>
 
-          <p v-if="errorMsg" class="text-sm font-medium text-negative text-center bg-negative-soft border border-negative/20 rounded-lg py-2 px-3">{{ errorMsg }}</p>
+          <div v-if="errorMsg" class="ui-field-error ui-field-error--animate" role="alert">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M5.062 19h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            <span>{{ errorMsg }}</span>
+          </div>
 
           <button
             @click="verifyTotp"
             :disabled="loading || totpCode.length < 6"
-            class="ui-btn ui-btn-accent w-full py-3 text-base"
+            class="ed-btn ed-btn-primary w-full ui-login-submit"
           >
             {{ loading ? 'מאמת…' : 'אימות' }}
             <svg v-if="!loading" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
@@ -102,8 +107,9 @@
             </svg>
           </button>
           <button
+            type="button"
             @click="step = 'login'; errorMsg = ''"
-            class="text-sm text-ink-muted hover:text-ink font-medium transition-colors self-center"
+            class="ed-link text-sm self-center"
           >
             ← חזרה לכניסה
           </button>
@@ -111,7 +117,7 @@
       </div>
 
       <!-- Footer -->
-      <div class="text-center mt-6 text-[11px] text-ink-faint font-medium ed-fade-up-delay-2">
+      <div class="ui-login-footer ed-fade-up-delay-2">
         IFMLogiX · © {{ new Date().getFullYear() }} · FM Group
       </div>
     </div>
@@ -193,6 +199,21 @@ async function verifyTotp() {
 </script>
 
 <style scoped>
+/* Page shell */
+.ui-login-shell {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  position: relative;
+}
+@media (min-width: 640px) {
+  .ui-login-shell { padding: 1.5rem; }
+}
+
 /* Subtle radial gradient backdrop */
 .ui-login-gradient {
   position: absolute;
@@ -204,11 +225,85 @@ async function verifyTotp() {
   z-index: 0;
 }
 
+/* Card overrides — the primitive .ui-card gives surface/border/radius/shadow,
+   here we only tune padding and shadow intensity for the login card. */
+.ui-login-card {
+  padding: clamp(1.75rem, 4vw, 2.5rem);
+  box-shadow: var(--shadow-lg);
+  border-radius: var(--radius-2xl);
+}
+
+.ui-brand-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--ink);
+  font-size: 1.25rem;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+.ui-brand-sub {
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+  font-weight: 500;
+  margin-top: 0.25rem;
+}
+
+.ui-login-title {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  color: var(--ink);
+  font-size: 1.5rem;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+.ui-login-hint {
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+  margin-top: 0.375rem;
+}
+
+/* Primary submit — a bit larger than default ed-btn */
+.ui-login-submit {
+  padding-block: 0.875rem;
+  font-size: 1rem;
+}
+
+/* TOTP icon puck */
+.ui-totp-icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--radius-lg);
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.75rem;
+}
+
+/* TOTP code input — large, spaced digits */
+.ui-totp-input {
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: 0.35em;
+  padding-block: 0.875rem;
+  text-align: center;
+}
+
+.ui-login-footer {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--ink-faint);
+}
+
+/* Brand mark — identical to top nav logo mark */
 .ui-logo-mark {
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #059669 0%, #0f172a 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--ink) 100%);
   box-shadow: 0 4px 14px rgba(5, 150, 105, 0.28), 0 1px 3px rgba(15, 23, 42, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.15);
   position: relative;
   flex-shrink: 0;
@@ -221,7 +316,7 @@ async function verifyTotp() {
   align-items: center;
   justify-content: center;
   color: #ffffff;
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--font-display);
   font-weight: 700;
   font-size: 22px;
   letter-spacing: -0.02em;

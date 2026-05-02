@@ -3,124 +3,135 @@
     <SkeletonLoader variant="kpi" :count="4" />
     <SkeletonLoader variant="chart" height="200px" />
   </div>
-  <div v-else-if="!formData" class="ed-section text-center py-16">
-    <div class="ed-eyebrow mb-3">אין נתונים</div>
-    <p class="font-sans text-xl text-ink max-w-md mx-auto">לפרויקט זה אין עדיין נתונים.</p>
+  <div v-else-if="!formData" class="ui-card text-center py-16 animate-fade-up">
+    <div class="ui-label mb-3">אין נתונים</div>
+    <p class="ui-display max-w-md mx-auto">לפרויקט זה אין עדיין נתונים.</p>
   </div>
   <div v-else>
     <!-- Project Header -->
-    <div class="flex items-start justify-between mb-6 flex-wrap gap-4">
-      <div>
-        <div class="ed-eyebrow mb-1">ניהול פרויקט · {{ formData.area || 'FM' }}</div>
-        <h2 class="font-sans font-semibold text-ink text-3xl leading-none">{{ project }}</h2>
-        <div class="font-sans text-ink-muted text-sm mt-2 flex items-center gap-4 flex-wrap">
-          <span v-if="formData.manager">{{ formData.manager }}</span>
-          <span v-if="formData.client">· {{ formData.client }}</span>
-          <span v-if="formData.start_date">· {{ formatDate(formData.start_date) }}</span>
-          <span v-if="formData.priority_id" class="ed-num"><bdi lang="en">{{ formData.priority_id }}</bdi></span>
+    <header class="ui-card animate-fade-up mb-6">
+      <div class="flex items-start justify-between flex-wrap gap-4">
+        <div class="min-w-0">
+          <div class="ui-label mb-2">ניהול פרויקט · {{ formData.area || 'FM' }}</div>
+          <h2 class="ui-display leading-tight">{{ project }}</h2>
+          <div class="font-sans text-ink-muted text-sm mt-3 flex items-center gap-3 flex-wrap">
+            <span v-if="formData.manager" class="ui-label">{{ formData.manager }}</span>
+            <span v-if="formData.client" class="ui-label">· {{ formData.client }}</span>
+            <span v-if="formData.start_date" class="ui-label ui-num">· {{ formatDate(formData.start_date) }}</span>
+            <span v-if="formData.priority_id" class="ui-pill ui-pill-neutral"><bdi lang="en" class="ui-num">{{ formData.priority_id }}</bdi></span>
+          </div>
+          <p v-if="formData.description" class="font-sans text-ink-faint text-sm mt-3 max-w-xl">{{ formData.description }}</p>
         </div>
-        <p v-if="formData.description" class="font-sans text-ink-faint text-sm mt-2 max-w-xl">{{ formData.description }}</p>
       </div>
-      <button @click="$emit('edit')" class="ed-btn">
-        עריכת טופס →
-      </button>
-    </div>
+    </header>
 
     <!-- KPI strip -->
-    <section class="ed-section">
-      <div class="flex flex-wrap gap-y-8 ed-col-rule">
-        <div class="flex-1" style="min-width: 160px;">
-          <HeroNumber label="סך הכנסות" :value="totalRevenue" prefix="₪" size="md" />
-        </div>
-        <div class="flex-1" style="min-width: 160px;">
-          <HeroNumber label="סך הוצאות" :value="totalExpenses" prefix="₪" tone="warning" size="md" />
-        </div>
-        <div class="flex-1" style="min-width: 160px;">
-          <HeroNumber label="רווח צפוי" :value="profit" prefix="₪" :tone="profit >= 0 ? 'positive' : 'negative'" size="md" />
-        </div>
-        <div class="flex-1" style="min-width: 160px;">
-          <HeroNumber
-            label="מרווח צפוי"
-            :value="margin"
-            suffix="%"
-            format="percent"
-            :tone="margin >= 20 ? 'positive' : margin >= 0 ? 'warning' : 'negative'"
-            size="md"
-          />
+    <section class="ui-stagger grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div class="ui-mini-card">
+        <div class="ui-label mb-2">סך הכנסות</div>
+        <div class="ui-num font-semibold text-ink text-xl"><bdi>₪ {{ fmt(totalRevenue) }}</bdi></div>
+      </div>
+      <div class="ui-mini-card">
+        <div class="ui-label mb-2">סך הוצאות</div>
+        <div class="ui-num font-semibold text-xl ed-tone-warning"><bdi>₪ {{ fmt(totalExpenses) }}</bdi></div>
+      </div>
+      <div class="ui-mini-card">
+        <div class="ui-label mb-2">רווח צפוי</div>
+        <div class="ui-num font-semibold text-xl" :class="profit >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'"><bdi>₪ {{ fmt(profit) }}</bdi></div>
+      </div>
+      <div class="ui-mini-card">
+        <div class="ui-label mb-2">מרווח צפוי</div>
+        <div class="flex items-baseline gap-2">
+          <span class="ui-num font-semibold text-xl" :class="margin >= 20 ? 'ed-tone-positive' : margin >= 0 ? 'ed-tone-warning' : 'ed-tone-negative'">
+            {{ margin.toFixed(1) }}%
+          </span>
+          <span class="ui-pill" :class="margin >= 20 ? 'ui-pill-positive' : margin >= 0 ? 'ui-pill-warning' : 'ui-pill-negative'">
+            {{ margin >= 20 ? 'חזק' : margin >= 0 ? 'לבדוק' : 'הפסד' }}
+          </span>
         </div>
       </div>
     </section>
 
     <!-- Payment Terms + Revenue Chart -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 mt-2">
-      <RuledSection eyebrow="תנאי תשלום" title="הכנסה">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+      <section class="ui-card">
+        <div class="ui-label mb-2">תנאי תשלום</div>
+        <h3 class="font-sans font-semibold text-ink text-lg mb-5">הכנסה</h3>
         <div v-if="paymentTerms.length" class="space-y-5">
           <div v-for="(term, i) in paymentTerms" :key="i">
             <div class="flex items-baseline justify-between mb-1.5">
               <span class="font-sans font-semibold text-ink">{{ term.type }}</span>
-              <span class="font-sans font-semibold text-ink ed-num"><bdi>{{ term.percent }}%</bdi></span>
+              <span class="ui-num font-semibold text-ink"><bdi>{{ term.percent }}%</bdi></span>
             </div>
-            <div class="w-full h-[2px] bg-paper-dark">
-              <div class="h-full transition-all" :style="{ width: term.percent + '%' }" :class="term.type === 'מקדמה' || term.type === 'מזומן' ? 'bg-positive' : 'bg-warning'"></div>
+            <div style="width: 100%; height: 2px; background: var(--surface-muted);">
+              <div style="height: 100%; transition: width 180ms var(--ease-out);" :style="{ width: term.percent + '%', background: term.type === 'מקדמה' || term.type === 'מזומן' ? 'var(--positive)' : 'var(--warning)' }"></div>
             </div>
-            <div class="ed-eyebrow mt-1.5" style="font-size: 0.625rem;">
-              <bdi class="ed-num">{{ fmt(Math.round(totalRevenue * term.percent / 100)) }} ₪</bdi>
+            <div class="ui-label mt-1.5" style="font-size: 0.625rem;">
+              <bdi class="ui-num">{{ fmt(Math.round(totalRevenue * term.percent / 100)) }} ₪</bdi>
               <span v-if="term.type !== 'מקדמה' && term.type !== 'מזומן'" class="ed-tone-warning"> · תשלום בהשהייה</span>
             </div>
           </div>
         </div>
         <p v-else class="font-sans text-ink-faint text-sm text-center py-6">לא הוגדרו תנאי תשלום</p>
-      </RuledSection>
+      </section>
 
-      <RuledSection eyebrow="תחזית" title="הכנסות חודשיות" class="lg:col-span-2">
-        <div class="h-52">
+      <section class="ui-card lg:col-span-2">
+        <div class="ui-label mb-2">תחזית</div>
+        <h3 class="font-sans font-semibold text-ink text-lg mb-5">הכנסות חודשיות</h3>
+        <div class="ui-chart-container ui-chart-container--sm">
           <Bar v-if="revenueChartData" :data="revenueChartData" :options="barOptions" />
         </div>
-      </RuledSection>
+      </section>
     </div>
 
     <!-- Expenses Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 mt-2">
-      <RuledSection eyebrow="פילוח" title="קטגוריות הוצאה">
-        <div class="h-48" v-if="expenseChartData">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+      <section class="ui-card">
+        <div class="ui-label mb-2">פילוח</div>
+        <h3 class="font-sans font-semibold text-ink text-lg mb-5">קטגוריות הוצאה</h3>
+        <div class="ui-chart-container" style="height: 192px;" v-if="expenseChartData">
           <Doughnut :data="expenseChartData" :options="doughnutOptions" />
         </div>
         <p v-else class="font-sans text-ink-faint text-center py-8">אין הוצאות</p>
-        <div class="space-y-2 mt-5 pt-4 border-t border-rule">
+        <div class="space-y-2 mt-5 pt-4" style="border-top: 1px solid var(--border);">
           <div v-for="cat in expenseCategories" :key="cat.key" class="flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <span class="w-2 h-2" :style="{ backgroundColor: cat.chartColor }"></span>
+              <span style="width: 8px; height: 8px; display: inline-block;" :style="{ backgroundColor: cat.chartColor }"></span>
               <span class="font-sans text-sm text-ink">{{ cat.label }}</span>
             </div>
-            <span class="font-sans font-semibold text-ink text-sm ed-num"><bdi>{{ fmt(cat.total) }} ₪</bdi></span>
+            <span class="ui-num font-semibold text-ink text-sm"><bdi>{{ fmt(cat.total) }} ₪</bdi></span>
           </div>
         </div>
-      </RuledSection>
+      </section>
 
-      <RuledSection eyebrow="ספקים וקבלנים" :title="allSuppliers.length + ' ספקים'" class="lg:col-span-2">
-        <div v-if="allSuppliers.length" class="divide-y divide-rule max-h-96 overflow-y-auto">
-          <div v-for="(sup, i) in allSuppliers" :key="i" class="flex items-baseline justify-between py-3 gap-4">
-            <div class="flex-1 min-w-0">
+      <section class="ui-card lg:col-span-2">
+        <div class="ui-label mb-2">ספקים וקבלנים</div>
+        <h3 class="font-sans font-semibold text-ink text-lg mb-5">{{ allSuppliers.length }} ספקים</h3>
+        <div v-if="allSuppliers.length" class="ui-stagger grid grid-cols-1 md:grid-cols-2 gap-3 max-h-96 overflow-y-auto pr-1">
+          <div v-for="(sup, i) in allSuppliers" :key="i" class="ui-mini-card">
+            <div class="flex items-baseline justify-between gap-3 mb-1">
               <div class="font-sans font-semibold text-ink truncate">{{ sup.name || 'ללא שם' }}</div>
-              <div class="ed-eyebrow mt-1" style="font-size: 0.625rem;">
-                <span>{{ sup.category }}</span>
-                <span v-if="sup.payment_terms"> · {{ sup.payment_terms }}</span>
-                <span v-if="sup.start_date"> · {{ formatDate(sup.start_date) }}</span>
-                <span v-if="sup.start_date && sup.end_date"> → </span>
-                <span v-if="sup.end_date">{{ formatDate(sup.end_date) }}</span>
-              </div>
+              <div class="ui-num font-semibold text-ink"><bdi>{{ fmt(sup.amount) }} ₪</bdi></div>
             </div>
-            <div class="font-sans font-semibold text-ink ed-num"><bdi>{{ fmt(sup.amount) }} ₪</bdi></div>
+            <div class="ui-label" style="font-size: 0.625rem;">
+              <span>{{ sup.category }}</span>
+              <span v-if="sup.payment_terms"> · {{ sup.payment_terms }}</span>
+              <span v-if="sup.start_date"> · {{ formatDate(sup.start_date) }}</span>
+              <span v-if="sup.start_date && sup.end_date"> → </span>
+              <span v-if="sup.end_date">{{ formatDate(sup.end_date) }}</span>
+            </div>
           </div>
         </div>
         <p v-else class="font-sans text-ink-faint text-center py-8">לא הוגדרו ספקים</p>
-      </RuledSection>
+      </section>
     </div>
 
     <!-- Monthly Expense Breakdown -->
-    <RuledSection eyebrow="פירוט חודשי" title="הוצאות לפי קטגוריה">
+    <section class="ui-card mb-6">
+      <div class="ui-label mb-2">פירוט חודשי</div>
+      <h3 class="font-sans font-semibold text-ink text-lg mb-5">הוצאות לפי קטגוריה</h3>
       <div class="overflow-x-auto">
-        <table class="ed-table" style="min-width: 600px;" dir="rtl">
+        <table class="ui-table" style="min-width: 600px;" dir="rtl">
           <thead>
             <tr>
               <th>קטגוריה / ספק</th>
@@ -130,39 +141,41 @@
           </thead>
           <tbody>
             <template v-for="cat in monthlyBreakdown" :key="cat.key">
-              <tr style="background: rgba(235, 228, 211, 0.3);">
+              <tr style="background: var(--surface-muted);">
                 <td class="font-sans font-semibold text-ink">{{ cat.label }}</td>
                 <td v-for="m in activeMonths" :key="m" class="num font-sans font-semibold">
-                  <bdi class="ed-num">{{ cat.monthlyTotals[m] ? fmt(cat.monthlyTotals[m]) : '—' }}</bdi>
+                  <bdi class="ui-num">{{ cat.monthlyTotals[m] ? fmt(cat.monthlyTotals[m]) : '—' }}</bdi>
                 </td>
-                <td class="num font-sans font-semibold ed-tone-positive"><bdi class="ed-num">{{ fmt(cat.grandTotal) }}</bdi></td>
+                <td class="num font-sans font-semibold ed-tone-positive"><bdi class="ui-num">{{ fmt(cat.grandTotal) }}</bdi></td>
               </tr>
               <tr v-for="(line, li) in cat.lines" :key="li">
                 <td class="text-ink-muted" style="padding-inline-start: 2rem;">{{ line.name || 'ללא שם' }}</td>
                 <td v-for="m in activeMonths" :key="m" class="num" :class="line.months[m] ? '' : 'ed-tone-faint'">
-                  <bdi class="ed-num">{{ line.months[m] ? fmt(line.months[m]) : '—' }}</bdi>
+                  <bdi class="ui-num">{{ line.months[m] ? fmt(line.months[m]) : '—' }}</bdi>
                 </td>
-                <td class="num"><bdi class="ed-num">{{ fmt(line.total) }}</bdi></td>
+                <td class="num"><bdi class="ui-num">{{ fmt(line.total) }}</bdi></td>
               </tr>
             </template>
-            <tr style="border-top: 3px double var(--rule-strong);">
+            <tr style="border-top: 2px solid var(--border-strong);">
               <td class="font-sans font-semibold text-ink">סה״כ הוצאות</td>
               <td v-for="m in activeMonths" :key="m" class="num font-sans font-semibold">
-                <bdi class="ed-num">{{ grandMonthlyTotal(m) ? fmt(grandMonthlyTotal(m)) : '—' }}</bdi>
+                <bdi class="ui-num">{{ grandMonthlyTotal(m) ? fmt(grandMonthlyTotal(m)) : '—' }}</bdi>
               </td>
-              <td class="num font-sans font-semibold ed-tone-negative"><bdi class="ed-num">{{ fmt(grandTotal) }}</bdi></td>
+              <td class="num font-sans font-semibold ed-tone-negative"><bdi class="ui-num">{{ fmt(grandTotal) }}</bdi></td>
             </tr>
           </tbody>
         </table>
       </div>
-    </RuledSection>
+    </section>
 
     <!-- Cashflow Chart -->
-    <RuledSection eyebrow="תזרים צפוי" title="כניסות, יציאות, ומצטבר">
-      <div class="h-64">
+    <section class="ui-card mb-6">
+      <div class="ui-label mb-2">תזרים צפוי</div>
+      <h3 class="font-sans font-semibold text-ink text-lg mb-5">כניסות, יציאות, ומצטבר</h3>
+      <div class="ui-chart-container ui-chart-container--md">
         <Bar v-if="cashflowChartData" :data="cashflowChartData" :options="cashflowOptions" />
       </div>
-    </RuledSection>
+    </section>
   </div>
 </template>
 
@@ -171,7 +184,7 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { Bar, Doughnut } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend, PointElement, LineElement } from 'chart.js'
 import { getProjectForm } from '../services/api'
-import { RuledSection, HeroNumber, SkeletonLoader } from './editorial'
+import { SkeletonLoader } from './editorial'
 import { COLORS, tooltipConfig, axisConfig } from '../utils/chartDefaults'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend, PointElement, LineElement)

@@ -2,83 +2,83 @@
   <Teleport to="body">
     <div v-if="show" class="ui-modal-layer" dir="rtl">
       <div class="ui-modal-backdrop" @click="$emit('close')"></div>
-      <div class="ui-modal-card ed-fade-up" style="max-width: 36rem;">
+      <div class="ui-modal-card" style="max-width: 36rem;">
         <!-- Header -->
         <header class="px-7 pt-6 pb-4">
           <div class="flex items-start justify-between gap-4">
             <div>
-              <div class="ed-eyebrow mb-1">פרופיל אישי</div>
-              <h2 class="font-sans font-semibold text-ink leading-none" style="font-size: clamp(1.75rem, 3vw, 2.25rem);">פרטי משתמש</h2>
+              <div class="ui-label mb-1">פרופיל אישי</div>
+              <h2 class="ui-modal-title">פרטי משתמש</h2>
             </div>
-            <button @click="$emit('close')" class="p-2 -m-2 rounded-lg text-ink-muted hover:text-accent hover:bg-surface-muted transition-colors" aria-label="סגור">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                <path stroke-linecap="square" d="M6 18L18 6M6 6l12 12"/>
+            <button @click="$emit('close')" class="ui-icon-btn" aria-label="סגור">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
               </svg>
             </button>
           </div>
-          <hr class="ed-rule mt-4" />
+          <hr class="ui-divider mt-4" />
         </header>
 
         <!-- Content -->
         <div class="flex-1 overflow-y-auto px-7 py-5 space-y-8">
           <!-- Avatar -->
           <div class="flex flex-col items-center gap-3">
-            <div class="relative group cursor-pointer" @click="$refs.avatarInput.click()">
-              <div class="w-28 h-28 bg-paper-light border border-rule-strong flex items-center justify-center overflow-hidden">
+            <div class="ui-avatar-uploader" @click="$refs.avatarInput.click()" role="button" tabindex="0" @keydown.enter.prevent="$refs.avatarInput.click()">
+              <div class="ui-avatar-ring">
                 <img v-if="form.avatar" :src="form.avatar" class="w-full h-full object-cover" alt="" />
-                <span v-else class="font-sans font-semibold text-3xl text-ink">{{ initials }}</span>
+                <span v-else class="ui-avatar-initials">{{ initials }}</span>
               </div>
-              <div class="absolute inset-0 bg-ink/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
-                <span class="font-sans text-paper text-sm">שינוי תמונה</span>
+              <div class="ui-avatar-overlay">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
               </div>
             </div>
             <input ref="avatarInput" type="file" accept="image/*" class="hidden" @change="onAvatarChange" />
-            <span class="ed-eyebrow">לחץ לשינוי תמונה</span>
+            <span class="ui-label">לחץ לשינוי תמונה</span>
           </div>
 
           <!-- Fields -->
-          <div class="space-y-6">
+          <div class="space-y-5">
             <div>
-              <label class="ed-label">שם משתמש</label>
-              <input :value="form.username" disabled class="ed-input" style="color: var(--ink-faint); border-bottom-style: dashed;" />
+              <label class="ui-form-label">שם משתמש</label>
+              <input :value="form.username" disabled class="ui-input ui-input--readonly" />
             </div>
             <div>
-              <label class="ed-label">שם מלא</label>
-              <input v-model="form.full_name" type="text" placeholder="השם המלא שלך" class="ed-input" />
+              <label class="ui-form-label">שם מלא</label>
+              <input v-model="form.full_name" type="text" placeholder="השם המלא שלך" class="ui-input" />
             </div>
             <div>
-              <label class="ed-label">אימייל</label>
-              <input v-model="form.email" type="email" placeholder="name@example.com" dir="ltr" class="ed-input" />
+              <label class="ui-form-label">אימייל</label>
+              <input v-model="form.email" type="email" placeholder="name@example.com" dir="ltr" class="ui-input" />
             </div>
             <div>
-              <label class="ed-label">הרשאה</label>
-              <div class="font-display text-ink pt-2.5 pb-2.5 border-b border-rule-strong" style="border-bottom-style: dashed;">
+              <label class="ui-form-label">הרשאה</label>
+              <div class="ui-role-display">
                 {{ roleLabels[form.role] || form.role }}
               </div>
-              <p class="font-sans text-ink-faint text-xs mt-1.5">שינוי הרשאה מתבצע רק דרך הגדרות מערכת</p>
+              <p class="ui-help-text">שינוי הרשאה מתבצע רק דרך הגדרות מערכת</p>
             </div>
           </div>
 
           <!-- Change password -->
-          <div class="border-t border-rule pt-6">
-            <button @click="showPasswordSection = !showPasswordSection" class="ed-link text-sm">
+          <div class="ui-password-section">
+            <button type="button" @click="showPasswordSection = !showPasswordSection" class="ed-link text-sm">
               {{ showPasswordSection ? 'ביטול שינוי סיסמה ←' : 'שינוי סיסמה →' }}
             </button>
-            <div v-if="showPasswordSection" class="mt-5 space-y-5 ed-fade-up">
+            <div v-if="showPasswordSection" class="mt-5 space-y-5">
               <div>
-                <label class="ed-label">סיסמה נוכחית</label>
-                <input v-model="passwords.current" type="password" class="ed-input" />
+                <label class="ui-form-label">סיסמה נוכחית</label>
+                <input v-model="passwords.current" type="password" class="ui-input" />
               </div>
               <div>
-                <label class="ed-label">סיסמה חדשה</label>
-                <input v-model="passwords.new_password" type="password" class="ed-input" />
+                <label class="ui-form-label">סיסמה חדשה</label>
+                <input v-model="passwords.new_password" type="password" class="ui-input" />
               </div>
               <div>
-                <label class="ed-label">אישור סיסמה חדשה</label>
-                <input v-model="passwords.confirm" type="password" class="ed-input" />
+                <label class="ui-form-label">אישור סיסמה חדשה</label>
+                <input v-model="passwords.confirm" type="password" class="ui-input" />
               </div>
-              <button @click="handleChangePassword" :disabled="saving" class="ed-btn ed-btn-primary">
-                שנה סיסמה →
+              <button @click="handleChangePassword" :disabled="saving" class="ui-btn ui-btn-primary">
+                {{ saving ? 'שומר…' : 'שנה סיסמה' }}
               </button>
             </div>
           </div>
@@ -94,16 +94,99 @@
         </div>
 
         <!-- Footer -->
-        <footer class="px-7 py-5 border-t border-rule-strong flex justify-between gap-4">
-          <button @click="$emit('close')" class="ed-link text-sm">ביטול</button>
-          <button @click="handleSave" :disabled="saving" class="ed-btn ed-btn-primary">
-            {{ saving ? 'שומר…' : 'שמירה' }} →
+        <footer class="px-7 py-5 border-t border-[color:var(--border)] flex justify-between gap-4">
+          <button @click="$emit('close')" class="ui-btn">ביטול</button>
+          <button @click="handleSave" :disabled="saving" class="ui-btn ui-btn-primary">
+            {{ saving ? 'שומר…' : 'שמירה' }}
           </button>
         </footer>
       </div>
     </div>
   </Teleport>
 </template>
+
+<style scoped>
+.ui-modal-title {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  color: var(--ink);
+  font-size: clamp(1.5rem, 3vw, 1.875rem);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+/* Avatar uploader — circular with subtle hover */
+.ui-avatar-uploader {
+  position: relative;
+  cursor: pointer;
+  border-radius: 9999px;
+  outline: none;
+}
+.ui-avatar-uploader:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.ui-avatar-ring {
+  width: 7rem;
+  height: 7rem;
+  border-radius: 9999px;
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: transform var(--dur-press) var(--ease-out), border-color 180ms var(--ease-out);
+}
+.ui-avatar-uploader:active .ui-avatar-ring { transform: scale(0.97); }
+.ui-avatar-initials {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 1.875rem;
+  color: var(--ink);
+}
+.ui-avatar-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: rgba(15, 23, 42, 0.45);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 180ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .ui-avatar-uploader:hover .ui-avatar-overlay { opacity: 1; }
+  .ui-avatar-uploader:hover .ui-avatar-ring { border-color: var(--border-strong); }
+}
+
+/* Disabled / readonly input */
+.ui-input--readonly {
+  color: var(--ink-faint);
+  background: var(--surface-muted);
+  cursor: not-allowed;
+}
+
+.ui-role-display {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  color: var(--ink);
+  padding: 0.625rem 0.875rem;
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+.ui-help-text {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+  margin-top: 0.375rem;
+}
+
+.ui-password-section {
+  border-top: 1px solid var(--border);
+  padding-top: 1.5rem;
+}
+</style>
 
 <script setup>
 import { ref, reactive, computed, watch } from 'vue'

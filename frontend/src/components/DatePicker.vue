@@ -6,7 +6,7 @@
         type="text"
         :value="displayValue"
         :placeholder="placeholder"
-        :class="[inputClass || 'ed-input', invalidDate ? 'is-error' : '']"
+        :class="[inputClass || 'ui-input', invalidDate ? 'is-error' : '']"
         style="padding-right: 2.5rem;"
         @input="onInput"
         @focus="showCalendar = true"
@@ -15,33 +15,38 @@
         dir="ltr"
       />
       <button type="button" @click="showCalendar = !showCalendar"
-        class="absolute right-2 top-1/2 -translate-y-1/2 text-ink-muted hover:text-accent transition-colors p-1 rounded-md hover:bg-slate-100" aria-label="בחר תאריך">
+        class="ui-datepicker-trigger ui-press" aria-label="בחר תאריך">
         <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.6">
           <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
         </svg>
       </button>
     </div>
-    <span v-if="invalidDate" class="font-sans text-[10px] ed-tone-negative mt-1 block">תאריך לא תקין</span>
+    <div v-if="invalidDate" class="ui-field-error ui-field-error--animate">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+      <span>תאריך לא תקין</span>
+    </div>
 
-    <!-- Calendar dropdown — editorial paper sheet -->
+    <!-- Calendar dropdown — origin-aware popover -->
     <Teleport to="body">
       <div v-if="showCalendar" class="fixed inset-0 z-[100]" @click="showCalendar = false"></div>
       <div v-if="showCalendar" ref="calendarEl"
-        class="fixed z-[101] bg-surface border border-border rounded-xl shadow-lg w-[300px] ed-fade-up"
+        class="ui-datepicker-popover ui-popover"
         :style="calendarPosition">
         <!-- Month/Year navigation -->
         <div class="flex items-center justify-between px-4 pt-3 pb-2">
-          <button type="button" @click="prevMonth" class="text-ink-muted hover:text-accent transition-colors p-1">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="square" d="M15 19l-7-7 7-7"/></svg>
+          <button type="button" @click="prevMonth" class="ui-datepicker-nav ui-press" aria-label="חודש קודם">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
           </button>
-          <div class="font-sans font-semibold text-ink ed-num">
+          <div class="font-sans font-semibold text-sm ui-num" style="color: var(--ink);">
             <span>{{ hebrewMonths[viewMonth] }}</span> <bdi>{{ viewYear }}</bdi>
           </div>
-          <button type="button" @click="nextMonth" class="text-ink-muted hover:text-accent transition-colors p-1">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="square" d="M9 5l7 7-7 7"/></svg>
+          <button type="button" @click="nextMonth" class="ui-datepicker-nav ui-press" aria-label="חודש הבא">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
           </button>
         </div>
-        <hr class="ed-rule mx-4" />
+        <div class="ui-datepicker-rule"></div>
 
         <!-- Day headers -->
         <div class="grid grid-cols-7 px-4 pt-3">
@@ -56,20 +61,20 @@
               @click="selectDay(day)"
               :disabled="isBeforeMin(day)"
               :class="[
-                'ed-date-cell',
+                'ui-date-cell',
                 isBeforeMin(day) ? 'is-disabled' : '',
                 isSelected(day) ? 'is-selected' : '',
                 isToday(day) && !isSelected(day) ? 'is-today' : '',
                 day.outside ? 'is-outside' : '',
               ]">
-              <bdi class="ed-num">{{ day.date }}</bdi>
+              <bdi class="ui-num">{{ day.date }}</bdi>
             </button>
           </div>
         </div>
 
         <!-- Today button -->
-        <div class="border-t border-rule px-4 py-2">
-          <button type="button" @click="goToday" class="ed-link text-sm w-full text-center block">
+        <div class="ui-datepicker-footer">
+          <button type="button" @click="goToday" class="ui-datepicker-today ui-press">
             היום →
           </button>
         </div>
@@ -289,67 +294,181 @@ function updatePosition() {
   if (!wrapper.value) return
   const rect = wrapper.value.getBoundingClientRect()
   const calHeight = 340
-  const calWidth = 280
+  const calWidth = 300
   const spaceBelow = window.innerHeight - rect.bottom
   const spaceAbove = rect.top
 
   let top, left
+  let originY = 'top'
   if (spaceBelow >= calHeight) {
     top = rect.bottom + 6
+    originY = 'top'
   } else if (spaceAbove >= calHeight) {
     top = rect.top - calHeight - 6
+    originY = 'bottom'
   } else {
     top = Math.max(8, (window.innerHeight - calHeight) / 2)
+    originY = 'top'
   }
 
-  left = rect.left
+  // Anchor to right side of input (RTL-friendly)
+  left = rect.right - calWidth
+  let originX = 'right'
+  if (left < 8) {
+    left = 8
+    originX = 'left'
+  }
   if (left + calWidth > window.innerWidth - 8) {
     left = window.innerWidth - calWidth - 8
   }
-  if (left < 8) left = 8
 
   calendarPosition.value = {
     top: top + 'px',
-    left: left + 'px'
+    left: left + 'px',
+    '--transform-origin': `${originY} ${originX}`
   }
 }
 </script>
 
 <style scoped>
-.ed-date-cell {
+/* Inline calendar trigger inside input */
+.ui-datepicker-trigger {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-muted);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: color 180ms var(--ease-out), background 180ms var(--ease-out), transform var(--dur-press) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .ui-datepicker-trigger:hover {
+    color: var(--accent);
+    background: var(--surface-muted);
+  }
+}
+.ui-datepicker-trigger:active {
+  transform: translateY(-50%) scale(0.97);
+}
+
+/* Calendar popover */
+.ui-datepicker-popover {
+  position: fixed;
+  z-index: 101;
+  width: 300px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+}
+.ui-datepicker-rule {
+  height: 1px;
+  background: var(--border);
+  margin: 0 1rem;
+}
+
+/* Prev/next month nav */
+.ui-datepicker-nav {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-muted);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: color 180ms var(--ease-out), background 180ms var(--ease-out), transform var(--dur-press) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .ui-datepicker-nav:hover {
+    color: var(--ink);
+    background: var(--surface-muted);
+  }
+}
+.ui-datepicker-nav:active {
+  transform: scale(0.97);
+}
+
+/* Footer */
+.ui-datepicker-footer {
+  border-top: 1px solid var(--border);
+  padding: 0.5rem 1rem;
+}
+.ui-datepicker-today {
+  width: 100%;
+  display: block;
+  text-align: center;
+  background: transparent;
+  border: 0;
+  color: var(--accent);
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  padding: 0.375rem 0.5rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 180ms var(--ease-out), transform var(--dur-press) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .ui-datepicker-today:hover {
+    background: var(--accent-soft);
+  }
+}
+.ui-datepicker-today:active {
+  transform: scale(0.98);
+}
+
+/* Day cells */
+.ui-date-cell {
   width: 100%;
   aspect-ratio: 1;
   border: 0;
   background: transparent;
-  font-family: var(--font-display);
-  font-size: 0.875rem;
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
   font-weight: 500;
   color: var(--ink);
   cursor: pointer;
-  transition: color 0.15s ease, background 0.15s ease, border-bottom-color 0.15s ease;
   padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-bottom: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-feature-settings: "lnum" 1, "tnum" 1;
+  transition: background 140ms var(--ease-out), color 140ms var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
-.ed-date-cell:hover:not(.is-disabled) {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
+@media (hover: hover) and (pointer: fine) {
+  .ui-date-cell:hover:not(.is-disabled):not(.is-selected) {
+    background: var(--surface-muted);
+    color: var(--accent);
+  }
 }
-.ed-date-cell.is-outside {
+.ui-date-cell:active:not(.is-disabled) {
+  transform: scale(0.94);
+}
+.ui-date-cell.is-outside {
   color: var(--ink-faint);
 }
-.ed-date-cell.is-today {
-  border-bottom: 2px solid var(--ink);
+.ui-date-cell.is-today {
+  box-shadow: inset 0 0 0 1px var(--border-strong);
   font-weight: 700;
 }
-.ed-date-cell.is-selected {
-  background: var(--ink);
-  color: var(--paper);
-  font-weight: 900;
+.ui-date-cell.is-selected {
+  background: var(--accent);
+  color: #ffffff;
+  font-weight: 700;
 }
-.ed-date-cell.is-disabled {
+.ui-date-cell.is-disabled {
   color: var(--ink-faint);
   cursor: not-allowed;
   opacity: 0.4;

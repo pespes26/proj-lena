@@ -3,22 +3,23 @@
     <SkeletonLoader variant="kpi" :count="3" />
     <SkeletonLoader variant="table" :columns="4" :rows="4" />
   </div>
-  <div v-else-if="!formData" class="ed-section text-center py-16">
-    <div class="ed-eyebrow mb-3">אין נתונים</div>
-    <p class="font-sans text-xl text-ink max-w-md mx-auto">לא נמצאו נתוני טופס לפרויקט זה.</p>
-    <button @click="$emit('edit')" class="ed-btn ed-btn-primary mt-6">צור טופס פרויקט →</button>
+  <div v-else-if="!formData" class="ui-card text-center py-16 animate-fade-up">
+    <div class="ui-label mb-3">אין נתונים</div>
+    <p class="ui-display max-w-md mx-auto">לא נמצאו נתוני טופס לפרויקט זה.</p>
   </div>
-  <div v-else class="space-y-2">
+  <div v-else class="space-y-6">
     <!-- Header -->
-    <div class="flex items-center justify-between flex-wrap gap-4 mb-4">
-      <div>
-        <div class="ed-eyebrow mb-1">פרטי פרויקט</div>
-        <h3 class="font-sans font-semibold text-ink text-2xl leading-none">{{ project }}</h3>
+    <header class="ui-card animate-fade-up">
+      <div class="flex items-center justify-between flex-wrap gap-4">
+        <div class="min-w-0">
+          <div class="ui-label mb-2">פרטי פרויקט</div>
+          <h2 class="ui-display leading-tight">{{ project }}</h2>
+        </div>
+        <button @click="exportPDF" :disabled="exporting" class="ui-btn">
+          {{ exporting ? 'מייצא…' : 'ייצוא PDF' }} ↓
+        </button>
       </div>
-      <button @click="exportPDF" :disabled="exporting" class="ed-btn">
-        {{ exporting ? 'מייצא…' : 'ייצוא PDF' }} ↓
-      </button>
-    </div>
+    </header>
 
     <!-- PDF content wrapper -->
     <div ref="pdfContent">
@@ -35,62 +36,64 @@
       </div>
 
       <!-- Project Info -->
-      <RuledSection eyebrow="מידע כללי" title="מסמך פרויקט">
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-8 gap-y-5">
+      <section class="ui-card mb-6">
+        <div class="ui-label mb-2">מידע כללי</div>
+        <h3 class="font-sans font-semibold text-ink text-xl mb-6">מסמך פרויקט</h3>
+        <div class="ui-stagger grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-8 gap-y-5">
           <div v-if="formData.project_name">
-            <div class="ed-eyebrow mb-1">שם פרויקט</div>
+            <div class="ui-label mb-1">שם פרויקט</div>
             <div class="font-sans font-semibold text-ink">{{ formData.project_name }}</div>
           </div>
           <div>
-            <div class="ed-eyebrow mb-1">מספר עדיפות</div>
-            <div class="font-sans font-semibold text-ink ed-num"><bdi lang="en">{{ formData.priority_id || '—' }}</bdi></div>
+            <div class="ui-label mb-1">מספר עדיפות</div>
+            <div class="ui-num font-semibold text-ink"><bdi lang="en">{{ formData.priority_id || '—' }}</bdi></div>
           </div>
           <div>
-            <div class="ed-eyebrow mb-1">מנהל פרויקט</div>
+            <div class="ui-label mb-1">מנהל פרויקט</div>
             <div class="font-sans font-semibold text-ink">{{ formData.manager || '—' }}</div>
           </div>
           <div>
-            <div class="ed-eyebrow mb-1">מזמין</div>
+            <div class="ui-label mb-1">מזמין</div>
             <div class="font-sans font-semibold text-ink">{{ formData.client || '—' }}</div>
           </div>
           <div>
-            <div class="ed-eyebrow mb-1">תאריך התחלה</div>
-            <div class="font-sans font-semibold text-ink ed-num">{{ formatDate(formData.start_date) }}</div>
+            <div class="ui-label mb-1">תאריך התחלה</div>
+            <div class="ui-num font-semibold text-ink">{{ formatDate(formData.start_date) }}</div>
           </div>
           <div>
-            <div class="ed-eyebrow mb-1">צפי סיום</div>
-            <div class="font-sans font-semibold text-ink ed-num">{{ formatDate(formData.expected_end_date) }}</div>
+            <div class="ui-label mb-1">צפי סיום</div>
+            <div class="ui-num font-semibold text-ink">{{ formatDate(formData.expected_end_date) }}</div>
           </div>
           <div>
-            <div class="ed-eyebrow mb-1">ציר</div>
+            <div class="ui-label mb-1">ציר</div>
             <div class="font-sans font-semibold text-ink">{{ formData.axis || '—' }}</div>
           </div>
           <div>
-            <div class="ed-eyebrow mb-1">תחום</div>
+            <div class="ui-label mb-1">תחום</div>
             <div class="font-sans font-semibold text-ink">{{ formData.area || '—' }}</div>
           </div>
           <div>
-            <div class="ed-eyebrow mb-1">סטטוס</div>
-            <div class="font-sans font-semibold" :class="statusToneClass">{{ statusLabel }}</div>
+            <div class="ui-label mb-1">סטטוס</div>
+            <span class="ui-pill" :class="statusPillClass">{{ statusLabel }}</span>
           </div>
         </div>
-        <div v-if="formData.description" class="mt-6 pt-4 border-t border-rule">
-          <div class="ed-eyebrow mb-2">תיאור</div>
+        <div v-if="formData.description" class="mt-6 pt-4" style="border-top: 1px solid var(--border);">
+          <div class="ui-label mb-2">תיאור</div>
           <p class="font-sans text-ink leading-relaxed">{{ formData.description }}</p>
         </div>
-      </RuledSection>
+      </section>
 
       <!-- Revenue Summary -->
-      <RuledSection eyebrow="הכנסות" title="סיכום הכנסות">
-        <HeroNumber
-          :label="'סך הכנסות (₪)'"
-          :value="formData.total_revenue || 0"
-          prefix="₪"
-          size="lg"
-        />
+      <section class="ui-card mb-6">
+        <div class="ui-label mb-2">הכנסות</div>
+        <h3 class="font-sans font-semibold text-ink text-xl mb-6">סיכום הכנסות</h3>
+        <div class="ui-mini-card" style="max-width: 340px;">
+          <div class="ui-label mb-2">סך הכנסות (₪)</div>
+          <div class="ui-num font-semibold text-ink text-2xl ed-tone-positive"><bdi>₪ {{ fmt(formData.total_revenue || 0) }}</bdi></div>
+        </div>
         <div v-if="formData.revenue_payment_terms?.length" class="mt-8">
-          <div class="ed-eyebrow mb-3">תנאי תשלום הכנסה</div>
-          <table class="ed-table">
+          <div class="ui-label mb-3">תנאי תשלום הכנסה</div>
+          <table class="ui-table">
             <thead>
               <tr>
                 <th>סוג</th>
@@ -100,50 +103,47 @@
             </thead>
             <tbody>
               <tr v-for="(term, i) in formData.revenue_payment_terms" :key="i">
-                <td class="font-sans font-semibold">{{ term.type }}</td>
-                <td class="num"><bdi class="ed-num">{{ term.percent }}%</bdi></td>
-                <td class="num"><bdi class="ed-num">{{ fmt(Math.round((formData.total_revenue || 0) * (term.percent || 0) / 100)) }}</bdi></td>
+                <td>
+                  <span class="ui-pill" :class="term.type === 'מקדמה' || term.type === 'מזומן' ? 'ui-pill-positive' : 'ui-pill-warning'">{{ term.type }}</span>
+                </td>
+                <td class="num"><bdi class="ui-num">{{ term.percent }}%</bdi></td>
+                <td class="num"><bdi class="ui-num">{{ fmt(Math.round((formData.total_revenue || 0) * (term.percent || 0) / 100)) }}</bdi></td>
               </tr>
             </tbody>
           </table>
         </div>
-      </RuledSection>
+      </section>
 
       <!-- Expenses Summary -->
-      <RuledSection eyebrow="הוצאות" title="סיכום הוצאות">
+      <section class="ui-card mb-6">
+        <div class="ui-label mb-2">הוצאות</div>
+        <h3 class="font-sans font-semibold text-ink text-xl mb-6">סיכום הוצאות</h3>
+
         <!-- Subcontractors -->
         <div v-if="formData.subcontractors?.length" class="mb-8">
-          <div class="ed-eyebrow mb-3">קבלני משנה · <bdi class="ed-num">{{ formData.subcontractors.length }}</bdi></div>
-          <table class="ed-table">
-            <thead>
-              <tr>
-                <th>שם</th>
-                <th class="num">סכום כולל (₪)</th>
-                <th>תנאי תשלום</th>
-                <th>תקופה</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(sub, i) in formData.subcontractors" :key="i">
-                <td class="font-sans font-semibold">{{ sub.name }}</td>
-                <td class="num"><bdi class="ed-num">{{ fmt(sub.total_amount || sub.monthly_amount || 0) }}</bdi></td>
-                <td>
-                  <template v-if="Array.isArray(sub.payment_terms)">
-                    <span v-for="(t, j) in sub.payment_terms" :key="j">{{ t.type }} {{ t.percent }}%<template v-if="j < sub.payment_terms.length - 1">, </template></span>
-                  </template>
-                  <template v-else>{{ sub.payment_terms || '—' }}</template>
-                </td>
-                <td class="text-ink-muted text-xs">{{ formatDate(sub.start_date) }} — {{ formatDate(sub.end_date) }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="ui-label mb-3">קבלני משנה · <bdi class="ui-num">{{ formData.subcontractors.length }}</bdi></div>
+          <div class="ui-stagger grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div v-for="(sub, i) in formData.subcontractors" :key="i" class="ui-mini-card">
+              <div class="flex items-baseline justify-between mb-2 gap-3">
+                <span class="font-sans font-semibold text-ink truncate">{{ sub.name }}</span>
+                <bdi class="ui-num font-semibold text-ink">{{ fmt(sub.total_amount || sub.monthly_amount || 0) }} ₪</bdi>
+              </div>
+              <div class="ui-label mb-1" style="font-size: 0.625rem;">
+                <template v-if="Array.isArray(sub.payment_terms)">
+                  <span v-for="(t, j) in sub.payment_terms" :key="j">{{ t.type }} {{ t.percent }}%<template v-if="j < sub.payment_terms.length - 1">, </template></span>
+                </template>
+                <template v-else>{{ sub.payment_terms || '—' }}</template>
+              </div>
+              <div class="ui-label ed-tone-muted" style="font-size: 0.625rem;">{{ formatDate(sub.start_date) }} — {{ formatDate(sub.end_date) }}</div>
+            </div>
+          </div>
         </div>
 
         <!-- Expense categories -->
         <template v-for="cat in expenseCategories" :key="cat.key">
           <div v-if="formData['expense_lines_' + cat.key]?.length" class="mb-8">
-            <div class="ed-eyebrow mb-3">{{ cat.label }} · <bdi class="ed-num">{{ formData['expense_lines_' + cat.key].length }}</bdi></div>
-            <table class="ed-table">
+            <div class="ui-label mb-3">{{ cat.label }} · <bdi class="ui-num">{{ formData['expense_lines_' + cat.key].length }}</bdi></div>
+            <table class="ui-table">
               <thead>
                 <tr>
                   <th>שם</th>
@@ -155,7 +155,7 @@
               <tbody>
                 <tr v-for="(line, i) in formData['expense_lines_' + cat.key]" :key="i">
                   <td class="font-sans font-semibold">{{ line.name }}</td>
-                  <td class="num"><bdi class="ed-num">{{ fmt(line.monthly_amount || 0) }}</bdi></td>
+                  <td class="num"><bdi class="ui-num">{{ fmt(line.monthly_amount || 0) }}</bdi></td>
                   <td>{{ line.payment_terms || '—' }}</td>
                   <td class="text-ink-muted text-xs">
                     <template v-if="line.start_date">{{ formatDate(line.start_date) }} — {{ formatDate(line.end_date) }}</template>
@@ -168,32 +168,34 @@
         </template>
 
         <!-- Total expenses -->
-        <div class="mt-6 pt-4 border-t border-rule-strong">
-          <HeroNumber label='סה״כ הוצאות משוערכות' :value="totalExpenses" prefix="₪" size="md" />
+        <div class="mt-6 pt-4" style="border-top: 1px solid var(--border-strong);">
+          <div class="ui-mini-card" style="max-width: 340px;">
+            <div class="ui-label mb-2">סה״כ הוצאות משוערכות</div>
+            <div class="ui-num font-semibold text-ink text-2xl ed-tone-warning"><bdi>₪ {{ fmt(totalExpenses) }}</bdi></div>
+          </div>
         </div>
-      </RuledSection>
+      </section>
 
       <!-- Profit Summary -->
-      <RuledSection eyebrow="רווחיות" title="סיכום רווחיות">
-        <div class="flex flex-wrap gap-y-8 ed-col-rule">
-          <div class="flex-1" style="min-width: 180px;">
-            <HeroNumber label="הכנסות" :value="formData.total_revenue || 0" prefix="₪" size="md" />
+      <section class="ui-card mb-6">
+        <div class="ui-label mb-2">רווחיות</div>
+        <h3 class="font-sans font-semibold text-ink text-xl mb-6">סיכום רווחיות</h3>
+        <div class="ui-stagger grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="ui-mini-card">
+            <div class="ui-label mb-2">הכנסות</div>
+            <div class="ui-num font-semibold text-ink text-xl ed-tone-positive"><bdi>₪ {{ fmt(formData.total_revenue || 0) }}</bdi></div>
           </div>
-          <div class="flex-1" style="min-width: 180px;">
-            <HeroNumber label="הוצאות" :value="totalExpenses" prefix="₪" size="md" tone="warning" />
+          <div class="ui-mini-card">
+            <div class="ui-label mb-2">הוצאות</div>
+            <div class="ui-num font-semibold text-xl ed-tone-warning"><bdi>₪ {{ fmt(totalExpenses) }}</bdi></div>
           </div>
-          <div class="flex-1" style="min-width: 180px;">
-            <HeroNumber
-              label="רווח צפוי"
-              :value="profit"
-              prefix="₪"
-              :tone="profit >= 0 ? 'positive' : 'negative'"
-              size="md"
-              :footnote="'מרווח ' + marginPercent"
-            />
+          <div class="ui-mini-card">
+            <div class="ui-label mb-2">רווח צפוי</div>
+            <div class="ui-num font-semibold text-xl" :class="profit >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'"><bdi>₪ {{ fmt(profit) }}</bdi></div>
+            <div class="ui-label mt-2" style="font-size: 0.625rem;">מרווח {{ marginPercent }}</div>
           </div>
         </div>
-      </RuledSection>
+      </section>
 
       <!-- PDF footer -->
       <div class="pdf-footer" style="display:none; text-align:center; margin-top:24px; padding-top:12px; border-top:1px solid #d8cfbe; font-size:10px; color:#928a7e;">
@@ -208,7 +210,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { getProjectForm, formatNumber } from '../services/api'
 import html2pdf from 'html2pdf.js'
-import { RuledSection, HeroNumber, SkeletonLoader } from './editorial'
+import { SkeletonLoader } from './editorial'
 
 const props = defineProps({
   project: { type: String, required: true }
@@ -237,12 +239,12 @@ const statusLabel = computed(() => {
   if (s === 'completed') return 'הושלם'
   return '—'
 })
-const statusToneClass = computed(() => {
+const statusPillClass = computed(() => {
   const s = formData.value?.status
-  if (s === 'active') return 'ed-tone-positive'
-  if (s === 'on-hold') return 'ed-tone-warning'
-  if (s === 'completed') return 'ed-tone-muted'
-  return 'text-ink'
+  if (s === 'active') return 'ui-pill-positive'
+  if (s === 'on-hold') return 'ui-pill-warning'
+  if (s === 'completed') return 'ui-pill-neutral'
+  return 'ui-pill-neutral'
 })
 
 const totalExpenses = computed(() => {
