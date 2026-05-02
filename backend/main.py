@@ -4,11 +4,18 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from routers import projects, cashflow, dashboard, reports, project_form, auth, ai
+from middleware import RequestLoggingMiddleware
+from exception_handlers import global_exception_handler
 
 ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
 
 app = FastAPI(title="IFMLogiX - P&L & Cash Flow")
 
+app.add_exception_handler(Exception, global_exception_handler)
+
+# Starlette applies middleware in reverse-registration order (last added = outermost).
+# CORSMiddleware registered first → RequestLoggingMiddleware registered second
+# → logging wraps everything, including CORS rejections.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
@@ -16,6 +23,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(RequestLoggingMiddleware)
 
 app.include_router(auth.router)
 app.include_router(projects.router)

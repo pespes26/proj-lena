@@ -1,0 +1,15 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // IFMLogiX — all data access goes through FastAPI backend (Firebase Admin SDK).
+    // Admin SDK bypasses these rules, so this is a safety net against
+    // accidental or malicious direct client SDK access.
+    // If you need to grant any client-side access in the future, add explicit
+    // match blocks here with proper auth checks.
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
