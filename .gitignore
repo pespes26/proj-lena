@@ -18,6 +18,9 @@ frontend/dist/
 
 # Environment
 .env
+**/.env
+backend/.env
+frontend/.env
 
 # Firebase service account (SECRET - never commit)
 backend/firebase-service-account.json
