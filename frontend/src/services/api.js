@@ -16,6 +16,9 @@ api.interceptors.request.use(async config => {
     } catch {
       // Token refresh failed — will get 401
     }
+  } else if (import.meta.env.VITE_DEV_MODE === 'true') {
+    const devToken = localStorage.getItem('dev_token')
+    if (devToken) config.headers.Authorization = `Bearer ${devToken}`
   }
   return config
 })

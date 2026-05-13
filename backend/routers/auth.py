@@ -30,14 +30,17 @@ class UpdateUser(BaseModel):
 
 @router.get("/api/auth/profile")
 def get_profile(user: dict = Depends(get_current_user)):
-    doc = db.collection('users').document(user['uid']).get()
-    data = doc.to_dict() if doc.exists else {}
+    try:
+        doc = db.collection('users').document(user['uid']).get()
+        data = doc.to_dict() if doc.exists else {}
+    except Exception:
+        data = {}
     return {
         "uid": user['uid'],
         "email": user['email'],
-        "full_name": data.get("full_name", user['email']),
-        "role": data.get("role", "viewer"),
-        "linked_manager": data.get("linked_manager", ""),
+        "full_name": data.get("full_name", user.get("full_name", user['email'])),
+        "role": data.get("role", user.get("role", "viewer")),
+        "linked_manager": data.get("linked_manager", user.get("linked_manager", "")),
         "avatar": data.get("avatar", ""),
     }
 

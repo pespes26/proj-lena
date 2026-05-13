@@ -150,6 +150,14 @@ async function handleLogin() {
     errorMsg.value = 'יש למלא אימייל וסיסמה'
     return
   }
+
+  // DEV MODE: skip Firebase, use local token
+  if (import.meta.env.VITE_DEV_MODE === 'true') {
+    localStorage.setItem('dev_token', 'dev-admin-local')
+    emit('login')
+    return
+  }
+
   loading.value = true
   try {
     await signInWithEmailAndPassword(auth, email.value, password.value)

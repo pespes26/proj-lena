@@ -1,4 +1,15 @@
 import os
+
+# Load .env before any other imports (local dev)
+_env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
+if os.path.exists(_env_path):
+    with open(_env_path) as _f:
+        for _line in _f:
+            _line = _line.strip()
+            if _line and '=' in _line and not _line.startswith('#'):
+                _k, _v = _line.split('=', 1)
+                os.environ.setdefault(_k.strip(), _v.strip())
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -36,6 +47,11 @@ app.include_router(ai.router)
 @app.get("/api/health")
 def health_check():
     return {"status": "ok"}
+
+@app.get("/api/debug-dev")
+def debug_dev():
+    import os
+    return {"DEV_MODE_env": os.environ.get("DEV_MODE", "NOT_SET"), "env_path_exists": os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env'))}
 
 # Serve frontend static files in production
 STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'frontend', 'dist')

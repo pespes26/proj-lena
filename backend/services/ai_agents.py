@@ -14,7 +14,8 @@ if os.path.exists(_env_path):
                 k, v = line.split('=', 1)
                 os.environ[k.strip()] = v.strip()
 
-client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY", ""))
+_gemini_key = os.environ.get("GEMINI_API_KEY", "")
+client = genai.Client(api_key=_gemini_key) if _gemini_key else None
 
 SYSTEM_PROMPT = """אתה IFMLogiX AI — אנליסט פיננסי בכיר בחברת לוגי גרופ / מנרב IFM.
 אתה מנתח פרויקטי בנייה, תחזוקה וניהול מתקנים (FM).

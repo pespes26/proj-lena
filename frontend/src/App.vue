@@ -6,7 +6,7 @@
       <div class="ui-wordmark">IFMLogiX</div>
     </div>
   </div>
-  <LoginPage v-else-if="!isLoggedIn" />
+  <LoginPage v-else-if="!isLoggedIn" @login="handleDevLogin" />
 
   <div v-else class="min-h-screen bg-bg text-ink" dir="rtl">
     <!-- ═══════════════════════════════════════════════════════════════
@@ -312,6 +312,16 @@ onMounted(() => {
         }
       }).catch(() => {})
     } else {
+      // DEV MODE: check localStorage on page refresh
+      if (import.meta.env.VITE_DEV_MODE === 'true' && localStorage.getItem('dev_token')) {
+        isLoggedIn.value = true
+        authReady.value = true
+        loadAppData()
+        getProfile().then(p => {
+          if (p.role === 'project_manager') activeTab.value = 'my-projects'
+        }).catch(() => {})
+        return
+      }
       isLoggedIn.value = false
       authReady.value = true
     }
@@ -372,8 +382,19 @@ function goHome() {
   selectedProject.value = ''
 }
 
+function handleDevLogin() {
+  isLoggedIn.value = true
+  loadAppData()
+  getProfile().then(p => {
+    if (p.role === 'project_manager') activeTab.value = 'my-projects'
+  }).catch(() => {})
+}
+
 function logout() {
-  signOut(auth)
+  if (import.meta.env.VITE_DEV_MODE === 'true') {
+    localStorage.removeItem('dev_token')
+  }
+  signOut(auth).catch(() => {})
   isLoggedIn.value = false
 }
 

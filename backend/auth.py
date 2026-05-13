@@ -3,6 +3,19 @@ import firebase_admin
 from firebase_admin import credentials, auth as firebase_auth, firestore
 from fastapi import Header, HTTPException, Depends
 
+# Load .env if present (local dev)
+_env_path = os.path.join(os.path.dirname(__file__), '.env')
+if os.path.exists(_env_path):
+    with open(_env_path) as _f:
+        for _line in _f:
+            _line = _line.strip()
+            if _line and '=' in _line and not _line.startswith('#'):
+                _k, _v = _line.split('=', 1)
+                os.environ.setdefault(_k.strip(), _v.strip())
+
+DEV_MODE = os.environ.get('DEV_MODE', '').lower() in ('true', '1')
+DEV_TOKEN = 'dev-admin-local'
+
 # Initialize Firebase Admin SDK
 _cred_path = os.path.join(os.path.dirname(__file__), 'firebase-service-account.json')
 if os.path.exists(_cred_path):
@@ -29,6 +42,17 @@ async def get_current_user(authorization: str = Header(None)) -> dict:
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="לא מחובר")
     token = authorization.split(" ", 1)[1]
+
+    # DEV MODE bypass — local development only
+    if DEV_MODE and token == DEV_TOKEN:
+        return {
+            'uid': 'dev-admin',
+            'email': 'dev@local',
+            'username': 'dev@local',
+            'role': 'admin',
+            'linked_manager': '',
+            'full_name': 'Dev Admin',
+        }
 
     try:
         decoded = firebase_auth.verify_id_token(token, clock_skew_seconds=30)
