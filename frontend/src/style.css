@@ -560,6 +560,7 @@ body {
   width: 100%;
   min-width: 0;
   height: clamp(200px, 30vh, 300px);
+  contain: layout paint;
 }
 .ui-chart-container--sm { height: clamp(160px, 24vh, 220px); }
 .ui-chart-container--md { height: clamp(220px, 33vh, 320px); }
@@ -987,6 +988,9 @@ body {
 .animate-fade-up { animation: ed-fade-up 320ms var(--ease-out) both; }
 
 /* Stagger helper — applies 50ms-spaced delays to children */
+/* will-change pre-promotes compositor layers before the animation runs,
+   eliminating the mid-sequence promotion jank on the first stagger frame. */
+.ui-stagger > * { will-change: transform, opacity; }
 .ui-stagger > *:nth-child(1) { animation: ed-fade-up 320ms var(--ease-out) 0ms both; }
 .ui-stagger > *:nth-child(2) { animation: ed-fade-up 320ms var(--ease-out) 50ms both; }
 .ui-stagger > *:nth-child(3) { animation: ed-fade-up 320ms var(--ease-out) 100ms both; }

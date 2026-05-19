@@ -276,12 +276,12 @@ import { ref, computed, onMounted, defineAsyncComponent } from 'vue'
 import LoginPage from './components/LoginPage.vue'
 import Dashboard from './components/Dashboard.vue'
 import ExecutiveDashboard from './components/ExecutiveDashboard.vue'
-import MyProjectsView from './components/MyProjectsView.vue'
-import PnlView from './components/PnlView.vue'
-import CashFlowView from './components/CashFlowView.vue'
 import { getPnl, getProjects, getProjectsDetail, getProfile } from './services/api'
 import { createToastProvider, setGlobalToast } from './composables/useToast'
 
+const MyProjectsView = defineAsyncComponent(() => import('./components/MyProjectsView.vue'))
+const PnlView = defineAsyncComponent(() => import('./components/PnlView.vue'))
+const CashFlowView = defineAsyncComponent(() => import('./components/CashFlowView.vue'))
 const ProjectFormModal = defineAsyncComponent(() => import('./components/ProjectFormModal.vue'))
 const UserProfileModal = defineAsyncComponent(() => import('./components/UserProfileModal.vue'))
 const SettingsModal = defineAsyncComponent(() => import('./components/SettingsModal.vue'))
