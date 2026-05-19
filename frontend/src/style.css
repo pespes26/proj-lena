@@ -174,7 +174,7 @@ body {
 }
 .ui-modal-card {
   position: relative;
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-lg);
@@ -225,9 +225,8 @@ body {
 /* Alert / pullquote → fintech alert card */
 .ui-alert,
 .ed-pullquote {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-inline-start: 4px solid var(--warning);
+  background: var(--warning-soft);
+  border: 1px solid rgba(217, 119, 6, 0.20);
   border-radius: var(--radius-lg);
   padding: 1.125rem 1.25rem;
   margin: 0.75rem 0;
@@ -622,11 +621,7 @@ body {
    Top bar / Navigation (App.vue chrome)
    ═══════════════════════════════════════════════════════════════════ */
 
-.ui-topbar {
-  background: var(--surface);
-  backdrop-filter: saturate(180%) blur(8px);
-  -webkit-backdrop-filter: saturate(180%) blur(8px);
-}
+/* .ui-topbar is defined in App.vue (scoped) — fully opaque, no blur. */
 
 .ui-brand-btn {
   display: inline-flex;
@@ -644,21 +639,7 @@ body {
 }
 .ui-brand-btn:active { transform: scale(0.97); }
 
-.ui-logo-mark {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  background: var(--ink);
-  position: relative;
-  flex-shrink: 0;
-}
-.ui-logo-mark::after {
-  content: '';
-  position: absolute;
-  inset: 6px;
-  border-radius: 3px;
-  background: var(--accent);
-}
+/* .ui-logo-mark and .ui-brand-name are defined in App.vue (scoped). */
 
 .ui-brand-name {
   font-family: var(--font-display);

@@ -788,7 +788,7 @@ function loadAppData() {
   margin-top: 0.25rem;
 }
 
-/* Toast notifications */
+/* Toast notifications — type is communicated by icon + tinted background, never a side stripe */
 .ui-toast {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -796,13 +796,12 @@ function loadAppData() {
   box-shadow: var(--shadow-lg);
   padding: 0.75rem 1rem;
   cursor: pointer;
-  border-inline-start: 3px solid var(--ink-muted);
   transition: transform var(--dur-press) var(--ease-out);
 }
 .ui-toast:active { transform: scale(0.98); }
-.ui-toast--success { border-inline-start-color: var(--accent); }
-.ui-toast--error   { border-inline-start-color: var(--negative); }
-.ui-toast--warning { border-inline-start-color: var(--warning); }
+.ui-toast--success { background: var(--positive-soft); border-color: rgba(5, 150, 105, 0.20); }
+.ui-toast--error   { background: var(--negative-soft); border-color: rgba(225, 29, 72, 0.20); }
+.ui-toast--warning { background: var(--warning-soft);  border-color: rgba(217, 119, 6, 0.20); }
 
 /* Toast animation — opacity + transform only, ease-out */
 .toast-enter-active { transition: opacity 220ms var(--ease-out), transform 220ms var(--ease-out); }
