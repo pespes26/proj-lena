@@ -3,3 +3,8 @@ uvicorn[standard]
 openpyxl
 pandas
 python-multipart
+psycopg[binary,pool]
+azure-identity
+azure-keyvault-secrets
+PyJWT[crypto]
+httpx
