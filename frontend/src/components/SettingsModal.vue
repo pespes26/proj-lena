@@ -110,13 +110,13 @@
                     <td class="font-semibold">{{ u.username }}</td>
                     <td>
                       <template v-if="editingUser === u.username">
-                        <input v-model="editForm.full_name" type="text" class="ui-input" />
+                        <input v-model="editForm.full_name" type="text" class="ui-input" aria-label="שם מלא" />
                       </template>
                       <template v-else>{{ u.full_name || '—' }}</template>
                     </td>
                     <td>
                       <template v-if="editingUser === u.username">
-                        <select v-model="editForm.role" class="ui-select">
+                        <select v-model="editForm.role" class="ui-select" aria-label="הרשאה">
                           <option value="admin">מנהל מערכת</option>
                           <option value="economist">כלכלנית</option>
                           <option value="viewer">צופה מלא</option>
@@ -129,7 +129,7 @@
                     </td>
                     <td>
                       <template v-if="editingUser === u.username && editForm.role === 'project_manager'">
-                        <select v-model="editForm.linked_manager" class="ui-select">
+                        <select v-model="editForm.linked_manager" class="ui-select" aria-label="מנהל משויך">
                           <option value="">בחר</option>
                           <option value="אלון">אלון</option>
                           <option value="אתי">אתי</option>

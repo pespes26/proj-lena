@@ -48,7 +48,7 @@
       </header>
 
       <!-- Messages -->
-      <div ref="messagesContainer" class="ui-chat-messages">
+      <div ref="messagesContainer" class="ui-chat-messages" aria-live="polite" aria-atomic="false" aria-label="שיחה">
         <!-- Welcome -->
         <div v-if="messages.length === 0" class="py-4">
           <div class="ui-chat-welcome-mark" aria-hidden="true">

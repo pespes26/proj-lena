@@ -30,8 +30,8 @@
         <!-- Form body -->
         <div class="flex-1 overflow-y-auto px-7 py-5 space-y-6">
           <!-- Type selector grid -->
-          <div>
-            <label class="ui-form-label">סוג דיווח</label>
+          <fieldset class="border-0 p-0 m-0">
+            <legend class="ui-form-label mb-2">סוג דיווח</legend>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
               <button
                 v-for="t in types"
@@ -52,12 +52,12 @@
                 <span>{{ t.label }}</span>
               </button>
             </div>
-          </div>
+          </fieldset>
 
           <!-- Month -->
           <div>
-            <label class="ui-form-label">חודש (אופציונלי)</label>
-            <select v-model="form.month" class="ui-select">
+            <label class="ui-form-label" for="report-month">חודש (אופציונלי)</label>
+            <select id="report-month" v-model="form.month" class="ui-select">
               <option :value="null">כללי — לא קשור לחודש ספציפי</option>
               <option v-for="m in 12" :key="m" :value="m">חודש {{ m }}</option>
             </select>
@@ -65,8 +65,9 @@
 
           <!-- Title -->
           <div>
-            <label class="ui-form-label">כותרת *</label>
+            <label class="ui-form-label" for="report-title">כותרת *</label>
             <input
+              id="report-title"
               v-model="form.title"
               type="text"
               placeholder="למשל: הוצאה חריגה על תיקון…"
@@ -84,8 +85,9 @@
 
           <!-- Amount -->
           <div v-if="form.type === 'expense' || form.type === 'revenue'">
-            <label class="ui-form-label">סכום (₪) *</label>
+            <label class="ui-form-label" for="report-amount">סכום (₪) *</label>
             <input
+              id="report-amount"
               v-model.number="form.amount"
               type="number"
               placeholder="0"
@@ -99,8 +101,9 @@
 
           <!-- Description -->
           <div>
-            <label class="ui-form-label">פירוט</label>
+            <label class="ui-form-label" for="report-detail">פירוט</label>
             <textarea
+              id="report-detail"
               v-model="form.description"
               rows="3"
               placeholder="תיאור מפורט…"

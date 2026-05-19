@@ -39,16 +39,16 @@
           <!-- Fields -->
           <div class="space-y-5">
             <div>
-              <label class="ui-form-label">שם משתמש</label>
-              <input :value="form.username" disabled class="ui-input ui-input--readonly" />
+              <label class="ui-form-label" for="profile-username">שם משתמש</label>
+              <input id="profile-username" :value="form.username" disabled class="ui-input ui-input--readonly" />
             </div>
             <div>
-              <label class="ui-form-label">שם מלא</label>
-              <input v-model="form.full_name" type="text" placeholder="השם המלא שלך" class="ui-input" />
+              <label class="ui-form-label" for="profile-fullname">שם מלא</label>
+              <input id="profile-fullname" v-model="form.full_name" type="text" placeholder="השם המלא שלך" class="ui-input" />
             </div>
             <div>
-              <label class="ui-form-label">אימייל</label>
-              <input v-model="form.email" type="email" placeholder="name@example.com" dir="ltr" class="ui-input" />
+              <label class="ui-form-label" for="profile-email">אימייל</label>
+              <input id="profile-email" v-model="form.email" type="email" placeholder="name@example.com" dir="ltr" class="ui-input" />
             </div>
             <div>
               <label class="ui-form-label">הרשאה</label>
