@@ -47,13 +47,13 @@ defineEmits(['click'])
   background: var(--surface-muted);
 }
 .ui-tab.is-active {
-  color: #ffffff;
+  color: var(--surface);
   background: var(--ink);
   font-weight: 600;
 }
 .ui-tab.is-active:hover {
   background: var(--ink-strong);
-  color: #ffffff;
+  color: var(--surface);
 }
 .ui-tab.is-disabled {
   color: var(--ink-faint);
@@ -74,7 +74,7 @@ defineEmits(['click'])
   font-family: var(--font-sans);
   font-size: 0.6875rem;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--surface);
   background: var(--negative);
   padding: 0.0625rem 0.4375rem;
   border-radius: 999px;
@@ -82,5 +82,5 @@ defineEmits(['click'])
   text-align: center;
   line-height: 1.3;
 }
-.ui-tab.is-active .ui-tab__badge { background: var(--accent); color: #ffffff; }
+.ui-tab.is-active .ui-tab__badge { background: var(--accent); color: var(--surface); }
 </style>

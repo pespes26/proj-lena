@@ -51,24 +51,24 @@
               <div class="ui-label mb-4">משתמש חדש</div>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                 <div>
-                  <label class="ui-form-label">שם משתמש *</label>
-                  <input v-model="newUser.username" type="text" class="ui-input" />
+                  <label class="ui-form-label" for="settings-username">שם משתמש *</label>
+                  <input id="settings-username" v-model="newUser.username" type="text" class="ui-input" />
                 </div>
                 <div>
-                  <label class="ui-form-label">סיסמה *</label>
-                  <input v-model="newUser.password" type="password" class="ui-input" />
+                  <label class="ui-form-label" for="settings-password">סיסמה *</label>
+                  <input id="settings-password" v-model="newUser.password" type="password" class="ui-input" />
                 </div>
                 <div>
-                  <label class="ui-form-label">שם מלא</label>
-                  <input v-model="newUser.full_name" type="text" class="ui-input" />
+                  <label class="ui-form-label" for="settings-fullname">שם מלא</label>
+                  <input id="settings-fullname" v-model="newUser.full_name" type="text" class="ui-input" />
                 </div>
                 <div>
-                  <label class="ui-form-label">אימייל</label>
-                  <input v-model="newUser.email" type="email" dir="ltr" class="ui-input" />
+                  <label class="ui-form-label" for="settings-email">אימייל</label>
+                  <input id="settings-email" v-model="newUser.email" type="email" dir="ltr" class="ui-input" />
                 </div>
                 <div>
-                  <label class="ui-form-label">הרשאה</label>
-                  <select v-model="newUser.role" class="ui-select">
+                  <label class="ui-form-label" for="settings-role">הרשאה</label>
+                  <select id="settings-role" v-model="newUser.role" class="ui-select">
                     <option value="admin">מנהל מערכת</option>
                     <option value="economist">כלכלנית</option>
                     <option value="viewer">צופה מלא</option>
@@ -76,8 +76,8 @@
                   </select>
                 </div>
                 <div v-if="newUser.role === 'project_manager'">
-                  <label class="ui-form-label">מנהל משויך *</label>
-                  <select v-model="newUser.linked_manager" class="ui-select">
+                  <label class="ui-form-label" for="settings-manager">מנהל משויך *</label>
+                  <select id="settings-manager" v-model="newUser.linked_manager" class="ui-select">
                     <option value="" disabled>בחר מנהל</option>
                     <option value="אלון">אלון</option>
                     <option value="אתי">אתי</option>

@@ -51,7 +51,7 @@
 
         <!-- High-severity -->
         <template v-if="highAlerts.length > 0">
-          <div class="ed-eyebrow mt-8 mb-3">חריגות חמורות</div>
+          <h2 class="ed-eyebrow mt-8 mb-3">חריגות חמורות</h2>
           <div class="ui-stagger space-y-3">
             <article
               v-for="(alert, i) in highAlerts"
@@ -80,7 +80,7 @@
 
         <!-- Medium-severity -->
         <template v-if="mediumAlerts.length > 0">
-          <div class="ed-eyebrow mt-8 mb-3">התראות לתשומת לב</div>
+          <h2 class="ed-eyebrow mt-8 mb-3">התראות לתשומת לב</h2>
           <div class="ui-stagger space-y-3">
             <article
               v-for="(alert, i) in mediumAlerts"

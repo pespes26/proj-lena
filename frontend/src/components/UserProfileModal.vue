@@ -125,7 +125,7 @@
   inset: 0;
   border-radius: 9999px;
   background: rgba(15, 23, 42, 0.45);
-  color: #ffffff;
+  color: var(--surface);
   display: flex;
   align-items: center;
   justify-content: center;

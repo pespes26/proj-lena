@@ -277,16 +277,16 @@ watch(showCalendar, async (val) => {
     }
     await nextTick()
     updatePosition()
-    window.addEventListener('scroll', onScrollOrResize, true)
+    window.addEventListener('scroll', onScrollOrResize, { passive: true, capture: true })
     window.addEventListener('resize', onScrollOrResize)
   } else {
-    window.removeEventListener('scroll', onScrollOrResize, true)
+    window.removeEventListener('scroll', onScrollOrResize, { passive: true, capture: true })
     window.removeEventListener('resize', onScrollOrResize)
   }
 })
 
 onBeforeUnmount(() => {
-  window.removeEventListener('scroll', onScrollOrResize, true)
+  window.removeEventListener('scroll', onScrollOrResize, { passive: true, capture: true })
   window.removeEventListener('resize', onScrollOrResize)
 })
 
@@ -363,7 +363,7 @@ function updatePosition() {
 .ui-datepicker-popover {
   position: fixed;
   z-index: 101;
-  width: 300px;
+  width: min(300px, calc(100vw - 2rem));
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
@@ -465,7 +465,7 @@ function updatePosition() {
 }
 .ui-date-cell.is-selected {
   background: var(--accent);
-  color: #ffffff;
+  color: var(--surface);
   font-weight: 700;
 }
 .ui-date-cell.is-disabled {

@@ -29,7 +29,7 @@
             </svg>
           </div>
           <div>
-            <div class="font-sans font-semibold text-sm leading-none" style="color: #ffffff;">IFMLogiX AI</div>
+            <div class="font-sans font-semibold text-sm leading-none" style="color: var(--surface);">IFMLogiX AI</div>
             <div class="text-[11px] font-medium mt-0.5" style="color: rgba(255, 255, 255, 0.65);">עוזר פיננסי חכם</div>
           </div>
         </div>
@@ -56,7 +56,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
             </svg>
           </div>
-          <h4 class="font-sans font-semibold text-base leading-tight" style="color: var(--ink);">שלום 👋</h4>
+          <h2 class="font-sans font-semibold text-base leading-tight" style="color: var(--ink);">שלום 👋</h2>
           <p class="text-sm mt-1.5 leading-relaxed" style="color: var(--ink-muted);">
             אני IFMLogiX AI — העוזר הפיננסי שלך. שאל אותי על הפרויקטים, התזרים, או הרווחיות של הקבוצה.
           </p>
@@ -188,7 +188,7 @@ async function scrollToBottom() {
   gap: 0.75rem;
   padding: 0.625rem 1rem 0.625rem 0.75rem;
   background: var(--ink);
-  color: #ffffff;
+  color: var(--surface);
   border: 0;
   border-radius: 999px;
   box-shadow: var(--shadow-lg);
@@ -214,7 +214,7 @@ async function scrollToBottom() {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
+  color: var(--surface);
   flex-shrink: 0;
 }
 .ui-chat-launcher__text {
@@ -233,7 +233,7 @@ async function scrollToBottom() {
 .ui-chat-launcher__label {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--surface);
   line-height: 1;
 }
 
@@ -271,7 +271,7 @@ async function scrollToBottom() {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
+  color: var(--surface);
   flex-shrink: 0;
 }
 .ui-chat-header__btn {
@@ -289,7 +289,7 @@ async function scrollToBottom() {
 }
 @media (hover: hover) and (pointer: fine) {
   .ui-chat-header__btn:hover {
-    color: #ffffff;
+    color: var(--surface);
     background: rgba(255, 255, 255, 0.08);
   }
 }
@@ -358,7 +358,7 @@ async function scrollToBottom() {
 .ui-chat-bubble__body-user {
   max-width: 85%;
   background: var(--ink);
-  color: #ffffff;
+  color: var(--surface);
   font-family: var(--font-sans);
   font-size: 0.875rem;
   font-weight: 500;
@@ -411,7 +411,7 @@ async function scrollToBottom() {
   height: 2.25rem;
   border-radius: var(--radius-md);
   background: var(--ink);
-  color: #ffffff;
+  color: var(--surface);
   border: 0;
   display: inline-flex;
   align-items: center;
@@ -434,14 +434,14 @@ async function scrollToBottom() {
   font-family: 'DM Sans', 'Rubik', sans-serif;
   font-weight: 700;
   margin: 10px 0 4px;
-  color: #0f172a;
+  color: var(--ink);
 }
 .ai-message h2 { font-size: 0.9375rem; }
 .ai-message h3 { font-size: 0.875rem; }
 .ai-message p { margin: 4px 0; }
 .ai-message ul, .ai-message ol { padding-right: 1.2em; margin: 4px 0; }
 .ai-message li { margin: 2px 0; }
-.ai-message strong { font-weight: 700; color: #0f172a; }
+.ai-message strong { font-weight: 700; color: var(--ink); }
 .ai-message table {
   width: 100%;
   border-collapse: collapse;
@@ -451,25 +451,25 @@ async function scrollToBottom() {
   font-feature-settings: "lnum" 1, "tnum" 1;
 }
 .ai-message th, .ai-message td {
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
   padding: 5px 8px;
   text-align: right;
 }
 .ai-message th {
   font-size: 0.6875rem;
   font-weight: 600;
-  color: #475569;
-  border-bottom-color: #cbd5e1;
+  color: var(--ink-muted);
+  border-bottom-color: var(--border-strong);
   text-transform: none;
   letter-spacing: 0;
 }
 .ai-message code {
-  background: #f1f5f9;
+  background: var(--surface-muted);
   padding: 1px 5px;
   border-radius: 4px;
   font-size: 0.8125rem;
   font-family: ui-monospace, monospace;
-  color: #0f172a;
+  color: var(--ink);
 }
-.ai-message hr { border: none; border-top: 1px solid #e2e8f0; margin: 10px 0; }
+.ai-message hr { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
 </style>

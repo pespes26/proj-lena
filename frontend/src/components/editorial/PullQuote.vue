@@ -36,7 +36,6 @@ defineProps({
   gap: 0.875rem;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-inline-start: 4px solid var(--border-strong);
   border-radius: var(--radius-lg);
   padding: 1.125rem 1.25rem;
   box-shadow: var(--shadow-sm);
@@ -83,7 +82,7 @@ defineProps({
 
 /* Severity accents */
 .ui-alert--high {
-  border-inline-start-color: var(--negative);
+  border-color: rgba(225,29,72,0.30);
   background: var(--negative-soft);
 }
 .ui-alert--high .ui-alert__icon {
@@ -94,7 +93,7 @@ defineProps({
   color: var(--negative);
 }
 .ui-alert--medium {
-  border-inline-start-color: var(--warning);
+  border-color: rgba(217,119,6,0.30);
   background: var(--warning-soft);
 }
 .ui-alert--medium .ui-alert__icon {
@@ -105,6 +104,6 @@ defineProps({
   color: var(--warning);
 }
 .ui-alert--low {
-  border-inline-start-color: var(--info);
+  border-color: rgba(37,99,235,0.25);
 }
 </style>

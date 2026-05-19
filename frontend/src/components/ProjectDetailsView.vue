@@ -26,12 +26,12 @@
 
       <!-- PDF header (visible only inside generated PDF) -->
       <div class="pdf-header" style="display:none">
-        <div style="text-align:center; margin-bottom:24px; padding-bottom:16px; border-bottom:2px solid #0f172a;">
-          <h1 style="font-family: 'DM Sans', 'Rubik', sans-serif; font-size:26px; font-weight:700; color:#0f172a; margin:0; letter-spacing:-0.02em;">IFMLogiX</h1>
-          <p style="font-family: 'DM Sans', 'Rubik', sans-serif; font-size:11px; color:#475569; margin:4px 0 10px; font-weight:500;">ניהול פיננסי חכם</p>
-          <h2 style="font-family: 'DM Sans', 'Rubik', sans-serif; font-size:20px; font-weight:700; color:#0f172a; margin:10px 0 4px;">{{ formData.project_name || project }}</h2>
-          <p style="font-family: 'DM Sans', 'Rubik', sans-serif; font-size:11px; color:#475569;">מספר עדיפות: {{ formData.priority_id || '—' }} · מנהל: {{ formData.manager || '—' }} · ציר: {{ formData.axis || '—' }} — {{ formData.area || '—' }}</p>
-          <p style="font-family: 'DM Sans', 'Rubik', sans-serif; font-size:10px; color:#94a3b8;">הופק בתאריך: {{ new Date().toLocaleDateString('he-IL') }}</p>
+        <div style="text-align:center; margin-bottom:24px; padding-bottom:16px; border-bottom:2px solid var(--ink);">
+          <h1 style="font-family: 'DM Sans', 'Rubik', sans-serif; font-size:26px; font-weight:700; color:var(--ink); margin:0; letter-spacing:-0.02em;">IFMLogiX</h1>
+          <p style="font-family: 'DM Sans', 'Rubik', sans-serif; font-size:11px; color:var(--ink-muted); margin:4px 0 10px; font-weight:500;">ניהול פיננסי חכם</p>
+          <h2 style="font-family: 'DM Sans', 'Rubik', sans-serif; font-size:20px; font-weight:700; color:var(--ink); margin:10px 0 4px;">{{ formData.project_name || project }}</h2>
+          <p style="font-family: 'DM Sans', 'Rubik', sans-serif; font-size:11px; color:var(--ink-muted);">מספר עדיפות: {{ formData.priority_id || '—' }} · מנהל: {{ formData.manager || '—' }} · ציר: {{ formData.axis || '—' }} — {{ formData.area || '—' }}</p>
+          <p style="font-family: 'DM Sans', 'Rubik', sans-serif; font-size:10px; color:var(--ink-whisper);">הופק בתאריך: {{ new Date().toLocaleDateString('he-IL') }}</p>
         </div>
       </div>
 

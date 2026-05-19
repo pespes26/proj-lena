@@ -1,5 +1,6 @@
 <template>
   <div>
+    <h1 class="sr-only">דשבורד פיננסי</h1>
     <div v-if="loading" class="space-y-8 py-4">
       <SkeletonLoader variant="kpi" :count="3" />
       <SkeletonLoader variant="table" :columns="6" :rows="5" />

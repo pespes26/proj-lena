@@ -1,5 +1,6 @@
 <template>
   <div>
+    <h1 class="sr-only">דשבורד פיננסי</h1>
     <SectionHeader
       eyebrow="דשבורד"
       :kicker="dateLabel"
@@ -312,7 +313,7 @@ const axisPieData = computed(() => {
       data: values,
       backgroundColor: colors,
       borderWidth: 2,
-      borderColor: '#ffffff',
+      borderColor: COLORS.paperLight,
       hoverOffset: 6,
     }]
   }

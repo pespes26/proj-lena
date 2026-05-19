@@ -276,7 +276,7 @@ async function verifyTotp() {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
+  color: var(--surface);
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 22px;

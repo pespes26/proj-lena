@@ -41,15 +41,15 @@
             <!-- Project name + Priority ID + Recurring toggle -->
             <div class="flex flex-col sm:flex-row gap-4 sm:gap-3 sm:items-end">
               <div v-if="newProject" class="flex-[15]" data-field="project_name">
-                <label class="ed-label">שם פרויקט *</label>
-                <input v-model="form.project_name" type="text" placeholder="שם הפרויקט"
+                <label class="ed-label" for="field-project-name">שם פרויקט *</label>
+                <input id="field-project-name" v-model="form.project_name" type="text" placeholder="שם הפרויקט"
                   @blur="vf('project_name', form.project_name, { required: true, minLen: 2 })"
                   :class="['w-full ui-input', fc('project_name')]" />
                 <div v-if="fe.project_name" class="ui-field-error ui-field-error--animate"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>{{ fe.project_name }}</div>
               </div>
               <div class="flex-[4]" data-field="priority_id">
-                <label class="ed-label">מספר Priority *</label>
-                <input v-model="form.priority_id" type="text" placeholder="P-1001"
+                <label class="ed-label" for="field-priority-id">מספר Priority *</label>
+                <input id="field-priority-id" v-model="form.priority_id" type="text" placeholder="P-1001"
                   @blur="vf('priority_id', form.priority_id, { required: true, minLen: 2 })"
                   :class="['w-full ui-input ui-num', fc('priority_id')]" />
                 <div v-if="fe.priority_id" class="ui-field-error ui-field-error--animate"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>{{ fe.priority_id }}</div>
@@ -72,8 +72,8 @@
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
               <div>
-                <label class="ed-label">מנהל פרויקט *</label>
-                <select v-model="form.manager"
+                <label class="ed-label" for="field-manager">מנהל פרויקט *</label>
+                <select id="field-manager" v-model="form.manager"
                   @change="vf('manager', form.manager, { required: true })"
                   :class="['w-full ui-select', fc('manager')]">
                   <option value="" disabled>בחר מנהל פרויקט</option>
@@ -82,8 +82,8 @@
                 <div v-if="fe.manager" class="ui-field-error ui-field-error--animate"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>{{ fe.manager }}</div>
               </div>
               <div>
-                <label class="ed-label">שם המזמין *</label>
-                <input v-model="form.client" type="text" placeholder="שם החברה/לקוח"
+                <label class="ed-label" for="field-client">שם המזמין *</label>
+                <input id="field-client" v-model="form.client" type="text" placeholder="שם החברה/לקוח"
                   @blur="vf('client', form.client, { required: true, minLen: 2 })"
                   :class="['w-full ui-input', fc('client')]" />
                 <div v-if="fe.client" class="ui-field-error ui-field-error--animate"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>{{ fe.client }}</div>
@@ -91,16 +91,16 @@
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
               <div>
-                <label class="ed-label">ציר</label>
-                <select v-model="form.axis" class="w-full ui-select">
+                <label class="ed-label" for="field-axis">ציר</label>
+                <select id="field-axis" v-model="form.axis" class="w-full ui-select">
                   <option value="לוגי">לוגי</option>
                   <option value="מנרב">מנרב</option>
                   <option value="פיתוח עסקי">פיתוח עסקי</option>
                 </select>
               </div>
               <div>
-                <label class="ed-label">תחום</label>
-                <select v-model="form.area" class="w-full ui-select">
+                <label class="ed-label" for="field-area">תחום</label>
+                <select id="field-area" v-model="form.area" class="w-full ui-select">
                   <option value="מסחרי פרטי">מסחרי פרטי</option>
                   <option value="פרוייקטים">פרוייקטים</option>
                   <option value="מטה">מטה</option>
@@ -109,8 +109,8 @@
                 </select>
               </div>
               <div>
-                <label class="ed-label">סטטוס</label>
-                <select v-model="form.status" class="w-full ui-select">
+                <label class="ed-label" for="field-status">סטטוס</label>
+                <select id="field-status" v-model="form.status" class="w-full ui-select">
                   <option value="active">פעיל</option>
                   <option value="on-hold">מושהה</option>
                   <option value="completed">הושלם</option>
@@ -118,8 +118,8 @@
               </div>
             </div>
             <div>
-              <label class="ed-label">תיאור פרויקט *</label>
-              <textarea v-model="form.description" rows="3" placeholder="תיאור כללי של הפרויקט..."
+              <label class="ed-label" for="field-description">תיאור פרויקט *</label>
+              <textarea id="field-description" v-model="form.description" rows="3" placeholder="תיאור כללי של הפרויקט..."
                 @blur="vf('description', form.description, { required: true, minLen: 5 })"
                 :class="['w-full ui-input resize-none', fc('description')]"></textarea>
               <div class="flex justify-between mt-0.5">
@@ -133,8 +133,8 @@
           <!-- Step 2: Revenue -->
           <div v-if="step === 1" class="space-y-6">
             <div>
-              <label class="ed-label">סך הכנסות הפרויקט (₪) *</label>
-              <input :value="fmtNum(form.total_revenue)" @input="onNumInput(form, 'total_revenue', $event)" type="text" inputmode="numeric" placeholder="0"
+              <label class="ed-label" for="field-total-revenue">סך הכנסות הפרויקט (₪) *</label>
+              <input id="field-total-revenue" :value="fmtNum(form.total_revenue)" @input="onNumInput(form, 'total_revenue', $event)" type="text" inputmode="numeric" placeholder="0"
                 @blur="vf('total_revenue', form.total_revenue, { required: true, positive: true, max: 999999999 })"
                 :class="['w-full ui-input ui-num', fc('total_revenue')]" />
               <div v-if="fe.total_revenue" class="ui-field-error ui-field-error--animate"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>{{ fe.total_revenue }}</div>

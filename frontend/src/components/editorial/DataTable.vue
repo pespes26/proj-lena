@@ -312,7 +312,7 @@ function formatPercent(v) {
 }
 .ui-table-page-btn.is-active {
   background: var(--ink);
-  color: #fff;
+  color: var(--surface);
 }
 .ui-table-page-btn.is-dots {
   cursor: default;
