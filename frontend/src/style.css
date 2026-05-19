@@ -348,8 +348,8 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   color: var(--ink-muted);
   background: transparent;
   border: 1px solid transparent;
@@ -559,12 +559,12 @@ body {
   position: relative;
   width: 100%;
   min-width: 0;
-  height: 260px;
+  height: clamp(200px, 30vh, 300px);
 }
-.ui-chart-container--sm { height: 200px; }
-.ui-chart-container--md { height: 280px; }
-.ui-chart-container--lg { height: 360px; }
-.ui-chart-container--xl { height: 440px; }
+.ui-chart-container--sm { height: clamp(160px, 24vh, 220px); }
+.ui-chart-container--md { height: clamp(220px, 33vh, 320px); }
+.ui-chart-container--lg { height: clamp(260px, 42vh, 400px); }
+.ui-chart-container--xl { height: clamp(300px, 50vh, 480px); }
 .ui-chart-container > canvas,
 .ui-chart-container > div {
   min-width: 0 !important;
@@ -897,8 +897,8 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   color: var(--ink-faint);
   background: transparent;
   border: 0;

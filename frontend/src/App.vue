@@ -197,7 +197,7 @@
 
     <!-- Toast notifications -->
     <Teleport to="body">
-      <div class="fixed top-5 left-1/2 -translate-x-1/2 z-[200] flex flex-col gap-2.5 w-full max-w-sm px-4" dir="rtl" role="status" aria-live="polite" aria-atomic="true">
+      <div class="fixed top-5 left-1/2 -translate-x-1/2 z-[200] flex flex-col gap-2.5 w-full max-w-[min(24rem,calc(100vw-2rem))] px-4" dir="rtl" role="status" aria-live="polite" aria-atomic="true">
         <TransitionGroup name="toast">
           <div v-for="t in toasts" :key="t.id"
             class="ui-toast"
@@ -648,7 +648,7 @@ function loadAppData() {
 /* User dropdown menu */
 .ui-user-menu {
   position: absolute;
-  left: 0;
+  inset-inline-end: 0;
   top: 100%;
   margin-top: 0.5rem;
   background: var(--surface);
@@ -658,7 +658,7 @@ function loadAppData() {
   padding: 0.375rem;
   min-width: 220px;
   z-index: 50;
-  transform-origin: top left;
+  transform-origin: top right;
 }
 .ui-menu-item {
   width: 100%;
