@@ -1,0 +1,234 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-19T00:00:00Z",
+  "title": "Design System: IFMLogiX — Logfi",
+  "extensions": {
+    "colorMeta": {
+      "clearance-green": {
+        "role": "primary",
+        "displayName": "Clearance Green",
+        "canonical": "oklch(60.7% 0.165 165)",
+        "tonalRamp": [
+          "oklch(20% 0.08 165)",
+          "oklch(30% 0.11 165)",
+          "oklch(40% 0.14 165)",
+          "oklch(50% 0.155 165)",
+          "oklch(60.7% 0.165 165)",
+          "oklch(72% 0.14 165)",
+          "oklch(83% 0.10 165)",
+          "oklch(93% 0.05 165)"
+        ]
+      },
+      "clearance-green-deep": {
+        "role": "primary-hover",
+        "displayName": "Clearance Green Deep",
+        "canonical": "oklch(55% 0.155 165)",
+        "tonalRamp": []
+      },
+      "clearance-green-soft": {
+        "role": "primary-tint",
+        "displayName": "Clearance Green Soft",
+        "canonical": "oklch(97% 0.035 165)",
+        "tonalRamp": []
+      },
+      "canvas": {
+        "role": "neutral-bg",
+        "displayName": "Canvas",
+        "canonical": "oklch(98.5% 0.005 230)",
+        "tonalRamp": [
+          "oklch(6% 0.012 255)",
+          "oklch(14% 0.025 255)",
+          "oklch(22% 0.022 255)",
+          "oklch(32% 0.020 255)",
+          "oklch(43% 0.018 255)",
+          "oklch(54% 0.016 255)",
+          "oklch(66% 0.013 255)",
+          "oklch(98.5% 0.005 230)"
+        ]
+      },
+      "ink": {
+        "role": "neutral-text",
+        "displayName": "Ink",
+        "canonical": "oklch(14% 0.025 255)",
+        "tonalRamp": [
+          "oklch(6% 0.012 255)",
+          "oklch(14% 0.025 255)",
+          "oklch(22% 0.022 255)",
+          "oklch(32% 0.020 255)",
+          "oklch(43% 0.018 255)",
+          "oklch(54% 0.016 255)",
+          "oklch(66% 0.013 255)",
+          "oklch(92% 0.007 255)"
+        ]
+      },
+      "signal-negative": {
+        "role": "tertiary-error",
+        "displayName": "Signal Negative",
+        "canonical": "oklch(50% 0.22 15)",
+        "tonalRamp": [
+          "oklch(20% 0.12 15)",
+          "oklch(30% 0.16 15)",
+          "oklch(40% 0.20 15)",
+          "oklch(50% 0.22 15)",
+          "oklch(60% 0.20 15)",
+          "oklch(70% 0.16 15)",
+          "oklch(82% 0.10 15)",
+          "oklch(97% 0.04 15)"
+        ]
+      },
+      "signal-warning": {
+        "role": "tertiary-warning",
+        "displayName": "Signal Warning",
+        "canonical": "oklch(62% 0.15 60)",
+        "tonalRamp": [
+          "oklch(25% 0.08 60)",
+          "oklch(35% 0.10 60)",
+          "oklch(45% 0.12 60)",
+          "oklch(55% 0.14 60)",
+          "oklch(62% 0.15 60)",
+          "oklch(72% 0.13 60)",
+          "oklch(82% 0.09 60)",
+          "oklch(97% 0.04 60)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Hero KPI numbers only. One per view. The single most important financial figure." },
+      "headline": { "displayName": "Headline", "purpose": "Secondary hero numbers and view titles on large desktop." },
+      "title": { "displayName": "Title", "purpose": "Section headings, card headings, modal titles." },
+      "body": { "displayName": "Body", "purpose": "All prose, labels, table content. Cap at 65ch on text surfaces." },
+      "label": { "displayName": "Label", "purpose": "Eyebrow labels, column headers, footnotes, metadata. Always 500 weight." }
+    },
+    "shadows": [
+      { "name": "ambient",  "value": "0 1px 2px 0 rgb(15 23 42 / 0.04), 0 1px 3px 0 rgb(15 23 42 / 0.06)",          "purpose": "Cards at rest. Minimal presence above canvas." },
+      { "name": "lifted",   "value": "0 2px 4px -2px rgb(15 23 42 / 0.06), 0 4px 12px -2px rgb(15 23 42 / 0.08)", "purpose": "Cards on hover, inputs on focus. State-driven lift." },
+      { "name": "elevated", "value": "0 10px 30px -10px rgb(15 23 42 / 0.18), 0 4px 12px -4px rgb(15 23 42 / 0.08)", "purpose": "Dropdowns, alert panels. Floated above the page." },
+      { "name": "modal",    "value": "0 20px 48px -16px rgb(15 23 42 / 0.22), 0 8px 24px -8px rgb(15 23 42 / 0.10)", "purpose": "Modals and full-screen overlays. Highest layer." }
+    ],
+    "motion": [
+      { "name": "ease-out",    "value": "cubic-bezier(0.23, 1, 0.32, 1)", "purpose": "All enter transitions, hover feedback, press feedback." },
+      { "name": "ease-in-out", "value": "cubic-bezier(0.77, 0, 0.175, 1)", "purpose": "Shake animation for validation errors only." },
+      { "name": "ease-drawer", "value": "cubic-bezier(0.32, 0.72, 0, 1)", "purpose": "Bottom-sheet and drawer entrance. iOS spring without bounce." },
+      { "name": "dur-press",   "value": "140ms", "purpose": "Press feedback scale. Fast enough to feel physical." },
+      { "name": "dur-dropdown","value": "180ms", "purpose": "Dropdown and popover entrance." },
+      { "name": "dur-modal",   "value": "220ms", "purpose": "Modal entrance and exit." }
+    ],
+    "breakpoints": [
+      { "name": "sm",  "value": "640px"  },
+      { "name": "md",  "value": "768px"  },
+      { "name": "lg",  "value": "1024px" },
+      { "name": "xl",  "value": "1280px" },
+      { "name": "app", "value": "1360px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Main CTA: new project, form submit. At most one per screen.",
+      "html": "<button class=\"ds-btn-primary\" dir=\"rtl\">פרויקט חדש</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; font-family: 'DM Sans', 'Rubik', system-ui, sans-serif; font-size: 0.875rem; font-weight: 600; color: #ffffff; background: #059669; border: 1px solid #059669; border-radius: 14px; padding: 0.625rem 1.125rem; cursor: pointer; white-space: nowrap; font-feature-settings: 'lnum' 1; line-height: 1.2; box-shadow: 0 1px 2px 0 rgb(15 23 42 / 0.04), 0 1px 3px 0 rgb(15 23 42 / 0.06); transition: background 180ms cubic-bezier(0.23,1,0.32,1), border-color 180ms cubic-bezier(0.23,1,0.32,1), box-shadow 180ms cubic-bezier(0.23,1,0.32,1), transform 140ms cubic-bezier(0.23,1,0.32,1); } .ds-btn-primary:hover { background: #047857; border-color: #047857; box-shadow: 0 2px 4px -2px rgb(15 23 42 / 0.06), 0 4px 12px -2px rgb(15 23 42 / 0.08); } .ds-btn-primary:active { transform: scale(0.97); } .ds-btn-primary:focus-visible { outline: 2px solid #059669; outline-offset: 3px; border-radius: 4px; }"
+    },
+    {
+      "name": "Dark Button",
+      "kind": "button",
+      "refersTo": "button-dark",
+      "description": "Modal confirm, primary save action. Authoritative without competing with green.",
+      "html": "<button class=\"ds-btn-dark\" dir=\"rtl\">שמור</button>",
+      "css": ".ds-btn-dark { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; font-family: 'DM Sans', 'Rubik', system-ui, sans-serif; font-size: 0.875rem; font-weight: 600; color: #ffffff; background: #0f172a; border: 1px solid #0f172a; border-radius: 14px; padding: 0.625rem 1.125rem; cursor: pointer; white-space: nowrap; line-height: 1.2; box-shadow: 0 1px 2px 0 rgb(15 23 42 / 0.04), 0 1px 3px 0 rgb(15 23 42 / 0.06); transition: background 180ms cubic-bezier(0.23,1,0.32,1), transform 140ms cubic-bezier(0.23,1,0.32,1); } .ds-btn-dark:hover { background: #020617; border-color: #020617; } .ds-btn-dark:active { transform: scale(0.97); } .ds-btn-dark:focus-visible { outline: 2px solid #059669; outline-offset: 3px; border-radius: 4px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Cancel, dismiss, secondary navigation. Quiet; same size as primary.",
+      "html": "<button class=\"ds-btn-secondary\" dir=\"rtl\">ביטול</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; font-family: 'DM Sans', 'Rubik', system-ui, sans-serif; font-size: 0.875rem; font-weight: 600; color: #0f172a; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 0.625rem 1.125rem; cursor: pointer; white-space: nowrap; line-height: 1.2; transition: border-color 180ms cubic-bezier(0.23,1,0.32,1), background 180ms cubic-bezier(0.23,1,0.32,1), transform 140ms cubic-bezier(0.23,1,0.32,1); } .ds-btn-secondary:hover { border-color: #cbd5e1; background: #f1f5f9; } .ds-btn-secondary:active { transform: scale(0.97); } .ds-btn-secondary:focus-visible { outline: 2px solid #059669; outline-offset: 3px; border-radius: 4px; }"
+    },
+    {
+      "name": "Nav Pill",
+      "kind": "nav",
+      "refersTo": "nav-pill-active",
+      "description": "Top navigation tabs. Active state: solid ink pill with white text.",
+      "html": "<nav class=\"ds-nav\" dir=\"rtl\"><button class=\"ds-nav-pill\">דשבורד</button><button class=\"ds-nav-pill ds-nav-pill--active\">תזרים מזומנים</button><button class=\"ds-nav-pill\">פרויקטים</button></nav>",
+      "css": ".ds-nav { display: flex; gap: 0.25rem; align-items: center; } .ds-nav-pill { display: inline-flex; align-items: center; padding: 0.5rem 0.875rem; font-family: 'DM Sans', 'Rubik', system-ui, sans-serif; font-size: 0.8125rem; font-weight: 600; color: #475569; background: transparent; border: 0; border-radius: 9999px; cursor: pointer; white-space: nowrap; user-select: none; transition: color 140ms cubic-bezier(0.23,1,0.32,1), background 140ms cubic-bezier(0.23,1,0.32,1), transform 140ms cubic-bezier(0.23,1,0.32,1); } .ds-nav-pill:hover { color: #0f172a; background: #f1f5f9; } .ds-nav-pill:active { transform: scale(0.96); } .ds-nav-pill--active { color: #ffffff; background: #0f172a; } .ds-nav-pill:focus-visible { outline: 2px solid #059669; outline-offset: 3px; border-radius: 4px; }"
+    },
+    {
+      "name": "Data Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Primary layout unit. White surface, ambient shadow, 18px radius.",
+      "html": "<div class=\"ds-card\" dir=\"rtl\"><div class=\"ds-card-label\">מרווח תפעולי</div><div class=\"ds-card-value\">24.3%</div></div>",
+      "css": ".ds-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; padding: clamp(1.25rem, 2vw, 1.75rem); box-shadow: 0 1px 2px 0 rgb(15 23 42 / 0.04), 0 1px 3px 0 rgb(15 23 42 / 0.06); } .ds-card:hover { border-color: #cbd5e1; box-shadow: 0 2px 4px -2px rgb(15 23 42 / 0.06), 0 4px 12px -2px rgb(15 23 42 / 0.08); } .ds-card-label { font-family: 'DM Sans', 'Rubik', system-ui, sans-serif; font-size: 0.75rem; font-weight: 500; color: #475569; margin-bottom: 0.5rem; } .ds-card-value { font-family: 'DM Sans', 'Rubik', system-ui, sans-serif; font-size: 1.5rem; font-weight: 600; color: #0f172a; font-feature-settings: 'lnum' 1, 'tnum' 1; font-variant-numeric: tabular-nums lining-nums; line-height: 1.1; }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input-default",
+      "description": "Stroke-style input. Focus: emerald border + ring. Placeholder: ink-whisper.",
+      "html": "<div class=\"ds-field\" dir=\"rtl\"><label class=\"ds-field-label\" for=\"ds-input-1\">שם פרויקט</label><input class=\"ds-input\" id=\"ds-input-1\" type=\"text\" placeholder=\"הזן שם פרויקט...\" /></div>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 0.375rem; } .ds-field-label { font-family: 'DM Sans', 'Rubik', system-ui, sans-serif; font-size: 0.8125rem; font-weight: 500; color: #475569; } .ds-input { display: block; width: 100%; font-family: 'DM Sans', 'Rubik', system-ui, sans-serif; font-size: 0.9375rem; color: #0f172a; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 0.625rem 0.875rem; outline: none; box-sizing: border-box; transition: border-color 180ms cubic-bezier(0.23,1,0.32,1), box-shadow 180ms cubic-bezier(0.23,1,0.32,1); } .ds-input::placeholder { color: #94a3b8; } .ds-input:focus { border-color: #059669; box-shadow: 0 0 0 3px rgba(5,150,105,0.20); } .ds-input:focus-visible { outline: none; }"
+    },
+    {
+      "name": "Status Chip",
+      "kind": "chip",
+      "refersTo": "chip-positive",
+      "description": "Financial verdict chip. Three semantic states plus neutral. Full-pill, 0.75rem, weight 600.",
+      "html": "<div style=\"display:flex;gap:0.5rem;align-items:center;\" dir=\"rtl\"><span class=\"ds-chip ds-chip-positive\">תקין</span><span class=\"ds-chip ds-chip-warning\">לבדוק</span><span class=\"ds-chip ds-chip-negative\">קריטי</span><span class=\"ds-chip ds-chip-neutral\">מושהה</span></div>",
+      "css": ".ds-chip { display: inline-flex; align-items: center; font-family: 'DM Sans', 'Rubik', system-ui, sans-serif; font-size: 0.75rem; font-weight: 600; padding: 0.1875rem 0.5rem; border-radius: 9999px; line-height: 1; font-feature-settings: 'lnum' 1, 'tnum' 1; } .ds-chip-positive { background: #ecfdf5; color: #059669; } .ds-chip-warning { background: #fffbeb; color: #d97706; } .ds-chip-negative { background: #fff1f2; color: #e11d48; } .ds-chip-neutral { background: #f1f5f9; color: #475569; }"
+    },
+    {
+      "name": "KPI Hero Number",
+      "kind": "custom",
+      "refersTo": "card",
+      "description": "Signature component. One per view. Display-scale financial figure with verdict pill.",
+      "html": "<div class=\"ds-kpi-hero\" dir=\"rtl\"><div class=\"ds-kpi-label\">רווח תפעולי</div><div class=\"ds-kpi-row\"><span class=\"ds-kpi-value ds-kpi-positive\">₪247,000</span><span class=\"ds-chip ds-chip-positive\">תקין</span></div><div class=\"ds-kpi-footnote\">מצטבר · מאוחד מכל הפרויקטים</div></div>",
+      "css": ".ds-kpi-hero { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; padding: clamp(1.25rem, 2vw, 1.75rem); box-shadow: 0 1px 2px 0 rgb(15 23 42 / 0.04), 0 1px 3px 0 rgb(15 23 42 / 0.06); } .ds-kpi-label { font-family: 'DM Sans', 'Rubik', system-ui, sans-serif; font-size: 0.75rem; font-weight: 500; color: #475569; margin-bottom: 0.5rem; } .ds-kpi-row { display: flex; align-items: baseline; gap: 0.875rem; flex-wrap: wrap; } .ds-kpi-value { font-family: 'DM Sans', 'Rubik', system-ui, sans-serif; font-size: clamp(2.75rem, 5.5vw, 4rem); font-weight: 700; line-height: 1.0; letter-spacing: -0.022em; font-feature-settings: 'lnum' 1, 'tnum' 1; font-variant-numeric: tabular-nums lining-nums; } .ds-kpi-positive { color: #059669; } .ds-kpi-negative { color: #e11d48; } .ds-kpi-footnote { font-family: 'DM Sans', 'Rubik', system-ui, sans-serif; font-size: 0.75rem; color: #64748b; margin-top: 0.75rem; } .ds-chip { display: inline-flex; align-items: center; font-family: 'DM Sans', 'Rubik', system-ui, sans-serif; font-size: 0.75rem; font-weight: 600; padding: 0.1875rem 0.5rem; border-radius: 9999px; line-height: 1; } .ds-chip-positive { background: #ecfdf5; color: #059669; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Financial Cockpit",
+    "overview": "Logfi is a financial instrument panel, not a reporting tool. The design draws from aviation and Bloomberg terminal UI: precise, readable under pressure, nothing decorative. A manager glances at this in a daylit office between two back-to-back calls. They need the answer in 10 seconds, not 10 minutes. The system is designed to be scanned, not read.\n\nThe palette is deliberately restrained: a near-white canvas, slate-family ink stops, and one accent — Clearance Green — used only when something is confirmed, active, or safe. The ink-on-white surface works naturally in the ambient light of an office.\n\nLogfi explicitly rejects: the homogeneous generic SaaS cream aesthetic; the dense grey-table Excel look it replaced; over-reliance on teal as a calming brand color; and crypto/VC-deck dark-mode energy.",
+    "keyCharacteristics": [
+      "Instrument-panel density: data is the product, chrome is infrastructure",
+      "Typographic hierarchy carries all visual weight — no decorative borders or gradients",
+      "Clearance Green appears on at most 10% of any screen; its scarcity signals meaning",
+      "Financial figures always use tabular numerals; column alignment is structural, not aesthetic",
+      "Layered shadow vocabulary encodes hierarchy: canvas, surface, raised card, float",
+      "RTL (Hebrew) is structural throughout — logical CSS properties only"
+    ],
+    "rules": [
+      { "name": "The Clearance Green Rule", "body": "Clearance Green (#059669) occupies at most 10% of any screen. One primary CTA per view, at most. Its rarity is the point: when something is green, it is cleared.", "section": "colors" },
+      { "name": "The Ink Gradient Rule", "body": "The six ink stops map to content importance — never break the correlation. Ink for primary data; Ink Muted for labels; Ink Faint for annotations; Ink Whisper for decoration only.", "section": "colors" },
+      { "name": "The No-Signal Rule", "body": "Semantic colors (negative/warning/info) are reserved for their domains. Warning amber is never used for brand decoration. Red is never used for anything other than loss or error.", "section": "colors" },
+      { "name": "The Tabular First Rule", "body": "Every financial figure uses font-feature-settings: 'lnum' 1, 'tnum' 1. Proportional numerals in data columns are forbidden.", "section": "typography" },
+      { "name": "The Single Voice Rule", "body": "DM Sans and Rubik are the only typefaces. Hierarchy comes from scale and weight — not from switching faces.", "section": "typography" },
+      { "name": "The State-Only Lift Rule", "body": "Cards and inputs rest flat (shadow-sm). Shadow-md appears only in response to state: hover lifts a card, focus lifts an input. Never apply shadow-md or above to a resting surface.", "section": "elevation" },
+      { "name": "The Layer Stack Rule", "body": "Four layers only: canvas, surface, raised card, float. Nothing lives between layers; nested cards are always wrong.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do use tabular numerals on every financial figure, every time.",
+      "Do use logical CSS properties (inset-inline-start, padding-inline-end, text-align: start) everywhere.",
+      "Do place the single most important number above the fold, at display scale, with its financial verdict adjacent.",
+      "Do let shadow encode layer position — not mood or decoration.",
+      "Do use Clearance Green sparingly: one primary CTA, the active nav state, confirmed signals.",
+      "Do size every interactive element to at least 40px in both dimensions.",
+      "Do add aria-expanded to every button that opens a dropdown or panel.",
+      "Do use role='img' and a computed aria-label on every Chart.js canvas."
+    ],
+    "donts": [
+      "Don't use border-inline-start greater than 1px as a colored stripe on cards, alerts, or toasts.",
+      "Don't use gradient text (background-clip: text with a gradient).",
+      "Don't use glassmorphism as decoration.",
+      "Don't put more than one primary (green) CTA on a screen.",
+      "Don't nest cards.",
+      "Don't design for dark mode by default or reflex.",
+      "Don't produce the generic SaaS cream aesthetic: beige backgrounds, rounded-everything, gradient accents.",
+      "Don't produce anything that reads as Excel or legacy government software.",
+      "Don't use teal as a personality color — it exists only as Clearance Green for positive/action states.",
+      "Don't use neon, gradient fills, or dark backgrounds with high-chroma accents.",
+      "Don't use Ink Whisper (#94a3b8) for any content that needs to be read."
+    ]
+  }
+}
