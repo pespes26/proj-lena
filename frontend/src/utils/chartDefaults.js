@@ -86,6 +86,7 @@ export const COLORS = {
 
   amber: '#d97706',              // amber-600
   amberLight: 'rgba(217, 119, 6, 0.14)',
+  amberFill: 'rgba(217, 119, 6, 0.06)',
 
   orange: '#ea580c',             // orange-600
   orangeLight: 'rgba(234, 88, 12, 0.14)',

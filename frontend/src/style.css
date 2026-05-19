@@ -306,7 +306,7 @@ body {
 /* Dark button — used for modal confirms and destructive actions */
 .ui-btn-dark,
 .ed-btn-dark {
-  color: #ffffff;
+  color: var(--surface);
   background: var(--ink);
   border-color: var(--ink);
   box-shadow: var(--shadow-sm);
@@ -316,7 +316,7 @@ body {
   .ed-btn-dark:hover {
     background: var(--ink-strong);
     border-color: var(--ink-strong);
-    color: #ffffff;
+    color: var(--surface);
     box-shadow: var(--shadow-md);
   }
 }
@@ -326,7 +326,7 @@ body {
 .ui-btn-primary,
 .ed-btn-primary,
 .ui-btn-accent {
-  color: #ffffff;
+  color: var(--surface);
   background: var(--accent);
   border-color: var(--accent);
   box-shadow: var(--shadow-sm);
@@ -337,7 +337,7 @@ body {
   .ui-btn-accent:hover {
     background: var(--accent-hover);
     border-color: var(--accent-hover);
-    color: #ffffff;
+    color: var(--surface);
     box-shadow: var(--shadow-md);
   }
 }
@@ -751,7 +751,7 @@ body {
   height: 18px;
   padding: 0 5px;
   background: var(--negative);
-  color: #ffffff;
+  color: var(--surface);
   font-size: 10px;
   font-weight: 700;
   border-radius: 999px;
@@ -787,7 +787,7 @@ body {
   height: 32px;
   border-radius: 999px;
   background: var(--ink);
-  color: #ffffff;
+  color: var(--surface);
   display: inline-flex;
   align-items: center;
   justify-content: center;

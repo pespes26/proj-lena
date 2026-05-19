@@ -239,7 +239,7 @@ async function scrollToBottom() {
 
 /* Chat panel — uses modal entrance */
 .ui-chat-panel {
-  width: 380px;
+  width: min(380px, calc(100vw - 2rem));
   height: 560px;
   max-height: 85vh;
   background: var(--surface);
@@ -278,8 +278,8 @@ async function scrollToBottom() {
   color: rgba(255, 255, 255, 0.72);
   background: transparent;
   border: 0;
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   border-radius: var(--radius-sm);
   display: inline-flex;
   align-items: center;
