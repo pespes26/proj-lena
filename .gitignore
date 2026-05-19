@@ -22,6 +22,11 @@ frontend/dist/
 backend/.env
 frontend/.env
 
+# Credentials (legacy GCP, just in case anything is left behind)
+backend/service-account.json
+**/service-account*.json
+**/*firebase-adminsdk*.json
+
 # Backups & contracts
 backups/
 contracts/

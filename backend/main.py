@@ -48,11 +48,6 @@ app.include_router(ai.router)
 def health_check():
     return {"status": "ok"}
 
-@app.get("/api/debug-dev")
-def debug_dev():
-    import os
-    return {"DEV_MODE_env": os.environ.get("DEV_MODE", "NOT_SET"), "env_path_exists": os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env'))}
-
 # Serve frontend static files in production
 STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'frontend', 'dist')
 if os.path.exists(STATIC_DIR):

@@ -156,7 +156,7 @@ def form_to_pnl(form_data, current_month=None):
             'margin': margin,
             'margin_alert': margin is not None and margin < 20,
             'notes': actual.get('notes', ''),
-            'is_actual': has_actual and m <= current_month,
+            'is_actual': bool(has_actual) and m <= current_month,
         })
 
     total_rev = sum(m['revenue'] for m in months)
