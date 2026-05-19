@@ -1,6 +1,5 @@
 import os
 import json
-from google import genai
 from services.unified import load_form_data
 from services.form_calculator import form_to_pnl
 
@@ -13,9 +12,6 @@ if os.path.exists(_env_path):
             if line and '=' in line and not line.startswith('#'):
                 k, v = line.split('=', 1)
                 os.environ[k.strip()] = v.strip()
-
-_gemini_key = os.environ.get("GEMINI_API_KEY", "")
-client = genai.Client(api_key=_gemini_key) if _gemini_key else None
 
 SYSTEM_PROMPT = """אתה IFMLogiX AI — אנליסט פיננסי בכיר בחברת לוגי גרופ / מנרב IFM.
 אתה מנתח פרויקטי בנייה, תחזוקה וניהול מתקנים (FM).
@@ -78,7 +74,6 @@ SYSTEM_PROMPT = """אתה IFMLogiX AI — אנליסט פיננסי בכיר ב�
 
 
 def _build_projects_context():
-    """Build a context string with all project data."""
     form_data = load_form_data()
     if not form_data:
         return "אין פרויקטים במערכת כרגע."
@@ -105,34 +100,6 @@ def _build_projects_context():
 
 
 def chat_stream(messages, user_message):
-    """Stream chat response using Gemini API with SSE."""
-    projects_context = _build_projects_context()
-
-    full_system = f"""{SYSTEM_PROMPT}
-
-## נתוני הפרויקטים הנוכחיים:
-
-{projects_context}"""
-
-    # Build conversation for Gemini
-    contents = []
-    for msg in messages:
-        role = "user" if msg["role"] == "user" else "model"
-        contents.append({"role": role, "parts": [{"text": msg["content"]}]})
-    contents.append({"role": "user", "parts": [{"text": user_message}]})
-
-    response = client.models.generate_content_stream(
-        model="gemini-3-flash-preview",
-        contents=contents,
-        config={
-            "system_instruction": full_system,
-            "temperature": 0.25,
-            "max_output_tokens": 2000,
-        },
-    )
-
-    for chunk in response:
-        if chunk.text:
-            yield f"data: {json.dumps({'token': chunk.text})}\n\n"
-
+    # Phase B: implement with new LLM provider
+    yield f"data: {json.dumps({'token': 'AI chat אינו זמין — נדרש Phase B'})}\n\n"
     yield f"data: {json.dumps({'done': True})}\n\n"

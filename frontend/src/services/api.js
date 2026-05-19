@@ -1,22 +1,13 @@
 import axios from 'axios'
-import { auth } from '../firebase'
 
 const api = axios.create({
   baseURL: '/api',
   timeout: 10000,
 })
 
-// Attach Firebase ID token to every request
+// Attach auth token to every request (DEV_MODE only — Phase B: replace with real token source)
 api.interceptors.request.use(async config => {
-  const user = auth.currentUser
-  if (user) {
-    try {
-      const token = await user.getIdToken()
-      config.headers.Authorization = `Bearer ${token}`
-    } catch {
-      // Token refresh failed — will get 401
-    }
-  } else if (import.meta.env.VITE_DEV_MODE === 'true') {
+  if (import.meta.env.VITE_DEV_MODE === 'true') {
     const devToken = localStorage.getItem('dev_token')
     if (devToken) config.headers.Authorization = `Bearer ${devToken}`
   }
@@ -31,7 +22,6 @@ api.interceptors.response.use(
   res => res,
   err => {
     if (err.response?.status === 401) {
-      // Don't auto-logout during initial load — let onAuthStateChanged handle it
       console.warn('401 from API:', err.config?.url)
     }
     const msg = err.response?.data?.detail || 'שגיאה בתקשורת עם השרת'
@@ -77,7 +67,7 @@ export const uploadSubcontractorContract = (project, subIndex, file) => {
   return api.post(`/project-form/${encodeURIComponent(project)}/upload-contract?sub_index=${subIndex}`, f, { headers: { 'Content-Type': 'multipart/form-data' } }).then(r => r.data)
 }
 
-// Auth & Users (Firebase-based)
+// Auth & Users
 export const getProfile = () => api.get('/auth/profile').then(r => r.data)
 export const updateProfile = (data) => api.put('/auth/profile', data).then(r => r.data)
 export const getUsers = () => api.get('/auth/users').then(r => r.data.users)
@@ -88,9 +78,10 @@ export const setupFirstAdmin = (data) => api.post('/auth/setup', data).then(r =>
 
 // AI Chat (streaming)
 export async function sendAiChatStream(messages, message, onToken) {
-  const user = auth.currentUser
   let token = ''
-  if (user) token = await user.getIdToken()
+  if (import.meta.env.VITE_DEV_MODE === 'true') {
+    token = localStorage.getItem('dev_token') || ''
+  }
 
   const response = await fetch('/api/ai/chat', {
     method: 'POST',

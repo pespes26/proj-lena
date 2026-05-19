@@ -1,4 +1,4 @@
-"""Create 10 realistic test projects in Firestore."""
+"""Create 10 realistic test projects (JSON storage)."""
 import datetime as dt
 from storage import save_project_firestore
 

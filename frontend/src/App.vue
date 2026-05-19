@@ -273,8 +273,6 @@
 
 <script setup>
 import { ref, computed, onMounted, defineAsyncComponent } from 'vue'
-import { auth } from './firebase'
-import { onAuthStateChanged, signOut } from 'firebase/auth'
 import LoginPage from './components/LoginPage.vue'
 import Dashboard from './components/Dashboard.vue'
 import ExecutiveDashboard from './components/ExecutiveDashboard.vue'
@@ -293,39 +291,17 @@ const isLoggedIn = ref(false)
 const authReady = ref(false)
 
 onMounted(() => {
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      try {
-        await user.getIdToken(true)
-      } catch {
-        await signOut(auth)
-        isLoggedIn.value = false
-        authReady.value = true
-        return
-      }
-      isLoggedIn.value = true
-      authReady.value = true
-      loadAppData()
-      getProfile().then(p => {
-        if (p.role === 'project_manager') {
-          activeTab.value = 'my-projects'
-        }
-      }).catch(() => {})
-    } else {
-      // DEV MODE: check localStorage on page refresh
-      if (import.meta.env.VITE_DEV_MODE === 'true' && localStorage.getItem('dev_token')) {
-        isLoggedIn.value = true
-        authReady.value = true
-        loadAppData()
-        getProfile().then(p => {
-          if (p.role === 'project_manager') activeTab.value = 'my-projects'
-        }).catch(() => {})
-        return
-      }
-      isLoggedIn.value = false
-      authReady.value = true
-    }
-  })
+  // Phase B: replace with real auth state listener
+  if (import.meta.env.VITE_DEV_MODE === 'true' && localStorage.getItem('dev_token')) {
+    isLoggedIn.value = true
+    authReady.value = true
+    loadAppData()
+    getProfile().then(p => {
+      if (p.role === 'project_manager') activeTab.value = 'my-projects'
+    }).catch(() => {})
+  } else {
+    authReady.value = true
+  }
 })
 
 const activeTab = ref('dashboard')
@@ -391,10 +367,7 @@ function handleDevLogin() {
 }
 
 function logout() {
-  if (import.meta.env.VITE_DEV_MODE === 'true') {
-    localStorage.removeItem('dev_token')
-  }
-  signOut(auth).catch(() => {})
+  localStorage.removeItem('dev_token')
   isLoggedIn.value = false
 }
 

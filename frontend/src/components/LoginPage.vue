@@ -126,12 +126,6 @@
 
 <script setup>
 import { ref } from 'vue'
-import { auth } from '../firebase'
-import {
-  signInWithEmailAndPassword,
-  TotpMultiFactorGenerator,
-  getMultiFactorResolver,
-} from 'firebase/auth'
 
 const emit = defineEmits(['login'])
 
@@ -142,8 +136,6 @@ const totpCode = ref('')
 const errorMsg = ref('')
 const loading = ref(false)
 
-const mfaResolver = ref(null)
-
 async function handleLogin() {
   errorMsg.value = ''
   if (!email.value || !password.value) {
@@ -151,58 +143,19 @@ async function handleLogin() {
     return
   }
 
-  // DEV MODE: skip Firebase, use local token
   if (import.meta.env.VITE_DEV_MODE === 'true') {
     localStorage.setItem('dev_token', 'dev-admin-local')
     emit('login')
     return
   }
 
-  loading.value = true
-  try {
-    await signInWithEmailAndPassword(auth, email.value, password.value)
-    emit('login')
-  } catch (err) {
-    if (err.code === 'auth/multi-factor-auth-required') {
-      mfaResolver.value = getMultiFactorResolver(auth, err)
-      step.value = 'totp'
-      totpCode.value = ''
-    } else if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password') {
-      errorMsg.value = 'אימייל או סיסמה שגויים'
-    } else if (err.code === 'auth/user-not-found') {
-      errorMsg.value = 'משתמש לא נמצא'
-    } else if (err.code === 'auth/too-many-requests') {
-      errorMsg.value = 'יותר מדי ניסיונות. נסה שוב מאוחר יותר'
-    } else {
-      errorMsg.value = err.message || 'שגיאה בהתחברות'
-    }
-  } finally {
-    loading.value = false
-  }
+  // Phase B: implement login with new auth provider
+  errorMsg.value = 'אימות אינו זמין — נדרש Phase B'
 }
 
 async function verifyTotp() {
-  errorMsg.value = ''
-  loading.value = true
-  try {
-    const resolver = mfaResolver.value
-    const totpHint = resolver.hints.find(h => h.factorId === TotpMultiFactorGenerator.FACTOR_ID)
-    if (!totpHint) {
-      errorMsg.value = 'לא נמצא אימות TOTP'
-      return
-    }
-    const assertion = TotpMultiFactorGenerator.assertionForSignIn(totpHint.uid, totpCode.value)
-    await resolver.resolveSignIn(assertion)
-    emit('login')
-  } catch (err) {
-    if (err.code === 'auth/invalid-verification-code') {
-      errorMsg.value = 'קוד שגוי. נסה שוב'
-    } else {
-      errorMsg.value = err.message || 'שגיאה באימות'
-    }
-  } finally {
-    loading.value = false
-  }
+  // Phase B: implement TOTP with new auth provider
+  errorMsg.value = 'אימות דו-שלבי אינו זמין — נדרש Phase B'
 }
 </script>
 

@@ -191,8 +191,6 @@
 <script setup>
 import { ref, reactive, computed, watch } from 'vue'
 import { getProfile, updateProfile } from '../services/api'
-import { auth } from '../firebase'
-import { updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth'
 import { useToast } from '../composables/useToast'
 
 const props = defineProps({ show: Boolean })
@@ -242,22 +240,8 @@ async function handleSave() {
 }
 
 async function handleChangePassword() {
-  if (passwords.new_password !== passwords.confirm) {
-    message.value = 'הסיסמאות לא תואמות'; messageType.value = 'error'; return
-  }
-  if (passwords.new_password.length < 4) {
-    message.value = 'סיסמה חייבת להכיל לפחות 4 תווים'; messageType.value = 'error'; return
-  }
-  saving.value = true; message.value = ''
-  try {
-    const user = auth.currentUser
-    const credential = EmailAuthProvider.credential(user.email, passwords.current)
-    await reauthenticateWithCredential(user, credential)
-    await updatePassword(user, passwords.new_password)
-    message.value = 'הסיסמה שונתה בהצלחה'; messageType.value = 'success'
-    showPasswordSection.value = false
-    passwords.current = ''; passwords.new_password = ''; passwords.confirm = ''
-  } catch (e) { message.value = e.message; messageType.value = 'error' }
-  saving.value = false
+  // Phase B: implement password change with new auth provider
+  message.value = 'שינוי סיסמה אינו זמין — נדרש Phase B'
+  messageType.value = 'error'
 }
 </script>
