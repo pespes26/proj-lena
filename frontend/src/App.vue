@@ -26,10 +26,10 @@
 
           <!-- Hamburger (mobile) -->
           <button @click="mobileMenuOpen = !mobileMenuOpen" class="ui-icon-btn md:hidden ms-auto" aria-label="פתח תפריט">
-            <svg v-if="!mobileMenuOpen" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <svg v-if="!mobileMenuOpen" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
               <path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/>
             </svg>
-            <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
               <path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/>
             </svg>
           </button>
@@ -48,7 +48,7 @@
             <div class="relative" ref="projectsBtn">
               <button type="button" class="ui-nav-pill" :class="{ 'is-active': activeTab === 'pnl' }" @click="pnlOpen = !pnlOpen" :aria-expanded="pnlOpen" aria-haspopup="listbox">
                 פרויקטים
-                <svg class="w-3 h-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" d="M19 9l-7 7-7-7"/></svg>
+                <svg class="w-3 h-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" aria-hidden="true"><path stroke-linecap="round" d="M19 9l-7 7-7-7"/></svg>
               </button>
             </div>
 
@@ -56,13 +56,17 @@
               <div v-if="pnlOpen" class="ui-dropdown-backdrop" @click="pnlOpen = false"></div>
               <div v-if="pnlOpen" dir="rtl"
                 class="ui-dropdown ui-popover"
-                :style="dropdownStyle">
+                :style="dropdownStyle"
+                role="listbox"
+                aria-label="פרויקטים">
                 <div class="px-4 pb-2 mb-1 border-b border-[color:var(--border)]">
                   <span class="ui-label">רשימת פרויקטים</span>
                 </div>
                 <button
                   v-for="p in projects" :key="p"
                   type="button"
+                  role="option"
+                  :aria-selected="activeTab === 'pnl' && selectedProject === p"
                   @click="selectProject(p); pnlOpen = false"
                   class="ui-dropdown-item ui-press"
                   :class="{ 'is-active': activeTab === 'pnl' && selectedProject === p }">
@@ -80,7 +84,7 @@
             <!-- Alerts bell -->
             <div class="relative" ref="alertsBtn">
               <button @click="showAlertsModal = !showAlertsModal" class="ui-icon-btn relative" :aria-label="alertCount > 0 ? alertCount + ' התראות פעילות' : 'התראות'" :aria-expanded="showAlertsModal" aria-haspopup="dialog">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                 </svg>
                 <span v-if="alertCount > 0" class="ui-alert-badge ui-num" aria-hidden="true">{{ alertCount }}</span>
@@ -90,7 +94,7 @@
             <!-- New project -->
             <button v-if="canEdit" @click="showNewProjectModal = true"
               class="ui-btn ui-btn-primary text-sm">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" d="M12 4v16m8-8H4"/></svg>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" d="M12 4v16m8-8H4"/></svg>
               <span>פרויקט חדש</span>
             </button>
 
@@ -105,21 +109,21 @@
                   <div class="ui-user-name">{{ userDisplayName }}</div>
                   <div class="ui-user-role">{{ userRoleLabel }}</div>
                 </div>
-                <svg class="w-3.5 h-3.5 text-ink-faint hidden lg:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" d="M19 9l-7 7-7-7"/></svg>
+                <svg class="w-3.5 h-3.5 text-ink-faint hidden lg:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" d="M19 9l-7 7-7-7"/></svg>
               </button>
               <div v-if="showUserMenu" class="fixed inset-0 z-40" @click="showUserMenu = false"></div>
               <div v-if="showUserMenu" class="ui-user-menu ui-popover" dir="rtl">
                 <button type="button" @click="showUserProfile = true; showUserMenu = false" class="ui-menu-item ui-press">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                   פרטי משתמש
                 </button>
                 <button v-if="isAdmin" type="button" @click="showSettings = true; showUserMenu = false" class="ui-menu-item ui-press">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                   הגדרות
                 </button>
                 <hr class="ui-divider my-1" />
                 <button type="button" @click="logout(); showUserMenu = false" class="ui-menu-item ui-menu-item--danger ui-press">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                   התנתקות
                 </button>
               </div>
@@ -148,7 +152,7 @@
           <hr class="border-border my-4" />
 
           <button v-if="canEdit" @click="showNewProjectModal = true; mobileMenuOpen = false" class="ui-btn ui-btn-primary self-start">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" d="M12 4v16m8-8H4"/></svg>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" d="M12 4v16m8-8H4"/></svg>
             פרויקט חדש
           </button>
           <button @click="showUserProfile = true; mobileMenuOpen = false" class="ui-mobile-nav-item">פרטי משתמש</button>
@@ -204,10 +208,10 @@
             :class="'ui-toast--' + t.type"
             @click="dismissToast(t.id)">
             <div class="flex items-start gap-2.5">
-              <svg v-if="t.type === 'success'" class="w-4.5 h-4.5 text-accent mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-              <svg v-else-if="t.type === 'error'" class="w-4.5 h-4.5 text-negative mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-              <svg v-else-if="t.type === 'warning'" class="w-4.5 h-4.5 text-warning mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-              <svg v-else class="w-4.5 h-4.5 text-ink-muted mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <svg v-if="t.type === 'success'" class="w-4.5 h-4.5 text-accent mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              <svg v-else-if="t.type === 'error'" class="w-4.5 h-4.5 text-negative mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+              <svg v-else-if="t.type === 'warning'" class="w-4.5 h-4.5 text-warning mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+              <svg v-else class="w-4.5 h-4.5 text-ink-muted mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
               <span class="font-sans text-sm font-medium text-ink leading-snug">{{ t.message }}</span>
             </div>
           </div>
@@ -228,7 +232,7 @@
           <div class="flex items-center gap-2">
             <button v-if="alerts.length > 0" type="button" @click="alerts = []; alertCount = 0" class="ed-link text-[11px]">נקה הכל</button>
             <button type="button" @click="showAlertsModal = false" class="ui-icon-btn" aria-label="סגור">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
                 <path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/>
               </svg>
             </button>
@@ -237,9 +241,9 @@
         <div class="ui-alerts-panel__body">
           <div v-if="alerts.length === 0" class="py-14 text-center px-6">
             <div class="ui-alerts-empty-icon">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
             </div>
-            <h4 class="ui-alerts-empty-title">הכל תקין</h4>
+            <p class="ui-alerts-empty-title">הכל תקין</p>
             <p class="ui-alerts-empty-text">כל הפרויקטים פועלים בטווח הצפוי</p>
           </div>
           <button v-for="(alert, i) in alerts" :key="i"
@@ -248,7 +252,7 @@
             class="ui-alert-item ui-press">
             <div class="ui-alert-icon"
               :class="alert.severity === 'high' ? 'ui-alert-icon--high' : 'ui-alert-icon--medium'">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
               </svg>
             </div>

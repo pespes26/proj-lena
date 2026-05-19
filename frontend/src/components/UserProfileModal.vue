@@ -2,7 +2,7 @@
   <Teleport to="body">
     <div v-if="show" class="ui-modal-layer" dir="rtl">
       <div class="ui-modal-backdrop" @click="$emit('close')"></div>
-      <div class="ui-modal-card" style="max-width: 36rem;">
+      <div ref="modalCard" class="ui-modal-card" style="max-width: 36rem;">
         <!-- Header -->
         <header class="px-7 pt-6 pb-4">
           <div class="flex items-start justify-between gap-4">
@@ -23,7 +23,7 @@
         <div class="flex-1 overflow-y-auto px-7 py-5 space-y-8">
           <!-- Avatar -->
           <div class="flex flex-col items-center gap-3">
-            <div class="ui-avatar-uploader" @click="$refs.avatarInput.click()" role="button" tabindex="0" @keydown.enter.prevent="$refs.avatarInput.click()">
+            <div class="ui-avatar-uploader" @click="$refs.avatarInput.click()" role="button" tabindex="0" @keydown.enter.prevent="$refs.avatarInput.click()" @keydown.space.prevent="$refs.avatarInput.click()" aria-label="שנה תמונת פרופיל">
               <div class="ui-avatar-ring">
                 <img v-if="form.avatar" :src="form.avatar" class="w-full h-full object-cover" alt="" />
                 <span v-else class="ui-avatar-initials">{{ initials }}</span>
@@ -167,13 +167,19 @@
 </style>
 
 <script setup>
-import { ref, reactive, computed, watch } from 'vue'
+import { ref, reactive, computed, watch, nextTick } from 'vue'
 import { getProfile, updateProfile } from '../services/api'
 import { useToast } from '../composables/useToast'
+import { useFocusTrap } from '../composables/useFocusTrap'
 
 const props = defineProps({ show: Boolean })
 defineEmits(['close'])
 const toast = useToast()
+const modalCard = ref(null)
+const { activate, deactivate } = useFocusTrap(modalCard)
+watch(() => props.show, async (val) => {
+  if (val) { await nextTick(); activate() } else { deactivate() }
+})
 
 const roleLabels = { admin: 'מנהל מערכת', economist: 'כלכלנית', viewer: 'צופה מלא', project_manager: 'מנהל פרויקט' }
 const form = reactive({ username: '', full_name: '', email: '', role: '', avatar: '' })

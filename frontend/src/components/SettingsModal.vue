@@ -2,7 +2,7 @@
   <Teleport to="body">
     <div v-if="show" class="ui-modal-layer" dir="rtl">
       <div class="ui-modal-backdrop" @click="$emit('close')"></div>
-      <div class="ui-modal-card" style="max-width: 48rem;">
+      <div ref="modalCard" class="ui-modal-card" style="max-width: 48rem;">
         <!-- Header -->
         <header class="px-7 pt-6 pb-4">
           <div class="flex items-start justify-between gap-4">
@@ -229,13 +229,19 @@
 </style>
 
 <script setup>
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch, nextTick } from 'vue'
 import { getUsers, createUser, deleteUser, updateUser } from '../services/api'
 import { useToast } from '../composables/useToast'
+import { useFocusTrap } from '../composables/useFocusTrap'
 
 const props = defineProps({ show: Boolean })
 defineEmits(['close'])
 const toast = useToast()
+const modalCard = ref(null)
+const { activate, deactivate } = useFocusTrap(modalCard)
+watch(() => props.show, async (val) => {
+  if (val) { await nextTick(); activate() } else { deactivate() }
+})
 
 const ROLE_MAP = {
   admin: 'מנהל מערכת',

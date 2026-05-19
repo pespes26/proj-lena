@@ -3,7 +3,7 @@
     <div v-if="show" class="ui-modal-layer" dir="rtl">
       <div class="ui-modal-backdrop" @click="handleClose()"></div>
 
-      <div class="ui-modal-card ed-fade-up" style="max-width: 56rem; max-height: 90vh; display: flex; flex-direction: column; padding: 0;">
+      <div ref="modalCard" class="ui-modal-card ed-fade-up" style="max-width: 56rem; max-height: 90vh; display: flex; flex-direction: column; padding: 0;">
         <!-- Header + Stepper -->
         <div class="px-5 sm:px-10 pt-6 sm:pt-8 pb-4 sm:pb-5">
           <div class="flex items-start justify-between mb-5 gap-4">
@@ -929,9 +929,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch } from 'vue'
+import { ref, reactive, computed, watch, nextTick } from 'vue'
 import { getProjectForm, saveProjectForm } from '../services/api'
 import { useToast } from '../composables/useToast'
+import { useFocusTrap } from '../composables/useFocusTrap'
 import DatePicker from './DatePicker.vue'
 
 // Format number with commas for display
@@ -965,6 +966,11 @@ const props = defineProps({
 })
 const emit = defineEmits(['close', 'saved'])
 const toast = useToast()
+const modalCard = ref(null)
+const { activate, deactivate } = useFocusTrap(modalCard)
+watch(() => props.show, async (val) => {
+  if (val) { await nextTick(); activate() } else { deactivate() }
+})
 
 const steps = ['פרטי פרויקט', 'צפי הכנסות', 'צפי הוצאות', 'סיכום']
 const step = ref(0)

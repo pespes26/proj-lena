@@ -7,7 +7,7 @@
       class="ui-chat-launcher ui-press"
       aria-label="פתח עוזר פיננסי"
     >
-      <div class="ui-chat-launcher__icon">
+      <div class="ui-chat-launcher__icon" aria-hidden="true">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
         </svg>
@@ -23,7 +23,7 @@
       <!-- Header -->
       <header class="ui-chat-header">
         <div class="flex items-center gap-2.5">
-          <div class="ui-chat-header__mark">
+          <div class="ui-chat-header__mark" aria-hidden="true">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
             </svg>
@@ -35,12 +35,12 @@
         </div>
         <div class="flex items-center gap-1">
           <button @click="clearChat" class="ui-chat-header__btn ui-press" title="נקה שיחה" aria-label="נקה">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
             </svg>
           </button>
           <button @click="isOpen = false" class="ui-chat-header__btn ui-press" aria-label="סגור">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
               <path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/>
             </svg>
           </button>
@@ -51,7 +51,7 @@
       <div ref="messagesContainer" class="ui-chat-messages">
         <!-- Welcome -->
         <div v-if="messages.length === 0" class="py-4">
-          <div class="ui-chat-welcome-mark">
+          <div class="ui-chat-welcome-mark" aria-hidden="true">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="color: var(--accent);">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
             </svg>
