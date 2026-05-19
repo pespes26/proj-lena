@@ -63,8 +63,8 @@
               <span class="font-sans font-semibold text-ink">{{ term.type }}</span>
               <span class="ui-num font-semibold text-ink"><bdi>{{ term.percent }}%</bdi></span>
             </div>
-            <div style="width: 100%; height: 2px; background: var(--surface-muted);">
-              <div style="height: 100%; transition: width 180ms var(--ease-out);" :style="{ width: term.percent + '%', background: term.type === 'מקדמה' || term.type === 'מזומן' ? 'var(--positive)' : 'var(--warning)' }"></div>
+            <div style="width: 100%; height: 2px; background: var(--surface-muted); overflow: hidden;">
+              <div style="height: 100%; width: 100%; transform-origin: right center; transition: transform 180ms var(--ease-out);" :style="{ transform: `scaleX(${term.percent / 100})`, background: term.type === 'מקדמה' || term.type === 'מזומן' ? 'var(--positive)' : 'var(--warning)' }"></div>
             </div>
             <div class="ui-label mt-1.5" style="font-size: 0.625rem;">
               <bdi class="ui-num">{{ fmt(Math.round(totalRevenue * term.percent / 100)) }} ₪</bdi>

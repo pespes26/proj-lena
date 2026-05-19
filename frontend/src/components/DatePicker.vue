@@ -278,16 +278,16 @@ watch(showCalendar, async (val) => {
     await nextTick()
     updatePosition()
     window.addEventListener('scroll', onScrollOrResize, { passive: true, capture: true })
-    window.addEventListener('resize', onScrollOrResize)
+    window.addEventListener('resize', onScrollOrResize, { passive: true })
   } else {
     window.removeEventListener('scroll', onScrollOrResize, { passive: true, capture: true })
-    window.removeEventListener('resize', onScrollOrResize)
+    window.removeEventListener('resize', onScrollOrResize, { passive: true })
   }
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('scroll', onScrollOrResize, { passive: true, capture: true })
-  window.removeEventListener('resize', onScrollOrResize)
+  window.removeEventListener('resize', onScrollOrResize, { passive: true })
 })
 
 function updatePosition() {

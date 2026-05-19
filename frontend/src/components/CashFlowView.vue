@@ -102,8 +102,8 @@
               </span>
             </div>
             <div class="flex h-1.5 overflow-hidden rounded-full" style="background: var(--surface-muted);">
-              <div style="background: var(--positive); transition: width 180ms cubic-bezier(0.4, 0, 0.2, 1);" :style="{ width: projectRevenuePercent(months) + '%' }"></div>
-              <div style="background: var(--warning); transition: width 180ms cubic-bezier(0.4, 0, 0.2, 1);" :style="{ width: projectExpensePercent(months) + '%' }"></div>
+              <div style="background: var(--positive);" :style="{ width: projectRevenuePercent(months) + '%' }"></div>
+              <div style="background: var(--warning);" :style="{ width: projectExpensePercent(months) + '%' }"></div>
             </div>
             <div class="flex justify-between mt-2 text-[11px] font-medium" style="color: var(--ink-muted);">
               <span>הכנסה <bdi class="ui-num font-semibold">{{ fmt(projectRevSum(months)) }}</bdi></span>
