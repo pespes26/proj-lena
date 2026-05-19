@@ -1,5 +1,5 @@
 <template>
-  <div class="ui-chart-container ui-chart-container--lg">
+  <div class="ui-chart-container ui-chart-container--lg" role="img" aria-label="גרף תזרים מזומנים מצטבר: יתרה מצטברת לאורך הזמן">
     <Line :data="chartData" :options="chartOptions" />
   </div>
 </template>

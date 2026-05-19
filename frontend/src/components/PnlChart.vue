@@ -1,5 +1,5 @@
 <template>
-  <div class="ui-chart-container ui-chart-container--md">
+  <div class="ui-chart-container ui-chart-container--md" role="img" :aria-label="`גרף P&L לפרויקט ${projectName}: הכנסות, הוצאות ורווח לאורך זמן`">
     <Line :key="chartType" :data="chartData" :options="chartOptions" />
   </div>
 </template>

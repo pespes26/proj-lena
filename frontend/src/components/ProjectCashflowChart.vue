@@ -1,5 +1,5 @@
 <template>
-  <div class="ui-chart-container">
+  <div class="ui-chart-container" role="img" aria-label="גרף תזרים מזומנים לפרויקט: הכנסות, הוצאות ויתרה">
     <Line :data="chartData" :options="chartOptions" />
   </div>
 </template>

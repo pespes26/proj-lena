@@ -1068,12 +1068,35 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+  /* Suppress decorative entrance animations and choreography.
+     Press feedback (scale transforms) and focus/hover transitions are
+     deliberately preserved — they communicate interaction state, not decoration. */
+  .ed-fade-up,
+  .ed-fade-up-delay-1,
+  .ed-fade-up-delay-2,
+  .ed-fade-up-delay-3,
+  .ed-fade-up-delay-4,
+  .animate-fade-up,
+  .ui-stagger > *,
+  .ed-rule-draw {
+    animation: none !important;
   }
+  .view-fade-enter-active,
+  .view-fade-leave-active,
+  .slide-down-enter-active,
+  .slide-down-leave-active,
+  .ui-modal-card,
+  .ui-modal-backdrop,
+  .ui-popover,
+  .ui-drawer,
+  .ui-tooltip,
+  .toast-enter-active,
+  .toast-leave-active,
+  .toast-move {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+  html { scroll-behavior: auto !important; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════

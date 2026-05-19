@@ -46,7 +46,7 @@
 
             <!-- Projects dropdown trigger -->
             <div class="relative" ref="projectsBtn">
-              <button type="button" class="ui-nav-pill" :class="{ 'is-active': activeTab === 'pnl' }" @click="pnlOpen = !pnlOpen">
+              <button type="button" class="ui-nav-pill" :class="{ 'is-active': activeTab === 'pnl' }" @click="pnlOpen = !pnlOpen" :aria-expanded="pnlOpen" aria-haspopup="listbox">
                 פרויקטים
                 <svg class="w-3 h-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" d="M19 9l-7 7-7-7"/></svg>
               </button>
@@ -79,11 +79,11 @@
           <div class="hidden md:flex items-center gap-2 flex-shrink-0">
             <!-- Alerts bell -->
             <div class="relative" ref="alertsBtn">
-              <button @click="showAlertsModal = !showAlertsModal" class="ui-icon-btn relative" aria-label="התראות">
+              <button @click="showAlertsModal = !showAlertsModal" class="ui-icon-btn relative" :aria-label="alertCount > 0 ? alertCount + ' התראות פעילות' : 'התראות'" :aria-expanded="showAlertsModal" aria-haspopup="dialog">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                 </svg>
-                <span v-if="alertCount > 0" class="ui-alert-badge ui-num">{{ alertCount }}</span>
+                <span v-if="alertCount > 0" class="ui-alert-badge ui-num" aria-hidden="true">{{ alertCount }}</span>
               </button>
             </div>
 
@@ -96,7 +96,7 @@
 
             <!-- User menu -->
             <div class="relative ms-1">
-              <button @click="showUserMenu = !showUserMenu" class="ui-user-btn" aria-label="תפריט משתמש">
+              <button @click="showUserMenu = !showUserMenu" class="ui-user-btn" aria-label="תפריט משתמש" :aria-expanded="showUserMenu" aria-haspopup="menu">
                 <div class="ui-user-avatar">
                   <img v-if="userProfile.avatar" :src="userProfile.avatar" class="w-full h-full object-cover" alt="" />
                   <span v-else>{{ userInitials }}</span>
@@ -131,7 +131,7 @@
 
     <!-- Mobile menu -->
     <transition name="slide-down">
-      <div v-if="mobileMenuOpen" class="fixed inset-0 top-16 z-20 bg-bg md:hidden overflow-y-auto" dir="rtl">
+      <nav v-if="mobileMenuOpen" class="fixed inset-0 top-16 z-20 bg-bg md:hidden overflow-y-auto" dir="rtl" aria-label="ניווט ראשי">
         <div class="max-w-app mx-auto px-6 py-5 flex flex-col gap-1.5 ui-safe-bottom">
           <button @click="mobileNav('dashboard')" class="ui-mobile-nav-item" :class="{ 'is-active': activeTab === 'dashboard' }">דשבורד</button>
           <button v-if="isAdmin" @click="mobileNav('operations')" class="ui-mobile-nav-item" :class="{ 'is-active': activeTab === 'operations' }">תפעול</button>
@@ -155,7 +155,7 @@
           <button v-if="isAdmin" @click="showSettings = true; mobileMenuOpen = false" class="ui-mobile-nav-item">הגדרות</button>
           <button @click="logout(); mobileMenuOpen = false" class="ui-mobile-nav-item ui-mobile-nav-item--danger">יציאה</button>
         </div>
-      </div>
+      </nav>
     </transition>
 
     <!-- Page content -->

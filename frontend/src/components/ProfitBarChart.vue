@@ -1,5 +1,5 @@
 <template>
-  <div class="ui-chart-container">
+  <div class="ui-chart-container" role="img" aria-label="גרף רווח תפעולי: פירוט חודשי">
     <Bar :data="chartData" :options="chartOptions" />
   </div>
 </template>

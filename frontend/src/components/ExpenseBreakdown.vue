@@ -1,6 +1,6 @@
 <template>
   <div class="flex items-center gap-8 flex-wrap">
-    <div class="ui-chart-container ui-chart-container--sm" style="width: 12rem; height: 12rem; flex-shrink: 0;">
+    <div class="ui-chart-container ui-chart-container--sm" style="width: 12rem; height: 12rem; flex-shrink: 0;" role="img" aria-label="גרף עוגה: פירוט הוצאות לפי קטגוריה">
       <Doughnut :data="chartData" :options="chartOptions" />
     </div>
     <div class="flex-1 min-w-[180px] border-t border-rule">

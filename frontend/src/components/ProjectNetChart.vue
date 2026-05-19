@@ -1,5 +1,5 @@
 <template>
-  <div class="ui-chart-container ui-chart-container--xl">
+  <div class="ui-chart-container ui-chart-container--xl" role="img" aria-label="גרף נטו לפי פרויקט: השוואה חודשית בין פרויקטים">
     <Bar :data="chartData" :options="chartOptions" />
   </div>
 </template>
