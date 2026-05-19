@@ -129,7 +129,7 @@
           <button
             @click="submit"
             :disabled="!canSubmit || submitting"
-            class="ui-btn-primary"
+            class="ui-btn ui-btn-dark"
             type="button"
           >
             {{ submitting ? 'שומר…' : 'שמור דיווח' }}

@@ -74,7 +74,7 @@
         <!-- Footer -->
         <footer class="px-7 py-5 border-t border-[color:var(--border)] flex justify-between gap-4">
           <button @click="$emit('close')" class="ui-btn">ביטול</button>
-          <button @click="handleSave" :disabled="saving" class="ui-btn ui-btn-primary">
+          <button @click="handleSave" :disabled="saving" class="ui-btn ui-btn-dark">
             {{ saving ? 'שומר…' : 'שמירה' }}
           </button>
         </footer>

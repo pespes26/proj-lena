@@ -85,7 +85,7 @@
     </div>
 
     <div class="flex items-center gap-3">
-      <button @click="save" :disabled="saving" class="ui-btn-primary">
+      <button @click="save" :disabled="saving" class="ui-btn ui-btn-dark">
         שמור ביצוע בפועל
       </button>
     </div>

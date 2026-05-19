@@ -87,7 +87,7 @@
               </div>
               <div class="flex justify-end gap-3 mt-6">
                 <button type="button" @click="showAddUser = false" class="ui-btn">ביטול</button>
-                <button type="button" @click="handleCreateUser" :disabled="saving" class="ui-btn ui-btn-primary">
+                <button type="button" @click="handleCreateUser" :disabled="saving" class="ui-btn ui-btn-dark">
                   {{ saving ? 'יוצר…' : 'צור משתמש' }}
                 </button>
               </div>

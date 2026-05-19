@@ -114,35 +114,44 @@
           </div>
         </RuledSection>
 
-        <!-- KPI hero strip -->
-        <section class="ui-stagger grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+        <!-- Hero KPI — operating margin (the project's health number) -->
+        <section class="ui-card mb-5 animate-fade-up">
+          <div class="ui-label mb-2">מרווח תפעולי</div>
+          <div class="flex items-baseline gap-3 flex-wrap">
+            <span
+              class="ui-num font-bold"
+              style="font-size: clamp(2.75rem, 5.5vw, 4rem); line-height: 1; letter-spacing: -0.025em;"
+              :class="pnlData.summary.margin == null ? 'ed-tone-muted' : pnlData.summary.margin >= 20 ? 'ed-tone-positive' : pnlData.summary.margin >= 10 ? 'ed-tone-warning' : 'ed-tone-negative'"
+            >
+              <bdi>{{ pnlData.summary.margin != null ? pnlData.summary.margin : 0 }}%</bdi>
+            </span>
+            <span
+              class="ui-pill"
+              :class="pnlData.summary.margin == null ? 'ui-pill-neutral' : pnlData.summary.margin >= 20 ? 'ui-pill-positive' : pnlData.summary.margin >= 10 ? 'ui-pill-warning' : 'ui-pill-negative'"
+            >
+              {{ pnlData.summary.margin == null ? '—' : pnlData.summary.margin >= 20 ? 'תקין' : pnlData.summary.margin >= 10 ? 'לבדוק' : 'קריטי' }}
+            </span>
+          </div>
+        </section>
+
+        <!-- Secondary KPIs — revenue / op expenses / salary / profit -->
+        <section class="ui-stagger grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <div class="ui-mini-card">
             <div class="ui-label mb-2">הכנסות שנתיות</div>
-            <div class="ui-num font-semibold text-ink text-xl"><bdi>₪ {{ fmt(pnlData.summary.total_revenue) }}</bdi></div>
+            <div class="ui-num font-semibold text-ink text-lg"><bdi>₪ {{ fmt(pnlData.summary.total_revenue) }}</bdi></div>
           </div>
           <div class="ui-mini-card">
             <div class="ui-label mb-2">הוצאות תפעול</div>
-            <div class="ui-num font-semibold text-ink text-xl"><bdi>₪ {{ fmt(pnlData.summary.total_op_expenses) }}</bdi></div>
+            <div class="ui-num font-semibold text-ink text-lg"><bdi>₪ {{ fmt(pnlData.summary.total_op_expenses) }}</bdi></div>
           </div>
           <div class="ui-mini-card">
             <div class="ui-label mb-2">הוצאות שכר</div>
-            <div class="ui-num font-semibold text-ink text-xl"><bdi>₪ {{ fmt(pnlData.summary.total_salary_expenses) }}</bdi></div>
+            <div class="ui-num font-semibold text-ink text-lg"><bdi>₪ {{ fmt(pnlData.summary.total_salary_expenses) }}</bdi></div>
           </div>
           <div class="ui-mini-card">
             <div class="ui-label mb-2">רווח תפעולי</div>
-            <div class="ui-num font-semibold text-xl" :class="pnlData.summary.total_operating_profit >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'">
+            <div class="ui-num font-semibold text-lg" :class="pnlData.summary.total_operating_profit >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'">
               <bdi>₪ {{ fmt(pnlData.summary.total_operating_profit) }}</bdi>
-            </div>
-          </div>
-          <div class="ui-mini-card">
-            <div class="ui-label mb-2">מרווח תפעולי</div>
-            <div class="flex items-baseline gap-2">
-              <span class="ui-num font-semibold text-xl" :class="pnlData.summary.margin >= 20 ? 'ed-tone-positive' : 'ed-tone-warning'">
-                {{ pnlData.summary.margin != null ? pnlData.summary.margin : 0 }}%
-              </span>
-              <span class="ui-pill" :class="pnlData.summary.margin >= 20 ? 'ui-pill-positive' : 'ui-pill-warning'">
-                {{ pnlData.summary.margin >= 20 ? 'חזק' : 'לבדוק' }}
-              </span>
             </div>
           </div>
         </section>

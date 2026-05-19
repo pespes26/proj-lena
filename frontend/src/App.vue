@@ -197,7 +197,7 @@
 
     <!-- Toast notifications -->
     <Teleport to="body">
-      <div class="fixed top-5 left-1/2 -translate-x-1/2 z-[200] flex flex-col gap-2.5 w-full max-w-sm px-4" dir="rtl">
+      <div class="fixed top-5 left-1/2 -translate-x-1/2 z-[200] flex flex-col gap-2.5 w-full max-w-sm px-4" dir="rtl" role="status" aria-live="polite" aria-atomic="true">
         <TransitionGroup name="toast">
           <div v-for="t in toasts" :key="t.id"
             class="ui-toast"
@@ -575,55 +575,7 @@ function loadAppData() {
   backdrop-filter: none;
 }
 
-/* Dropdown (projects picker) */
-.ui-dropdown-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 90;
-}
-.ui-dropdown {
-  position: fixed;
-  z-index: 100;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  padding: 0.625rem 0;
-  min-width: 280px;
-  max-height: 20rem;
-  overflow-y: auto;
-  transform-origin: top center;
-}
-.ui-dropdown-item {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  padding: 0.625rem 1rem;
-  background: transparent;
-  border: 0;
-  font-family: var(--font-sans);
-  font-size: 0.875rem;
-  color: var(--ink);
-  cursor: pointer;
-  transition: background 160ms var(--ease-out), color 160ms var(--ease-out), transform var(--dur-press) var(--ease-out);
-}
-@media (hover: hover) and (pointer: fine) {
-  .ui-dropdown-item:hover { background: var(--surface-muted); }
-}
-.ui-dropdown-item.is-active {
-  background: var(--accent-soft);
-  color: var(--accent);
-  font-weight: 600;
-}
-.ui-dropdown-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 9999px;
-  background: var(--border-strong);
-  flex-shrink: 0;
-}
-.ui-dropdown-item.is-active .ui-dropdown-dot { background: var(--accent); }
+/* Dropdown styles are canonical in src/style.css — Teleport+fixed pattern. */
 
 /* Alerts bell badge */
 .ui-alert-badge {

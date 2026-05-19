@@ -17,7 +17,8 @@
   --ink: #0f172a;
   --ink-strong: #020617;
   --ink-muted: #475569;
-  --ink-faint: #94a3b8;
+  --ink-faint: #64748b;     /* slate-500 — passes WCAG AA on white (4.92:1) */
+  --ink-whisper: #94a3b8;   /* slate-400 — decorative only (placeholders, disabled) */
 
   /* Lines */
   --border: #e2e8f0;
@@ -295,7 +296,7 @@ body {
 }
 .ui-btn:disabled,
 .ed-btn:disabled {
-  color: var(--ink-faint);
+  color: var(--ink-whisper);
   cursor: not-allowed;
   opacity: 0.6;
 }
@@ -303,22 +304,28 @@ body {
 .ed-btn:disabled:active {
   transform: none;
 }
-.ui-btn-primary,
-.ed-btn-primary {
+/* Dark button — used for modal confirms and destructive actions */
+.ui-btn-dark,
+.ed-btn-dark {
   color: #ffffff;
   background: var(--ink);
   border-color: var(--ink);
   box-shadow: var(--shadow-sm);
 }
 @media (hover: hover) and (pointer: fine) {
-  .ui-btn-primary:hover,
-  .ed-btn-primary:hover {
+  .ui-btn-dark:hover,
+  .ed-btn-dark:hover {
     background: var(--ink-strong);
     border-color: var(--ink-strong);
     color: #ffffff;
     box-shadow: var(--shadow-md);
   }
 }
+
+/* Primary (brand) button — emerald. `ui-btn-primary` and `ui-btn-accent` are
+   aliases. Use for main CTAs that should carry the brand. */
+.ui-btn-primary,
+.ed-btn-primary,
 .ui-btn-accent {
   color: #ffffff;
   background: var(--accent);
@@ -326,9 +333,12 @@ body {
   box-shadow: var(--shadow-sm);
 }
 @media (hover: hover) and (pointer: fine) {
+  .ui-btn-primary:hover,
+  .ed-btn-primary:hover,
   .ui-btn-accent:hover {
     background: var(--accent-hover);
     border-color: var(--accent-hover);
+    color: #ffffff;
     box-shadow: var(--shadow-md);
   }
 }
@@ -377,7 +387,7 @@ body {
   font-feature-settings: "lnum" 1, "tnum" 1;
 }
 .ui-input::placeholder,
-.ed-input::placeholder { color: var(--ink-faint); }
+.ed-input::placeholder { color: var(--ink-whisper); }
 .ui-input:focus,
 .ed-input:focus {
   border-color: var(--accent);
@@ -695,23 +705,25 @@ body {
   background: var(--ink);
 }
 
-/* Dropdown (Projects list) */
+/* Dropdown (Projects list, alerts, anything Teleport'd to body and anchored
+   by viewport coordinates from getBoundingClientRect — hence `fixed`).      */
 .ui-dropdown-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 40;
+  z-index: 90;
 }
 .ui-dropdown {
-  position: absolute;
-  z-index: 50;
+  position: fixed;
+  z-index: 100;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-xl);
   padding: 0.5rem;
-  min-width: 260px;
+  min-width: 280px;
   max-height: 24rem;
   overflow-y: auto;
+  transform-origin: top center;
 }
 .ui-dropdown-item {
   display: flex;

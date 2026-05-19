@@ -899,7 +899,7 @@
                 </li>
               </ul>
             </div>
-            <button @click="showValidationModal = false" class="ui-btn ui-btn-primary w-full" style="justify-content: center;">הבנתי, חזרה לעריכה</button>
+            <button @click="showValidationModal = false" class="ui-btn ui-btn-dark w-full" style="justify-content: center;">הבנתי, חזרה לעריכה</button>
           </div>
         </div>
 
@@ -913,11 +913,11 @@
 
           <div class="flex items-center gap-3">
             <div v-if="error" class="ed-tone-negative text-xs" style="font-weight: 500;">{{ error }}</div>
-            <button v-if="step < steps.length - 1" @click="nextStep" class="ui-btn ui-btn-primary" style="gap: 0.375rem;">
+            <button v-if="step < steps.length - 1" @click="nextStep" class="ui-btn ui-btn-dark" style="gap: 0.375rem;">
               הבא
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
             </button>
-            <button v-else @click="save" :disabled="saving" class="ui-btn ui-btn-primary disabled:opacity-50" style="gap: 0.375rem;">
+            <button v-else @click="save" :disabled="saving" class="ui-btn ui-btn-dark disabled:opacity-50" style="gap: 0.375rem;">
               <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
               {{ saving ? 'שומר...' : 'אשר ושמור' }}
             </button>

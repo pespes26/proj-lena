@@ -325,7 +325,7 @@ const doughnutOptions = {
     legend: {
       position: 'bottom',
       rtl: true,
-      labels: { font: { family: "'Assistant', system-ui, sans-serif", size: 12 }, padding: 16, usePointStyle: true, pointStyle: 'rectRounded', color: COLORS.inkMuted },
+      labels: { font: { family: "'DM Sans', 'Rubik', system-ui, sans-serif", size: 12 }, padding: 16, usePointStyle: true, pointStyle: 'rectRounded', color: COLORS.inkMuted },
     },
     tooltip: {
       ...tooltipConfig,
