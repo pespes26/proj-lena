@@ -162,6 +162,61 @@ def delete_project_firestore(name: str) -> None:
             cur.execute("DELETE FROM projects WHERE id = %s", (name,))
 
 
+# --- Users ---
+
+def get_or_create_user(uid: str, email: str = "", full_name: str = "") -> Dict[str, Any]:
+    """Look up a user by uid, inserting a default-role row on first sight.
+
+    Called from the auth layer immediately after a token verifies. The
+    role/linked_manager/avatar fields are managed in-app (Phase D), never
+    from the token, so first-time logins land as ``role='viewer'`` until
+    an admin promotes them.
+    """
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT uid, email, full_name, role, linked_manager, avatar "
+                "FROM users WHERE uid = %s",
+                (uid,),
+            )
+            row = cur.fetchone()
+            if row:
+                u, e, n, r, lm, av = row
+                return {
+                    'uid': u, 'email': e, 'full_name': n,
+                    'role': r, 'linked_manager': lm, 'avatar': av,
+                }
+            # First time we've seen this principal — insert as viewer.
+            # ON CONFLICT(uid) silently no-ops if a concurrent request
+            # inserted first; we re-read in that case.
+            cur.execute(
+                """
+                INSERT INTO users (uid, email, full_name, role)
+                VALUES (%s, %s, %s, 'viewer')
+                ON CONFLICT (uid) DO NOTHING
+                RETURNING uid, email, full_name, role, linked_manager, avatar
+                """,
+                (uid, email, full_name),
+            )
+            inserted = cur.fetchone()
+            if inserted:
+                u, e, n, r, lm, av = inserted
+                return {
+                    'uid': u, 'email': e, 'full_name': n,
+                    'role': r, 'linked_manager': lm, 'avatar': av,
+                }
+            cur.execute(
+                "SELECT uid, email, full_name, role, linked_manager, avatar "
+                "FROM users WHERE uid = %s",
+                (uid,),
+            )
+            u, e, n, r, lm, av = cur.fetchone()
+            return {
+                'uid': u, 'email': e, 'full_name': n,
+                'role': r, 'linked_manager': lm, 'avatar': av,
+            }
+
+
 # --- Reports ---
 
 def _row_to_report(row: tuple) -> Dict[str, Any]:

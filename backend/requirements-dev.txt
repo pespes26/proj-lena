@@ -1,0 +1,6 @@
+# Test-only dependencies. Install for local dev with:
+#   pip install -r requirements.txt -r requirements-dev.txt
+# Kept out of the production image to keep it lean.
+
+-r requirements.txt
+pytest>=8.0
