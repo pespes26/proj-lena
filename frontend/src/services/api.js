@@ -1,25 +1,15 @@
 import axios from 'axios'
-import { auth } from '../firebase'
 
 const api = axios.create({
   baseURL: '/api',
   timeout: 10000,
 })
 
-// Attach Firebase ID token to every request
-api.interceptors.request.use(async config => {
-  const user = auth.currentUser
-  if (user) {
-    try {
-      const token = await user.getIdToken()
-      config.headers.Authorization = `Bearer ${token}`
-    } catch {
-      // Token refresh failed — will get 401
-    }
-  } else if (import.meta.env.VITE_DEV_MODE === 'true') {
-    const devToken = localStorage.getItem('dev_token')
-    if (devToken) config.headers.Authorization = `Bearer ${devToken}`
-  }
+// TODO Phase E: replace with MSAL acquireTokenSilent.
+// Phase 0 stub — read Bearer token from localStorage.
+api.interceptors.request.use(config => {
+  const token = localStorage.getItem('auth_token')
+  if (token) config.headers.Authorization = `Bearer ${token}`
   return config
 })
 
@@ -77,7 +67,7 @@ export const uploadSubcontractorContract = (project, subIndex, file) => {
   return api.post(`/project-form/${encodeURIComponent(project)}/upload-contract?sub_index=${subIndex}`, f, { headers: { 'Content-Type': 'multipart/form-data' } }).then(r => r.data)
 }
 
-// Auth & Users (Firebase-based)
+// Auth & Users — backend will move to Entra External ID + PostgreSQL (Phase C/D).
 export const getProfile = () => api.get('/auth/profile').then(r => r.data)
 export const updateProfile = (data) => api.put('/auth/profile', data).then(r => r.data)
 export const getUsers = () => api.get('/auth/users').then(r => r.data.users)
@@ -88,9 +78,7 @@ export const setupFirstAdmin = (data) => api.post('/auth/setup', data).then(r =>
 
 // AI Chat (streaming)
 export async function sendAiChatStream(messages, message, onToken) {
-  const user = auth.currentUser
-  let token = ''
-  if (user) token = await user.getIdToken()
+  const token = localStorage.getItem('auth_token') || ''
 
   const response = await fetch('/api/ai/chat', {
     method: 'POST',

@@ -22,13 +22,6 @@ frontend/dist/
 backend/.env
 frontend/.env
 
-# Firebase service account (SECRET - never commit)
-backend/firebase-service-account.json
-*firebase-adminsdk*.json
-backend/service-account.json
-**/service-account*.json
-**/*-service-account*.json
-
 # Backups & contracts
 backups/
 contracts/
@@ -40,9 +33,6 @@ contracts/
 # Claude Code local config
 .claude/settings.local.json
 .claude/launch.json
-
-# Firebase Hosting cache
-.firebase/
 
 # OS
 .DS_Store

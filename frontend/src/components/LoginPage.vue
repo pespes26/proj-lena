@@ -126,12 +126,10 @@
 
 <script setup>
 import { ref } from 'vue'
-import { auth } from '../firebase'
-import {
-  signInWithEmailAndPassword,
-  TotpMultiFactorGenerator,
-  getMultiFactorResolver,
-} from 'firebase/auth'
+
+// TODO Phase E: replace this entire flow with MSAL.js (Entra External ID).
+// Phase 0 stub — any submission stores the DEV token and emits 'login'.
+// The TOTP step is kept in the template but is unreachable until real auth lands.
 
 const emit = defineEmits(['login'])
 
@@ -142,7 +140,7 @@ const totpCode = ref('')
 const errorMsg = ref('')
 const loading = ref(false)
 
-const mfaResolver = ref(null)
+const DEV_TOKEN = 'dev-admin-local'
 
 async function handleLogin() {
   errorMsg.value = ''
@@ -150,59 +148,14 @@ async function handleLogin() {
     errorMsg.value = 'יש למלא אימייל וסיסמה'
     return
   }
-
-  // DEV MODE: skip Firebase, use local token
-  if (import.meta.env.VITE_DEV_MODE === 'true') {
-    localStorage.setItem('dev_token', 'dev-admin-local')
-    emit('login')
-    return
-  }
-
-  loading.value = true
-  try {
-    await signInWithEmailAndPassword(auth, email.value, password.value)
-    emit('login')
-  } catch (err) {
-    if (err.code === 'auth/multi-factor-auth-required') {
-      mfaResolver.value = getMultiFactorResolver(auth, err)
-      step.value = 'totp'
-      totpCode.value = ''
-    } else if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password') {
-      errorMsg.value = 'אימייל או סיסמה שגויים'
-    } else if (err.code === 'auth/user-not-found') {
-      errorMsg.value = 'משתמש לא נמצא'
-    } else if (err.code === 'auth/too-many-requests') {
-      errorMsg.value = 'יותר מדי ניסיונות. נסה שוב מאוחר יותר'
-    } else {
-      errorMsg.value = err.message || 'שגיאה בהתחברות'
-    }
-  } finally {
-    loading.value = false
-  }
+  localStorage.setItem('auth_token', DEV_TOKEN)
+  emit('login')
 }
 
 async function verifyTotp() {
-  errorMsg.value = ''
-  loading.value = true
-  try {
-    const resolver = mfaResolver.value
-    const totpHint = resolver.hints.find(h => h.factorId === TotpMultiFactorGenerator.FACTOR_ID)
-    if (!totpHint) {
-      errorMsg.value = 'לא נמצא אימות TOTP'
-      return
-    }
-    const assertion = TotpMultiFactorGenerator.assertionForSignIn(totpHint.uid, totpCode.value)
-    await resolver.resolveSignIn(assertion)
-    emit('login')
-  } catch (err) {
-    if (err.code === 'auth/invalid-verification-code') {
-      errorMsg.value = 'קוד שגוי. נסה שוב'
-    } else {
-      errorMsg.value = err.message || 'שגיאה באימות'
-    }
-  } finally {
-    loading.value = false
-  }
+  // Unreachable in Phase 0 — kept so the template still compiles.
+  localStorage.setItem('auth_token', DEV_TOKEN)
+  emit('login')
 }
 </script>
 

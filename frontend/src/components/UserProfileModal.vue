@@ -59,29 +59,7 @@
             </div>
           </div>
 
-          <!-- Change password -->
-          <div class="ui-password-section">
-            <button type="button" @click="showPasswordSection = !showPasswordSection" class="ed-link text-sm">
-              {{ showPasswordSection ? 'ביטול שינוי סיסמה ←' : 'שינוי סיסמה →' }}
-            </button>
-            <div v-if="showPasswordSection" class="mt-5 space-y-5">
-              <div>
-                <label class="ui-form-label">סיסמה נוכחית</label>
-                <input v-model="passwords.current" type="password" class="ui-input" />
-              </div>
-              <div>
-                <label class="ui-form-label">סיסמה חדשה</label>
-                <input v-model="passwords.new_password" type="password" class="ui-input" />
-              </div>
-              <div>
-                <label class="ui-form-label">אישור סיסמה חדשה</label>
-                <input v-model="passwords.confirm" type="password" class="ui-input" />
-              </div>
-              <button @click="handleChangePassword" :disabled="saving" class="ui-btn ui-btn-primary">
-                {{ saving ? 'שומר…' : 'שנה סיסמה' }}
-              </button>
-            </div>
-          </div>
+          <!-- TODO Phase E: password reset flows through Entra External ID. -->
 
           <!-- Messages -->
           <p
@@ -191,8 +169,6 @@
 <script setup>
 import { ref, reactive, computed, watch } from 'vue'
 import { getProfile, updateProfile } from '../services/api'
-import { auth } from '../firebase'
-import { updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth'
 import { useToast } from '../composables/useToast'
 
 const props = defineProps({ show: Boolean })
@@ -201,8 +177,6 @@ const toast = useToast()
 
 const roleLabels = { admin: 'מנהל מערכת', economist: 'כלכלנית', viewer: 'צופה מלא', project_manager: 'מנהל פרויקט' }
 const form = reactive({ username: '', full_name: '', email: '', role: '', avatar: '' })
-const passwords = reactive({ current: '', new_password: '', confirm: '' })
-const showPasswordSection = ref(false)
 const saving = ref(false)
 const message = ref('')
 const messageType = ref('success')
@@ -215,8 +189,6 @@ const initials = computed(() => {
 watch(() => props.show, async (val) => {
   if (val) {
     message.value = ''
-    showPasswordSection.value = false
-    passwords.current = ''; passwords.new_password = ''; passwords.confirm = ''
     try {
       const data = await getProfile()
       Object.assign(form, data)
@@ -241,23 +213,5 @@ async function handleSave() {
   saving.value = false
 }
 
-async function handleChangePassword() {
-  if (passwords.new_password !== passwords.confirm) {
-    message.value = 'הסיסמאות לא תואמות'; messageType.value = 'error'; return
-  }
-  if (passwords.new_password.length < 4) {
-    message.value = 'סיסמה חייבת להכיל לפחות 4 תווים'; messageType.value = 'error'; return
-  }
-  saving.value = true; message.value = ''
-  try {
-    const user = auth.currentUser
-    const credential = EmailAuthProvider.credential(user.email, passwords.current)
-    await reauthenticateWithCredential(user, credential)
-    await updatePassword(user, passwords.new_password)
-    message.value = 'הסיסמה שונתה בהצלחה'; messageType.value = 'success'
-    showPasswordSection.value = false
-    passwords.current = ''; passwords.new_password = ''; passwords.confirm = ''
-  } catch (e) { message.value = e.message; messageType.value = 'error' }
-  saving.value = false
-}
+// TODO Phase E: password change moves to Entra External ID self-service.
 </script>

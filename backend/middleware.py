@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 
-# Configure root logger to output JSON to stdout (Cloud Run captures it)
+# Configure root logger to output JSON to stdout (Azure Container Apps captures it)
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger("ifmlogix")
 
