@@ -1185,7 +1185,7 @@ watch([startMonth, endMonth, () => form.total_revenue], () => {
     form.revenue_forecast[m] = active.includes(m) ? pct : 0
   }
   initRevenueAmounts()
-}, { immediate: false })
+}, { immediate: true })
 
 // Extract X days from שוטף+X
 function extractShotefDays(type) {
