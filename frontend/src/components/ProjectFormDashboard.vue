@@ -185,7 +185,7 @@ import { Bar, Doughnut } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend, PointElement, LineElement } from 'chart.js'
 import { getProjectForm } from '../services/api'
 import { SkeletonLoader } from './editorial'
-import { COLORS, tooltipConfig, axisConfig } from '../utils/chartDefaults'
+import { COLORS, tooltipConfig, axisConfig, hebrewLabelCallback } from '../utils/chartDefaults'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend, PointElement, LineElement)
 
@@ -373,11 +373,14 @@ const months = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
 
 const revenueChartData = computed(() => {
   if (!formData.value?.total_revenue) return null
+  const activeMos = activeMonths.value.length
+    ? activeMonths.value
+    : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
   return {
-    labels: months,
+    labels: activeMos.map(m => hebrewMonths[m]),
     datasets: [
-      { label: 'הכנסה צפויה', data: months.map((_, i) => monthlyRevenue(i + 1)), backgroundColor: COLORS.primary, borderRadius: 0 },
-      { label: 'כניסת תשלום', data: months.map((_, i) => cashInflow(i + 1)), backgroundColor: COLORS.amber, borderRadius: 0 },
+      { label: 'הכנסה צפויה', data: activeMos.map(m => monthlyRevenue(m)), backgroundColor: COLORS.primary, borderRadius: 0 },
+      { label: 'כניסת תשלום', data: activeMos.map(m => cashInflow(m)), backgroundColor: COLORS.amber, borderRadius: 0 },
     ]
   }
 })
@@ -393,15 +396,18 @@ const expenseChartData = computed(() => {
 
 const cashflowChartData = computed(() => {
   if (!formData.value) return null
+  const activeMos = activeMonths.value.length
+    ? activeMonths.value
+    : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
   let cumulative = 0
-  const inflows = months.map((_, i) => cashInflow(i + 1))
-  const outflows = months.map(() => totalExpenses.value / 12)
-  const cumulativeData = months.map((_, i) => {
+  const inflows = activeMos.map(m => cashInflow(m))
+  const outflows = activeMos.map(() => totalExpenses.value / 12)
+  const cumulativeData = activeMos.map((_, i) => {
     cumulative += inflows[i] - outflows[i]
     return cumulative
   })
   return {
-    labels: months,
+    labels: activeMos.map(m => hebrewMonths[m]),
     datasets: [
       { label: 'כניסות', data: inflows, backgroundColor: COLORS.positive || COLORS.green, borderRadius: 0, order: 2 },
       { label: 'יציאות', data: outflows.map(v => -v), backgroundColor: COLORS.amber, borderRadius: 0, order: 2 },
@@ -413,8 +419,14 @@ const cashflowChartData = computed(() => {
 const barOptions = {
   responsive: true,
   maintainAspectRatio: false,
-  plugins: { legend: legendMini(), tooltip: tooltipConfig },
-  scales: { y: axisConfig.y, x: axisConfig.x },
+  plugins: {
+    legend: legendMini(),
+    tooltip: { ...tooltipConfig, callbacks: { label: hebrewLabelCallback() } },
+  },
+  scales: {
+    y: axisConfig.y,
+    x: { ...axisConfig.x, ticks: { ...axisConfig.x.ticks, maxRotation: 0 } },
+  },
 }
 const doughnutOptions = {
   responsive: true,
@@ -425,8 +437,14 @@ const doughnutOptions = {
 const cashflowOptions = {
   responsive: true,
   maintainAspectRatio: false,
-  plugins: { legend: legendMini(), tooltip: tooltipConfig },
-  scales: { y: axisConfig.y, x: axisConfig.x },
+  plugins: {
+    legend: legendMini(),
+    tooltip: { ...tooltipConfig, callbacks: { label: hebrewLabelCallback() } },
+  },
+  scales: {
+    y: axisConfig.y,
+    x: { ...axisConfig.x, ticks: { ...axisConfig.x.ticks, maxRotation: 0 } },
+  },
 }
 
 function legendMini() {
