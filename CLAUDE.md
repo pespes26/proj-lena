@@ -1,4 +1,4 @@
-# CLAUDE.md — Logfi (FM Financial Co-Pilot)
+# CLAUDE.md — Logfi (IFMLogiX)
 
 > Operating manual for Claude Code in this repo. Read this first, every session.
 > Claude replies to the user in **English**. UI strings and user-facing text stay **Hebrew, RTL**.
@@ -7,17 +7,17 @@
 
 ## 1. Project Overview
 
-**Logfi** (previously "סנג'ר של לנה") is an internal financial dashboard for an Israeli FM (Facility Management) company. Its job is to give Lena and the management team real-time per-project visibility into P&L, cash flow, and risk — replacing a previous world where each project's profitability was invisible until end-of-quarter Excel consolidation.
+**Logfi** (brand name: IFMLogiX, internal codename: "סנג'ר של לנה") is an internal financial dashboard for an Israeli FM (Facility Management) company. Its job is to give Lena and the management team real-time per-project visibility into P&L, cash flow, and risk.
 
 **Core value (all four matter):**
-1. **Per-project P&L visibility** — the original pain point; know which sites make or lose money, each month.
+1. **Per-project P&L visibility** — know which sites make or lose money, each month.
 2. **Cash flow forecasting** — cumulative and monthly net liquidity view.
 3. **Risk alerts / early warning** — surface projects bleeding margin before they become problems.
-4. **AI CFO layer** — the strategic direction. Full AI financial co-pilot: natural-language chat over the data, automated risk scoring, what-if simulations, and forecasting.
+4. **AI CFO layer** — strategic direction; natural-language chat, automated risk scoring, what-if simulations. Currently stubbed — see §8.
 
-**Users:** Lena + a management team of roughly 5–15 people. Mixed technical levels — some want raw numbers, some want "just show me the risk." Role-gated UI today supports at least `admin` and `project_manager` roles (see [App.vue](frontend/src/App.vue)).
+**Users:** Lena + a management team of roughly 5–15 people. Mixed technical levels. Role-gated UI (see §5 Roles).
 
-**Strategic scope:** Internal tool for **one company only**. Not a SaaS, not multi-tenant. Do **not** introduce multi-tenant primitives (org IDs, tenant isolation, per-tenant config) without explicit approval — it adds complexity the product doesn't need.
+**Strategic scope:** Internal tool for **one company only**. Not SaaS, not multi-tenant. Do **not** introduce multi-tenant primitives without explicit approval.
 
 **Language & UX:** Everything user-facing is Hebrew, RTL (`dir="rtl"`). All labels, errors, tooltips, chart legends. Code identifiers stay English.
 
@@ -28,353 +28,472 @@
 ### Frontend ([frontend/package.json](frontend/package.json))
 - **Vue 3.4** — Composition API + `<script setup>` exclusively. No Options API.
 - **Vite 5.4** — dev server + build
-- **Tailwind CSS 3.4** — styling; iOS-inspired glassmorphic design system
-- **Chart.js 4 + vue-chartjs 5** — all charts
-- **Firebase 12.11** — Auth (client SDK; see [firebase.js](frontend/src/firebase.js), project `minlog-491211`)
-- **Axios** — HTTP
-- **html2pdf.js** — PDF export
-- **marked** — Markdown rendering (used in AI chat responses)
+- **Tailwind CSS 3.4** — utility classes; design tokens are CSS custom properties (see §6 Design)
+- **Chart.js 4 + vue-chartjs 5** — all charts; shared config in `utils/chartDefaults.js`
+- **Axios** — HTTP; all calls through `services/api.js`
+- **html2pdf.js** — PDF export in ProjectDetailsView
+- **marked** — Markdown rendering in AI chat
 - **qrcode** — QR generation
 
 ### Backend ([backend/requirements.txt](backend/requirements.txt))
-- **FastAPI + uvicorn[standard]** — API layer, also serves built frontend SPA in prod
-- **firebase-admin** — backend token verification (see [backend/auth.py](backend/auth.py))
-- **google-cloud-firestore** — primary data store
-- **google-cloud-storage** — file/backup storage
-- **google-genai** — **primary LLM SDK (Vertex AI Gemini)**
-- **anthropic** — also present in requirements; Claude may be used as secondary model. Confirm with user before introducing new Anthropic calls.
-- **openpyxl + pandas** — Excel parsing for legacy/import flows
+- **FastAPI + uvicorn[standard]** — API layer; serves built SPA in prod
+- **psycopg[binary,pool]** — PostgreSQL via psycopg3; connection pool in `db.py`
+- **PyJWT[crypto] + httpx** — Entra External ID JWT verification in `auth.py`
+- **azure-identity + azure-keyvault-secrets** — Azure Key Vault for prod secrets
+- **openpyxl + pandas** — Excel parsing for legacy import flows
 - **python-multipart** — file uploads
 
 ### Runtime
-- **Python 3.11** (see [Dockerfile](Dockerfile))
+- **Python 3.11** (Dockerfile)
 - **Node 20** (Dockerfile frontend build stage)
 
 ---
 
-## 3. Repository Structure
+## 3. Infrastructure Status
 
-```
-Lena/
-├── backend/
-│   ├── main.py                    # FastAPI entrypoint; mounts SPA from frontend/dist in prod
-│   ├── auth.py                    # Firebase token verification, get_current_user dependency
-│   ├── config.py                  # Hardcoded PROJECTS, month maps, expense breakdowns, file paths
-│   ├── storage.py                 # Firestore/JSON persistence helpers
-│   ├── create_user.py             # Admin script for user setup
-│   ├── create_test_projects.py    # Seed/demo data script
-│   ├── routers/
-│   │   ├── auth.py                # /api/auth/* — login, user profile
-│   │   ├── projects.py            # /api/projects/* — CRUD
-│   │   ├── project_form.py        # /api/projects/form/* — wizard intake
-│   │   ├── dashboard.py           # /api/dashboard/* — aggregated KPIs
-│   │   ├── cashflow.py            # /api/cashflow/* — cumulative & monthly net
-│   │   ├── reports.py             # /api/reports/* — spot reports
-│   │   └── ai.py                  # /api/ai/* — chat stream, whatif, risk-scores
-│   ├── services/
-│   │   ├── unified.py             # Shared project data access layer
-│   │   ├── form_calculator.py     # P&L math from form inputs (SENSITIVE — see §9)
-│   │   ├── calculator_agent.py    # Risk scoring, what-if, budget-vs-actual (SENSITIVE)
-│   │   ├── ai_agents.py           # LLM system prompt, chat_stream, context builder
-│   │   ├── excel_reader.py        # Legacy Excel import
-│   │   └── payment_terms.py       # Payment schedule logic
-│   ├── service-account.json       # GCP SA key (local dev only — MUST be gitignored, see §10)
-│   └── requirements.txt
-├── frontend/
-│   ├── src/
-│   │   ├── App.vue                # Top nav + tab router + role gating
-│   │   ├── main.js                # Entry
-│   │   ├── firebase.js            # Firebase client init (project minlog-491211)
-│   │   ├── style.css              # Global tokens, RTL base
-│   │   ├── services/api.js        # All HTTP calls + formatters (single source of truth for API surface)
-│   │   └── components/            # 28 Vue SFCs (pages, charts, modals)
-│   ├── vite.config.js             # Proxies /api → localhost:8000 in dev
-│   ├── tailwind.config.js
-│   └── package.json
-├── Dockerfile                     # Multi-stage: build frontend → bundle into Python image → uvicorn
-├── CLAUDE.md                      # This file
-└── (data.xlsx, *.json, backups/, contracts/)    # Gitignored data artifacts
-```
+### Migration history (completed)
+| Layer | Old (abandoned) | New (current) |
+|---|---|---|
+| Auth | Firebase Auth | Microsoft Entra External ID (backend JWT verified; frontend login still Phase 0 stub) |
+| Database | Cloud Firestore | PostgreSQL (psycopg3 pool; schema in `backend/migrations/001_init.sql`) |
+| Secrets | GCP Secret Manager | Azure Key Vault (`AZURE_KEY_VAULT_URL` + managed identity) |
+| Hosting target | GCP Cloud Run | Azure Container Apps (not yet deployed — see §11) |
 
-**Notable currently-disabled features:** `AttendanceView.vue`, `DataView.vue`, `routers/attendance.py`, `routers/data.py` were removed but are **temporarily disabled**, not permanently gone. Do not delete references defensively; do not reintroduce them without asking.
+### GCP/Firebase status
+**Completely abandoned.** The Firebase project `minlog-491211`, Cloud Firestore, Cloud Run, Vertex AI — none of this is in use or referenced. `.gitignore` retains legacy GCP credential patterns as a safeguard, not because they're active. Do not add any new GCP/Firebase dependencies.
+
+### Current stub areas (not yet wired)
+- **Frontend login** — Phase 0 stub. Any email+password submission stores a DEV token in localStorage and emits `login`. Real Entra OIDC flow is pending.
+- **AI chat** — Phase 0 stub. `chat_stream()` in `ai_agents.py` emits a single placeholder SSE event. Azure OpenAI wiring is the planned next step.
+- **Production deployment** — App runs locally only. No Azure Container Apps environment exists yet.
 
 ---
 
-## 4. Running the App
+## 4. Repository Structure
 
-### Day-to-day local dev: **Docker**
-The user runs the app via Docker locally. A production [Dockerfile](Dockerfile) exists (multi-stage: builds Vue frontend, copies into a Python 3.11 image, runs uvicorn serving both API and static SPA).
-
-**Gap Claude may be asked to fix:** there is no `docker-compose.yml` yet for local dev with live reload. If asked to set one up, propose: one service for backend (uvicorn with `--reload`), one for frontend (vite dev server), shared volume for source, proxied via vite. Ask before creating.
-
-### Fallback — bare metal
-```bash
-# Backend
-cd backend && pip install -r requirements.txt
-uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-
-# Frontend (separate terminal)
-cd frontend && npm install && npm run dev
 ```
-Vite dev server runs on port 3000 and proxies `/api/*` → `localhost:8000`.
-
-### Build for production
-```bash
-docker build -t logfi .
-docker run -p 8000:8000 --env-file .env logfi
+proj-lena/
+├── backend/
+│   ├── main.py                    # FastAPI app; CORS, middleware, routers, SPA fallback
+│   ├── auth.py                    # Entra External ID JWT verify; get_current_user dependency
+│   ├── db.py                      # PostgreSQL connection pool (lazy; supports Azure Key Vault)
+│   ├── storage.py                 # Persistence layer — PostgreSQL via psycopg3
+│   │                              #   (functions keep _firestore suffix for call-site compat)
+│   ├── middleware.py              # RequestLoggingMiddleware — structured JSON logs to stdout
+│   ├── exception_handlers.py     # global_exception_handler — logs + 500 JSON response
+│   ├── config.py                  # Legacy PROJECTS / EXPENSE_BREAKDOWN constants (pre-Postgres era)
+│   ├── create_user.py             # Admin script for user setup
+│   ├── create_test_projects.py    # Seed/demo data script
+│   ├── migrations/
+│   │   └── 001_init.sql           # Schema: users, projects (JSONB data column), reports
+│   ├── routers/
+│   │   ├── auth.py                # /api/auth/* — login stub, profile, user CRUD
+│   │   ├── projects.py            # /api/projects/* — CRUD
+│   │   ├── project_form.py        # /api/projects/form/* — wizard intake + actuals
+│   │   ├── dashboard.py           # /api/dashboard/* — aggregated KPIs
+│   │   ├── cashflow.py            # /api/cashflow/* — cumulative & monthly net
+│   │   ├── reports.py             # /api/reports/* — spot reports
+│   │   └── ai.py                  # /api/ai/* — chat stub, whatif, risk-scores
+│   ├── services/
+│   │   ├── unified.py             # Shared project data access layer
+│   │   ├── form_calculator.py     # P&L math from form inputs (SENSITIVE — see §9)
+│   │   ├── calculator_agent.py    # Risk scoring, what-if, budget-vs-actual (pure Python, no LLM)
+│   │   ├── ai_agents.py           # SYSTEM_PROMPT + chat_stream stub; context builder
+│   │   ├── excel_reader.py        # Legacy Excel import
+│   │   └── payment_terms.py       # Payment schedule logic
+│   ├── tests/
+│   │   ├── conftest.py            # pytest fixtures: RSA key pair, Entra OIDC stubs, Postgres
+│   │   ├── test_auth.py           # Auth JWT verification tests
+│   │   └── test_storage.py        # Storage layer tests (requires DATABASE_URL)
+│   └── requirements.txt
+├── frontend/
+│   ├── src/
+│   │   ├── App.vue                # Top nav + tab router + role gating + toast host
+│   │   ├── main.js                # Entry
+│   │   ├── style.css              # Design tokens (CSS custom props), RTL base, global classes
+│   │   ├── services/
+│   │   │   └── api.js             # All HTTP calls + formatters (sole API surface)
+│   │   ├── composables/
+│   │   │   ├── useFocusTrap.js    # WCAG 2.1.2 keyboard trap for modals
+│   │   │   └── useToast.js        # Toast notification provider/consumer
+│   │   ├── utils/
+│   │   │   └── chartDefaults.js   # COLORS token object + shared Chart.js plugin config
+│   │   └── components/
+│   │       ├── editorial/         # Design system primitives (see §6)
+│   │       │   ├── index.js       # Named re-exports + currentHebrewDate()
+│   │       │   ├── SectionHeader.vue
+│   │       │   ├── RuledSection.vue
+│   │       │   ├── HeroNumber.vue
+│   │       │   ├── DataTable.vue
+│   │       │   ├── PullQuote.vue
+│   │       │   ├── SectionMarker.vue
+│   │       │   ├── Dateline.vue
+│   │       │   ├── FootnoteSource.vue
+│   │       │   ├── EpigraphCaption.vue
+│   │       │   └── SkeletonLoader.vue
+│   │       ├── (29 page/feature components — see §6 for map)
+│   │       └── ...
+│   ├── vite.config.js             # Proxies /api → localhost:8000 in dev
+│   ├── tailwind.config.js
+│   └── package.json
+├── Dockerfile                     # Multi-stage: Node build → Python 3.11 → uvicorn
+├── CLAUDE.md                      # This file
+└── (.gitignore covers: node_modules, dist, .env, *.xlsx, *.json data files, GCP creds)
 ```
-In production the FastAPI app serves the built SPA at `/` and catches all non-`/api` routes via [main.py:33](backend/main.py#L33).
 
-### Tests
-**Stated rule:** a full test suite is required for changes.
-**Current reality:** no test suite exists yet in the repo. This is a **gap**, not a settled state. When Claude makes non-trivial changes, it should:
-1. Propose adding tests (pytest for backend, Vitest for frontend) alongside the change.
-2. For touched financial/AI logic, prioritize writing tests *even if* the surrounding area is untested.
-3. When the user explicitly says "skip tests," respect that — but note it in the plan.
-
-Until a test runner is configured, every plan must include a **manual verification checklist** the user can click through.
+**Temporarily disabled features:** `AttendanceView.vue`, `DataView.vue`, and their backend routers were removed but are on hold, not permanently gone. Do not delete references defensively; do not reintroduce without asking.
 
 ---
 
 ## 5. Architecture & Data Flow
 
-### Data store: **Firestore (canonical)**
-All persistent data lives in **Cloud Firestore** (project `minlog-491211`). Excel and JSON files in the repo (`data.xlsx`, `projects_data.json`, `reports.json`, `attendance_data.json`) are either:
-- legacy artifacts from the pre-Firebase era, or
-- import sources used by one-off scripts.
+### Database: PostgreSQL (canonical)
 
-**Do not** treat local JSON files as the source of truth. **Do not** write new features that read/write those files unless explicitly migrating. When in doubt, read from Firestore via [backend/storage.py](backend/storage.py) and [backend/services/unified.py](backend/services/unified.py).
+Schema lives in `backend/migrations/001_init.sql`. Three tables:
 
-The hardcoded `PROJECTS` / `EXPENSE_BREAKDOWN` dicts in [backend/config.py](backend/config.py) are also legacy Excel-era constants. Check whether a feature should be pulling from Firestore instead before relying on them.
+| Table | Key columns | Notes |
+|---|---|---|
+| `users` | `uid TEXT PK`, `email`, `full_name`, `role`, `linked_manager`, `avatar` | uid = Entra `oid` (or `dev-admin` in DEV_MODE) |
+| `projects` | `id TEXT PK` (project name), hot cols (`manager`, `axis`, `area`, `status`, `source`), `data JSONB` | Full form payload in `data`; hot cols indexed |
+| `reports` | `id SERIAL`, `project_id → projects.id`, `month`, `type`, `title`, `amount` | Cascading delete on project removal |
+
+Apply schema: `psql "$DATABASE_URL" -f backend/migrations/001_init.sql`
+
+`storage.py` function names retain `_firestore` suffix for call-site compatibility — this is intentional and will be renamed in a later pass.
+
+**Do not** treat any local JSON files as the source of truth. The hardcoded `PROJECTS`/`EXPENSE_BREAKDOWN` dicts in `config.py` are legacy Excel-era constants — check whether any feature should be pulling from Postgres before relying on them.
 
 ### Auth
-- **Frontend:** Firebase Auth via [firebase.js](frontend/src/firebase.js). Login flow in [LoginPage.vue](frontend/src/components/LoginPage.vue). ID token attached to API requests.
-- **Backend:** [backend/auth.py](backend/auth.py) verifies tokens with `firebase-admin`. All protected routers use `Depends(get_current_user)` — see [backend/routers/ai.py:9](backend/routers/ai.py#L9) as reference.
-- **Roles:** at least `admin` and `project_manager` (checked in [App.vue](frontend/src/App.vue) for tab gating). More may exist — grep before assuming.
 
-### AI layer ([backend/services/ai_agents.py](backend/services/ai_agents.py), [backend/services/calculator_agent.py](backend/services/calculator_agent.py))
-- **Primary model:** Google Vertex AI Gemini via `google-genai` SDK.
-- **Endpoints** (all under [backend/routers/ai.py](backend/routers/ai.py)):
-  - `POST /api/ai/chat` — streaming chat (SSE) over project context
-  - `POST /api/ai/whatif` — scenario simulation for a project
-  - `GET /api/ai/risk-scores` — all projects
-  - `GET /api/ai/risk-score/{project}` — single project
-- **Frontend UI:** [AiChat.vue](frontend/src/components/AiChat.vue), [WhatIfPanel.vue](frontend/src/components/WhatIfPanel.vue), [RiskScoreBadge.vue](frontend/src/components/RiskScoreBadge.vue), [ExecutiveDashboard.vue](frontend/src/components/ExecutiveDashboard.vue).
-- **Prompts live in code.** `SYSTEM_PROMPT` and context-building functions are in `ai_agents.py`. See §9 before editing prompts.
+**Backend** (`auth.py`): Entra External ID RS256 JWT verification. Flow:
+1. Extract bearer token from `Authorization` header.
+2. If `DEV_MODE=true` and token is `dev-admin-local`, short-circuit to admin user.
+3. Otherwise: decode JWT header, look up `kid` in JWKS cache (fetched from OIDC discovery), verify signature via PyJWT.
+4. Extract `oid` as `uid`; `preferred_username` / `email` for email.
+5. Merge role, `linked_manager`, `full_name` from `users` table (not from token claims). First-time logins auto-insert a `viewer` row.
+
+**Frontend** (`LoginPage.vue`): Phase 0 stub. Email+password form that stores the DEV token in `localStorage` and emits `login`. No real Entra OIDC flow yet. `api.js` reads `auth_token` from localStorage and sets `Authorization: Bearer <token>`.
+
+**Roles** (four, exhaustive):
+
+| Role | Hebrew label | Access |
+|---|---|---|
+| `admin` | מנהל מערכת | Full access; settings; user management |
+| `economist` | כלכלנית | Same edit rights as admin; no user management |
+| `viewer` | צופה מלא | Read-only; default on first login |
+| `project_manager` | מנהל פרויקט | Sees only assigned projects (My Projects view) |
+
+`isAdmin` = `role === 'admin'`. `isEditor` = `['admin', 'economist'].includes(role)`.
+
+### AI layer
+
+**Status: fully stubbed.** No LLM is connected.
+
+- `chat_stream()` in `ai_agents.py` emits one placeholder SSE event and returns.
+- `SYSTEM_PROMPT` and the context builder are preserved and model-agnostic — ready to wire to Azure OpenAI.
+- `calculator_agent.py` (what-if simulation, risk scores, budget-vs-actual) runs **pure Python math** — no LLM dependency, fully functional.
+
+When the AI wiring task comes: confirm with the user before adding any LLM SDK dependency. Likely target is Azure OpenAI via `openai` SDK (not `anthropic` or `google-genai`).
+
+**Frontend UI components** (AiChat.vue, WhatIfPanel.vue, RiskScoreBadge.vue) are fully built and accessible. They surface the stub responses correctly.
 
 ### API conventions
-- All routes under `/api/`.
-- Response shapes: `{ data: ... }`, `{ projects: [...] }`, `{ scores: [...] }` — follow the existing router's shape when adding endpoints.
-- Error messages raised via `HTTPException` **in Hebrew**: `raise HTTPException(status_code=404, detail="פרויקט לא נמצא")`.
-- All frontend HTTP calls go through [frontend/src/services/api.js](frontend/src/services/api.js). Do not `axios.get` directly from components.
+- All routes under `/api/`. Health check at `GET /api/health`.
+- Response shapes follow the existing router's pattern. Add to the same pattern when extending.
+- Error messages via `HTTPException` **in Hebrew**: `raise HTTPException(status_code=404, detail="פרויקט לא נמצא")`.
+- All frontend HTTP calls go through `frontend/src/services/api.js`. Never `axios.get` directly from components.
 
 ### State management
 - No Pinia, no Vuex. Component-local `ref()` + `computed()`.
-- `activeTab` ref in [App.vue](frontend/src/App.vue) controls which page renders. No Vue Router today — the user is **open to introducing Vue Router** if there's a clear reason, but it's not required. Don't migrate for its own sake.
-- Cross-component state is passed via props or re-fetched from the API. That's the accepted tradeoff; don't invent a global store.
+- `activeTab` ref in `App.vue` controls which page renders. No Vue Router — open to introducing it if there's a clear reason, but don't migrate for its own sake.
+- Cross-component state passes via props or re-fetches from the API.
 
 ---
 
 ## 6. Code Style & Conventions
 
 ### Hard rules (violating these is a bug)
-- **Hebrew UI, English code.** Every user-visible string in Hebrew. Every identifier, comment, and log line in English.
+- **Hebrew UI, English code.** Every user-visible string in Hebrew. Every identifier, comment, log line in English.
 - **Composition API only.** No `<script>` Options API blocks.
-- **Financial values in ₪ (ILS).** Months are 1–12 (the app uses `MONTH_LABELS` starting Sep; see [config.py:82](backend/config.py#L82)).
+- **Financial values in ₪ (ILS).** Use `formatNumber` from `api.js`. Months are 1–12.
 - **RTL everywhere.** Root has `dir="rtl"`; Chart.js tooltips need `{ rtl: true, cornerRadius: 12 }`.
 - **Revenue forecasts must sum to 100%** (percentage-based in the project form).
+- **All colors via design tokens** — `var(--*)` in CSS/templates; `COLORS.*` from `chartDefaults.js` in JS Chart.js config. Never hardcode hex in component styles.
+
+### Design system
+
+The design system is editorial/typographic — **not** glassmorphic, not iOS-inspired. The old `.ios-card` description is obsolete.
+
+**CSS tokens** (defined in `style.css` as custom properties):
+
+| Token group | Key tokens |
+|---|---|
+| Surface | `--surface`, `--surface-muted`, `--bg` |
+| Ink | `--ink`, `--ink-strong`, `--ink-muted`, `--ink-faint`, `--ink-whisper` |
+| Border | `--border`, `--border-strong` |
+| Accent | `--accent`, `--accent-hover`, `--accent-soft` |
+| Semantic | `--positive`, `--positive-soft`, `--negative`, `--negative-soft`, `--warning`, `--warning-soft`, `--info` |
+| Radius | `--radius-sm`, `--radius-md`, `--radius-lg`, `--radius-xl` |
+| Shadow | `--shadow-sm`, `--shadow-md`, `--shadow-xl` |
+| Motion | `--ease-out`, `--dur-press` |
+
+**Chart.js color tokens** — import `COLORS` from `src/utils/chartDefaults.js`. Never use raw hex strings for chart datasets. Key values: `COLORS.accent`, `COLORS.emerald`, `COLORS.cyan`, `COLORS.purple`, `COLORS.amber`, `COLORS.amberFill`, `COLORS.amberLight`, `COLORS.paperLight`.
+
+**Editorial component library** — import from `./editorial` (the `index.js` barrel):
+- `SectionHeader` — page-level title block with eyebrow, kicker, subtitle, actions slot. Accepts `level` prop (default 2) for heading level.
+- `RuledSection` — titled section with ruled separator, footnote slot.
+- `HeroNumber` — large KPI display with tone, prefix, footnote.
+- `DataTable` — sortable, searchable, paginated table with custom cell slots.
+- `PullQuote` — callout with semantic variants (negative, warning, info).
+- `SectionMarker` — tab-bar navigation component.
+- `SkeletonLoader` — loading placeholders (variants: kpi, chart, cards).
+- `FootnoteSource`, `Dateline`, `EpigraphCaption` — typography utilities.
+- `currentHebrewDate()` — utility: current month in Hebrew, e.g. "מאי 2026".
+
+**Composables** (`src/composables/`):
+- `useFocusTrap(containerRef)` — activate/deactivate keyboard trap for modals. Always use on modal-like surfaces. Returns `{ activate, deactivate }`. Wire via `watch(show, async val => { if (val) { await nextTick(); activate() } else { deactivate() } })`.
+- `useToast()` — `{ success(msg), error(msg), info(msg) }`. Provider in `App.vue`; inject with `useToast()` in any component.
+
+**Accessibility — WCAG 2.1 AA compliant.** All forms have `for`/`id` label/input pairs. All modals use `useFocusTrap`. All decorative SVGs have `aria-hidden="true"`. Icon-only buttons have `aria-label`. The AI chat message list has `aria-live="polite"`. `sr-only` h1 landmarks on Dashboard and ExecutiveDashboard. Do not regress these.
+
+**Banned patterns** (enforced by `/impeccable` design system):
+- Side-stripe borders: no `border-left/right > 1px` as colored accents on cards or alerts
+- Gradient text: no `background-clip: text`
+- Glassmorphism: no decorative blurs
+- Layout property animations: use `transform` + `scaleX()` instead of animating `width`/`height`
+- Hardcoded hex in component styles: always use `var(--*)` or `COLORS.*`
+
+### Component map (29 main + 10 editorial)
+
+**Pages / views:** `Dashboard.vue`, `ExecutiveDashboard.vue`, `PnlView.vue`, `CashFlowView.vue`, `AlertsView.vue`, `MyProjectsView.vue`, `ProjectDetailsView.vue`, `ProjectFormDashboard.vue`, `LoginPage.vue`
+
+**Feature panels:** `AiChat.vue`, `WhatIfPanel.vue`, `MonthlyActualsEditor.vue`
+
+**Modals:** `ProjectFormModal.vue`, `SettingsModal.vue`, `UserProfileModal.vue`, `ReportModal.vue`
+
+**Charts:** `PnlChart.vue`, `CashFlowChart.vue`, `RevenueExpenseChart.vue`, `MonthlyNetChart.vue`, `ProjectNetChart.vue`, `CashflowMiniChart.vue`, `ProjectCashflowChart.vue`, `ProjectCompareChart.vue`, `ProfitBarChart.vue`, `ExpenseBreakdown.vue`
+
+**Atoms:** `DatePicker.vue`, `RiskScoreBadge.vue`
 
 ### Linting & formatting
-**Stated rule:** full linting both sides (ESLint + Prettier on frontend, Black + Ruff on backend).
-**Current reality:** not yet configured in the repo. If Claude is asked to set it up, do both sides in one PR:
+Not yet configured. If asked to set it up:
 - Frontend: ESLint flat config + Prettier, `lint` and `format` npm scripts.
-- Backend: Ruff (lint + format) — modern consolidated choice, faster than Black+Flake8.
-- Do **not** silently auto-lint unrelated files when making a change. Wait until the config is in place and the user opts into a sweep.
+- Backend: Ruff (lint + format).
+- Do **not** silently auto-lint unrelated files alongside a feature change.
 
 ### Naming
 - Components: `PascalCase.vue`
-- JS services: `camelCase.js`
+- JS services/composables/utils: `camelCase.js`
 - Python modules: `snake_case.py`
-- API endpoints: `/api/resource/verb` with kebab-case (e.g. `/api/ai/risk-scores`)
+- API endpoints: `/api/resource/verb` kebab-case
 
-### Design tokens
-- Primary: `#0D9488` (teal) / `emerald-800` via Tailwind for brand surfaces
-- Cards: `.ios-card` — white, `rounded-2xl`, `shadow-sm`, `border-gray-100`
-- Chart palette: `#0D9488`, `#22c55e`, `#06b6d4`, `#8b5cf6`, `#f59e0b`
+### Recipes
 
-### Recipes for common work
 **New page:**
-1. Create SFC in [frontend/src/components/](frontend/src/components/)
-2. Import and register as a tab in [App.vue](frontend/src/App.vue)
-3. Add role gating (`v-if="isAdmin"` or `v-if="userProfile?.role === '...'"`) if needed
-4. Fetch data via [api.js](frontend/src/services/api.js)
+1. Create SFC in `frontend/src/components/`
+2. Import as `defineAsyncComponent` in `App.vue`
+3. Add `activeTab` case and role gate
+4. Fetch data via `api.js`
+5. Add `<h1 class="sr-only">…</h1>` as first element for SR page landmark
 
 **New API endpoint:**
-1. Add route in the appropriate `backend/routers/*.py` (create a new router module if it's a new domain, and register it in [backend/main.py](backend/main.py))
-2. Add `Depends(get_current_user)` for anything non-public
-3. Export a typed function from [api.js](frontend/src/services/api.js)
-4. Hebrew error messages via `HTTPException`
+1. Route in appropriate `backend/routers/*.py`
+2. `Depends(get_current_user)` on anything non-public
+3. Export from `api.js`
+4. Hebrew `HTTPException` detail
 
 **New chart:**
-1. vue-chartjs component, registered ChartJS modules imported at top
-2. RTL tooltip config, teal palette, consistent card wrapper
+1. vue-chartjs component, register ChartJS modules at top
+2. Import `COLORS` and `chartDefaults` from `utils/chartDefaults.js`
+3. RTL tooltip: `{ rtl: true, cornerRadius: 12 }`
+
+**New modal:**
+1. `ref="modalCard"` on the card element
+2. Import and wire `useFocusTrap(modalCard)` with `watch(show, ...)`
+3. All inputs must have `for`/`id` label associations
+4. Close button needs `aria-label="סגור"`
 
 ---
 
 ## 7. How Claude Works in This Repo
 
-The user picked these settings explicitly. Follow them.
-
 ### Autonomy: **plan first, then execute**
 For any non-trivial change:
-1. Read enough of the code to understand the real state (don't guess).
+1. Read enough code to understand the real state (don't guess).
 2. Produce a plan: files to touch, exact changes, risks, verification steps.
 3. Wait for approval.
-4. Execute. Report back with diff summary and verification results.
+4. Execute. Report back.
 
-Trivial fixes (typos, obvious one-line bugs, answering questions) don't need a formal plan.
+Trivial fixes (typos, obvious one-liners, answering questions) don't need a formal plan.
 
 ### When uncertain: **research more, then decide**
-Don't ask the user a question you could answer by reading 3 more files. Grep, read, verify, *then* either proceed with confidence or come back with a specific, narrow question. Vague "what do you think?" questions are not welcome — if you ask, give the user 2–3 concrete options with your recommendation.
+Don't ask the user a question you could answer by reading 3 more files. Grep, read, verify — then either proceed with confidence or come back with 2–3 concrete options and a recommendation.
 
 ### Communication style
 - Reply in **English**. UI strings in Hebrew.
-- **Adaptive verbosity:** terse action-first for small tasks; step-by-step reasoning for complex/risky changes (financial logic, auth, migrations).
+- Terse action-first for small tasks; step-by-step reasoning for complex/risky changes.
 - No trailing summary of obvious diffs. The user reads diffs.
-- Lead with the answer or action, not the preamble.
+- Lead with the answer or action.
 
 ### Commits
-Descriptive multi-line style:
 ```
 Short imperative title (<72 chars)
 
-Body explaining the *why*: what problem this solves, what the user
-was seeing, and any non-obvious tradeoffs. Reference files and
-functions if it helps future-reader navigate.
+Body explaining the why: what problem this solves, what the user
+was seeing, and any non-obvious tradeoffs. Reference files if it
+helps future readers navigate.
 ```
 Never commit unless the user asks. Never `--amend` without being told.
 
-### Primary task mix (in rough order of frequency)
-1. **New features** — AI-driven, dashboard views, role flows
-2. **AI prompt & agent tuning** — improving [ai_agents.py](backend/services/ai_agents.py) prompts, tool definitions, context building
-3. **Bug fixes** — across any area
-
-Refactors are welcome but should be explicit and scoped, never snuck in alongside feature work.
+### Primary task mix (rough frequency order)
+1. **Azure deployment pipeline** — the explicit next priority: Container Apps config, CI/CD
+2. **Frontend Entra login** — replace Phase 0 stub with real OIDC flow
+3. **AI chat wiring** — connect Azure OpenAI to the existing stub infrastructure
+4. **New features** — dashboard views, role flows
+5. **Bug fixes** — across any area
 
 ---
 
 ## 8. Current Hot Zones (in flux — treat with care)
 
-These areas are actively changing and more likely to have rough edges. Read carefully before editing.
+1. **Auth stub → real Entra flow.** `LoginPage.vue` is a stub. `auth.py` is ready for production JWT verification but depends on `ENTRA_*` env vars. Any change to the login flow needs coordination across both.
 
-1. **Financial calculations** — [backend/services/form_calculator.py](backend/services/form_calculator.py), [backend/services/calculator_agent.py](backend/services/calculator_agent.py). Small changes to P&L math ripple into every dashboard number and every AI risk score. See §9.
-2. **AI features** — The whole AI stack is new: [routers/ai.py](backend/routers/ai.py), [services/ai_agents.py](backend/services/ai_agents.py), and the frontend components [AiChat.vue](frontend/src/components/AiChat.vue), [WhatIfPanel.vue](frontend/src/components/WhatIfPanel.vue), [RiskScoreBadge.vue](frontend/src/components/RiskScoreBadge.vue), [ExecutiveDashboard.vue](frontend/src/components/ExecutiveDashboard.vue). Expect churn. Prompts and tool signatures may change between sessions.
-3. **Auth / user management** — Firebase migration is recent; role semantics (`admin`, `project_manager`, possibly more) are still settling. Check [backend/auth.py](backend/auth.py) and the role checks in [App.vue](frontend/src/App.vue) before assuming.
+2. **AI features.** `ai_agents.py` `chat_stream()` is a stub. `calculator_agent.py` (risk scoring, what-if) is functional pure-Python. When wiring Azure OpenAI, touch only `ai_agents.py` — do not touch calculator logic.
+
+3. **Financial calculations.** `form_calculator.py` and the P&L math in `calculator_agent.py` drive every dashboard number. Small changes ripple everywhere. See §9.
+
+4. **storage.py function naming.** Functions keep `_firestore` suffix intentionally (call-site compat). A rename pass is planned — don't do it opportunistically alongside feature work.
 
 ---
 
 ## 9. Do Not Touch Without Explicit Approval
 
-These areas are **locked** by default. If a task seems to require touching them, stop and ask.
+1. **Auth configuration.** `auth.py`, the login flow in `LoginPage.vue`, any Entra app registration settings. Breaking auth locks everyone out.
 
-1. **Auth / Firebase configuration.**
-   [frontend/src/firebase.js](frontend/src/firebase.js), [backend/auth.py](backend/auth.py), Firebase console settings, security rules, the login flow in [LoginPage.vue](frontend/src/components/LoginPage.vue). Breaking auth locks everyone out.
+2. **Database schema / data.** No destructive writes, no schema changes, no migration scripts unprompted. Read freely; write only through normal app code paths.
 
-2. **Firestore data & backups.**
-   No destructive writes, no schema migrations, no "cleanup" scripts, no bulk deletes. Read freely; write only through normal app code paths that the user is testing end-to-end. Never run a migration script unprompted. Never delete a backup.
+3. **Financial calculation formulas.** `form_calculator.py`, P&L and margin math in `calculator_agent.py`. These drive management decisions and the user has been burned by silent formula changes. Reading is fine; changing requires the user to explicitly say "edit the formula" and review the diff line-by-line.
 
-3. **Financial calculation formulas.**
-   `form_calculator.py`, the P&L math in `calculator_agent.py`, revenue/expense aggregation, margin calculations. Reason: these numbers drive management decisions and the user has been burned by silent formula changes. Reading is fine; changing requires the user to explicitly say "edit the formula" and review the diff line-by-line.
-
-4. **AI system prompts.**
-   The `SYSTEM_PROMPT` and context-builder in [backend/services/ai_agents.py](backend/services/ai_agents.py) shape what the AI CFO says to the user. Prompt tuning is a primary task — *but* changes should be proposed in the plan phase with before/after text, not snuck into a diff.
+4. **AI system prompts.** `SYSTEM_PROMPT` and context-builder in `ai_agents.py`. Propose before/after text in the plan phase — don't change in a diff without prior review.
 
 ---
 
 ## 10. Secrets, Config & Environment
 
-### Where secrets live today
-- **Local dev:** `.env` files (gitignored) + `backend/service-account.json` (GCP SA key)
-- **Production target:** **GCP Secret Manager** for backend secrets, Firebase config baked into the frontend bundle (Firebase client keys are not secrets — they're scoped by security rules)
-
-### service-account.json — current status & recommendation
-The file `backend/service-account.json` is currently present as an untracked file. **Gitignore gap:** [.gitignore](.gitignore) blocks `backend/firebase-service-account.json` and `*firebase-adminsdk*.json` but **does not block the exact filename `service-account.json`**. First action if Claude is asked to help with secrets: add `backend/service-account.json` and `**/service-account*.json` to `.gitignore`. Verify the file has never been committed (`git log --all --full-history -- backend/service-account.json`).
-
-**Recommended long-term pattern** (ask the user before implementing):
-- **Local dev:** keep `service-account.json` on disk, export `GOOGLE_APPLICATION_CREDENTIALS=/app/backend/service-account.json`. Never commit.
-- **Cloud Run:** attach a dedicated runtime service account with IAM roles for Vertex AI, Firestore, Cloud Storage, and Secret Manager. **No key file needed in the container** — the ADC (Application Default Credentials) flow picks up the runtime SA automatically. This is the GCP-native pattern and eliminates the key-leak risk entirely.
-
 ### Expected environment variables
-Based on code inspection:
-- `ALLOWED_ORIGINS` — CORS whitelist, comma-separated (see [main.py:8](backend/main.py#L8))
-- `PORT` — server port (Cloud Run injects this; default 8000)
-- `GOOGLE_APPLICATION_CREDENTIALS` — path to SA key for local dev
-- Firebase admin and Vertex/google-genai will pick up credentials via ADC; no explicit vars if ADC is configured
-- Likely also: Firebase project ID, Gemini model name, any Anthropic API key if Claude is being called. Confirm by reading [backend/services/ai_agents.py](backend/services/ai_agents.py) when in doubt.
+
+**Local dev** (put in `backend/.env`):
+```
+DEV_MODE=true
+DATABASE_URL=postgresql://user:pass@localhost:5432/logfi
+ALLOWED_ORIGINS=http://localhost:3000
+```
+
+**Production (Azure Container Apps)**:
+```
+ENTRA_TENANT_ID=<tenant-guid>
+ENTRA_CLIENT_ID=<app-registration-guid>
+ENTRA_AUTHORITY=https://<tenant>.ciamlogin.com   # Entra External ID
+AZURE_KEY_VAULT_URL=https://<vault>.vault.azure.net
+POSTGRES_SECRET_NAME=POSTGRES-CONN               # default; Key Vault secret name
+ALLOWED_ORIGINS=https://app.example.com
+PORT=8080                                         # Azure Container Apps injects this
+```
+
+When `AZURE_KEY_VAULT_URL` is set, `db.py` fetches the Postgres connection string from Key Vault via managed identity — no key file in the container.
+
+### DEV_MODE
+When `DEV_MODE=true`, `auth.py` accepts the token string `dev-admin-local` and maps it to a hardcoded admin user. The frontend Phase 0 stub always sends this token. Never enable DEV_MODE in production.
 
 ### Sensitive data
-- Financial data for real company projects. Treat all project names, revenue figures, and employee attendance as confidential.
-- Don't paste real data into external tools (pastebins, diagram services, third-party AI) during debugging.
+Financial data for real company projects. Treat all project names, revenue figures, and employee data as confidential. Don't paste into external tools (pastebins, diagram services, third-party AI).
 
 ---
 
-## 11. Deployment (Target: GCP Cloud Run)
+## 11. Deployment (Target: Azure Container Apps)
 
-**Current state: no working deploy pipeline.** The user said explicitly: *"I don't deploy it properly yet and I should do it."* This is an open area Claude is expected to help design when asked.
+**Current state: not deployed.** The app runs locally only. The `Dockerfile` is production-ready (multi-stage: Vite build → Python 3.11 image → uvicorn). No cloud environment exists yet.
+
+The user's stated next priority is deploying to Azure Container Apps.
 
 ### Target architecture
-- **Cloud Run** — single service running the multi-stage [Dockerfile](Dockerfile) (FastAPI serving API + bundled frontend SPA)
-- **Vertex AI (Gemini)** — LLM via `google-genai` SDK, authenticated via Cloud Run runtime SA
-- **Firebase** — Auth + Firestore (project `minlog-491211`)
-- **Secret Manager** — backend secrets (any API keys, webhook URLs, etc.)
-- **Cloud Build** — CI/CD trigger on `git push` to `main`
-- **Region:** confirm with user before first deploy. Common choice for Israel is `europe-west1` (Belgium) or `europe-west4` (Netherlands) — lowest latency, Vertex + Firestore both supported. Avoid US regions unless there's a reason.
+- **Azure Container Apps** — single container running the multi-stage `Dockerfile` (FastAPI + bundled SPA)
+- **Azure Database for PostgreSQL** — managed Postgres, connected via `POSTGRES-CONN` secret in Key Vault
+- **Azure Key Vault** — all backend secrets; accessed via managed identity (no key files in container)
+- **Microsoft Entra External ID** — auth provider (backend JWT verification ready; frontend login pending)
+- **Azure Container Registry** — image registry
+- **Region:** confirm with user. `swedencentral` or `westeurope` are low-latency options for Israel.
 
-### What's missing (tasks Claude may be asked to do)
-- [ ] `cloudbuild.yaml` at repo root — build image, push to Artifact Registry, deploy to Cloud Run
-- [ ] Cloud Build trigger wired to the GitHub repo
-- [ ] Runtime service account with minimal IAM (`roles/aiplatform.user`, `roles/datastore.user`, `roles/storage.objectUser`, `roles/secretmanager.secretAccessor`)
-- [ ] Secret Manager entries for any backend API keys, wired into Cloud Run env
-- [ ] `docker-compose.yml` for local dev (separate from prod Dockerfile)
-- [ ] Health check endpoint (`/healthz`) if not already present
+### What's missing
+- [ ] Azure Container Apps environment + Container App resource
+- [ ] Azure Container Registry push + image tagging
+- [ ] CI/CD pipeline (GitHub Actions or Azure DevOps) triggering on push to `main`
+- [ ] Azure Database for PostgreSQL provisioned + schema applied
+- [ ] Key Vault with `POSTGRES-CONN` secret
+- [ ] Managed identity bound to Container App with Key Vault + DB access
+- [ ] Frontend Entra login (OIDC flow replacing the stub)
+- [ ] `docker-compose.yml` for local dev with live reload (separate from prod `Dockerfile`)
 
 ### Environments
-**Current state: no formal dev/staging/prod split.** Whatever is in `main` is "the app." When setting up deploy, recommend to the user:
-- **Option A (simple):** `main` → prod Cloud Run; ephemeral local Docker for dev. One environment.
-- **Option B (safer):** `main` → staging Cloud Run, tagged releases → prod Cloud Run. Two Firestore projects (or one project with environment-prefixed collections).
-
-Option A is probably right for an internal tool with 5–15 users. Confirm before building infrastructure.
+No formal dev/staging/prod split exists. Recommend Option A for an internal 5–15 user tool: `main` → single prod Container App; local Docker for dev.
 
 ---
 
-## 12. Known Gaps & Open Questions
+## 12. Testing
 
-Tracked here so Claude can raise them proactively when relevant:
+### Backend (works)
+```bash
+cd backend
+pip install -r requirements.txt pytest cryptography
+pytest tests/
+```
+- `test_auth.py` — RS256 JWT verification; Entra OIDC discovery + JWKS stubbed via monkeypatch
+- `test_storage.py` — Postgres CRUD; requires `DATABASE_URL` env var; skips gracefully if missing
 
-1. **No test suite exists** despite the rule that changes should include tests. First-time-touched files should get tests added.
-2. **No linter/formatter configured** despite the "full linting both sides" rule. Setup is a pending task.
-3. **Deploy pipeline missing** — see §11.
-4. **`service-account.json` gitignore gap** — see §10.
-5. **Legacy Excel/JSON artifacts** still referenced in [config.py](backend/config.py) and some services even though Firestore is canonical. Migration isn't finished; watch for dual code paths.
-6. **Temporarily disabled features** (Attendance, Data upload) may come back — don't garbage-collect their integration points.
-7. **Dual LLM SDKs** (`google-genai` and `anthropic`) in requirements. Primary is Vertex Gemini; confirm before adding new Anthropic call sites.
+Fixtures in `conftest.py` generate a real RSA-2048 key pair per session and stub OIDC HTTP calls.
+
+### Frontend (not configured)
+No Vitest setup exists yet. First-time-touched components should get tests added. When setting up:
+- Vitest + `@vue/test-utils` + `jsdom`
+- Add `test` script to `package.json`
+- Priority: form validation logic, financial formatters in `api.js`
+
+Until a frontend runner is configured, every plan must include a **manual verification checklist**.
 
 ---
 
-## 13. Quick Reference
+## 13. Known Gaps & Open Tasks
+
+1. **Frontend Entra login** — `LoginPage.vue` is a stub. Real OIDC flow needs MSAL or a redirect-based Entra flow.
+2. **AI chat wiring** — `chat_stream()` is a stub. Wire to Azure OpenAI when the CIO confirms the tenant.
+3. **No deploy pipeline** — highest-priority infrastructure task. See §11.
+4. **No frontend test runner** — Vitest not configured. Add alongside the next significant component change.
+5. **No linter/formatter** — ESLint + Prettier (frontend), Ruff (backend) pending.
+6. **`storage.py` `_firestore` naming** — planned rename pass; don't rename opportunistically.
+7. **`config.py` legacy constants** — `PROJECTS` / `EXPENSE_BREAKDOWN` are pre-Postgres era. Any new feature should read from Postgres via `unified.py`, not from these dicts.
+8. **Temporarily disabled features** — `AttendanceView.vue`, `DataView.vue`, and their routers are on hold. Don't garbage-collect their integration points.
+
+---
+
+## 14. Quick Reference
 
 | Thing | Value |
 |---|---|
-| Brand | Logfi (internal codename: "סנג'ר של לנה") |
+| Brand | IFMLogiX (internal codename: Logfi / "סנג'ר של לנה") |
 | Frontend | Vue 3.4 + Vite 5.4 + Tailwind 3.4 |
 | Backend | FastAPI + Python 3.11 |
-| Data store | Cloud Firestore (`minlog-491211`) |
-| Auth | Firebase Auth |
-| LLM | Vertex AI Gemini (primary) |
-| Hosting target | GCP Cloud Run |
+| Database | PostgreSQL (psycopg3); schema in `backend/migrations/001_init.sql` |
+| Auth | Entra External ID (backend ready; frontend login = Phase 0 stub) |
+| AI / LLM | Stub only — no LLM connected. Calculator math works. |
+| Hosting target | Azure Container Apps (not yet deployed) |
+| Secrets (prod) | Azure Key Vault via managed identity |
 | Language (UI) | Hebrew, RTL |
-| Language (Claude replies) | English |
+| Language (Claude) | English |
 | Currency | ₪ (ILS) |
+| Roles | admin, economist, viewer, project_manager |
+| Design system | Editorial/typographic; CSS custom props (`var(--*)`); editorial component library |
+| Accessibility | WCAG 2.1 AA compliant — do not regress |
 | Default autonomy | Plan → approve → execute |
 | Commit style | Descriptive multi-line (why > what) |
-| Never touch without approval | Auth, Firestore data, financial formulas, AI system prompts |
+| Never touch without approval | Auth config, DB schema/data, financial formulas, AI prompts |
+| Top priority | Deploy to Azure Container Apps |

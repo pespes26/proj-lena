@@ -2,7 +2,7 @@
   <Teleport to="body">
     <div v-if="show" class="ui-modal-layer" dir="rtl">
       <div class="ui-modal-backdrop" @click="$emit('close')"></div>
-      <div class="ui-modal-card" style="max-width: 36rem;">
+      <div ref="modalCard" class="ui-modal-card" style="max-width: 36rem;">
         <!-- Header -->
         <header class="px-7 pt-6 pb-4">
           <div class="flex items-start justify-between gap-4">
@@ -23,7 +23,7 @@
         <div class="flex-1 overflow-y-auto px-7 py-5 space-y-8">
           <!-- Avatar -->
           <div class="flex flex-col items-center gap-3">
-            <div class="ui-avatar-uploader" @click="$refs.avatarInput.click()" role="button" tabindex="0" @keydown.enter.prevent="$refs.avatarInput.click()">
+            <div class="ui-avatar-uploader" @click="$refs.avatarInput.click()" role="button" tabindex="0" @keydown.enter.prevent="$refs.avatarInput.click()" @keydown.space.prevent="$refs.avatarInput.click()" aria-label="שנה תמונת פרופיל">
               <div class="ui-avatar-ring">
                 <img v-if="form.avatar" :src="form.avatar" class="w-full h-full object-cover" alt="" />
                 <span v-else class="ui-avatar-initials">{{ initials }}</span>
@@ -39,16 +39,16 @@
           <!-- Fields -->
           <div class="space-y-5">
             <div>
-              <label class="ui-form-label">שם משתמש</label>
-              <input :value="form.username" disabled class="ui-input ui-input--readonly" />
+              <label class="ui-form-label" for="profile-username">שם משתמש</label>
+              <input id="profile-username" :value="form.username" disabled class="ui-input ui-input--readonly" />
             </div>
             <div>
-              <label class="ui-form-label">שם מלא</label>
-              <input v-model="form.full_name" type="text" placeholder="השם המלא שלך" class="ui-input" />
+              <label class="ui-form-label" for="profile-fullname">שם מלא</label>
+              <input id="profile-fullname" v-model="form.full_name" type="text" placeholder="השם המלא שלך" class="ui-input" />
             </div>
             <div>
-              <label class="ui-form-label">אימייל</label>
-              <input v-model="form.email" type="email" placeholder="name@example.com" dir="ltr" class="ui-input" />
+              <label class="ui-form-label" for="profile-email">אימייל</label>
+              <input id="profile-email" v-model="form.email" type="email" placeholder="name@example.com" dir="ltr" class="ui-input" />
             </div>
             <div>
               <label class="ui-form-label">הרשאה</label>
@@ -59,29 +59,7 @@
             </div>
           </div>
 
-          <!-- Change password -->
-          <div class="ui-password-section">
-            <button type="button" @click="showPasswordSection = !showPasswordSection" class="ed-link text-sm">
-              {{ showPasswordSection ? 'ביטול שינוי סיסמה ←' : 'שינוי סיסמה →' }}
-            </button>
-            <div v-if="showPasswordSection" class="mt-5 space-y-5">
-              <div>
-                <label class="ui-form-label">סיסמה נוכחית</label>
-                <input v-model="passwords.current" type="password" class="ui-input" />
-              </div>
-              <div>
-                <label class="ui-form-label">סיסמה חדשה</label>
-                <input v-model="passwords.new_password" type="password" class="ui-input" />
-              </div>
-              <div>
-                <label class="ui-form-label">אישור סיסמה חדשה</label>
-                <input v-model="passwords.confirm" type="password" class="ui-input" />
-              </div>
-              <button @click="handleChangePassword" :disabled="saving" class="ui-btn ui-btn-primary">
-                {{ saving ? 'שומר…' : 'שנה סיסמה' }}
-              </button>
-            </div>
-          </div>
+          <!-- TODO Phase E: password reset flows through Entra External ID. -->
 
           <!-- Messages -->
           <p
@@ -96,7 +74,7 @@
         <!-- Footer -->
         <footer class="px-7 py-5 border-t border-[color:var(--border)] flex justify-between gap-4">
           <button @click="$emit('close')" class="ui-btn">ביטול</button>
-          <button @click="handleSave" :disabled="saving" class="ui-btn ui-btn-primary">
+          <button @click="handleSave" :disabled="saving" class="ui-btn ui-btn-dark">
             {{ saving ? 'שומר…' : 'שמירה' }}
           </button>
         </footer>
@@ -147,7 +125,7 @@
   inset: 0;
   border-radius: 9999px;
   background: rgba(15, 23, 42, 0.45);
-  color: #ffffff;
+  color: var(--surface);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -189,20 +167,22 @@
 </style>
 
 <script setup>
-import { ref, reactive, computed, watch } from 'vue'
+import { ref, reactive, computed, watch, nextTick } from 'vue'
 import { getProfile, updateProfile } from '../services/api'
-import { auth } from '../firebase'
-import { updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth'
 import { useToast } from '../composables/useToast'
+import { useFocusTrap } from '../composables/useFocusTrap'
 
 const props = defineProps({ show: Boolean })
 defineEmits(['close'])
 const toast = useToast()
+const modalCard = ref(null)
+const { activate, deactivate } = useFocusTrap(modalCard)
+watch(() => props.show, async (val) => {
+  if (val) { await nextTick(); activate() } else { deactivate() }
+})
 
 const roleLabels = { admin: 'מנהל מערכת', economist: 'כלכלנית', viewer: 'צופה מלא', project_manager: 'מנהל פרויקט' }
 const form = reactive({ username: '', full_name: '', email: '', role: '', avatar: '' })
-const passwords = reactive({ current: '', new_password: '', confirm: '' })
-const showPasswordSection = ref(false)
 const saving = ref(false)
 const message = ref('')
 const messageType = ref('success')
@@ -215,8 +195,6 @@ const initials = computed(() => {
 watch(() => props.show, async (val) => {
   if (val) {
     message.value = ''
-    showPasswordSection.value = false
-    passwords.current = ''; passwords.new_password = ''; passwords.confirm = ''
     try {
       const data = await getProfile()
       Object.assign(form, data)
@@ -241,23 +219,5 @@ async function handleSave() {
   saving.value = false
 }
 
-async function handleChangePassword() {
-  if (passwords.new_password !== passwords.confirm) {
-    message.value = 'הסיסמאות לא תואמות'; messageType.value = 'error'; return
-  }
-  if (passwords.new_password.length < 4) {
-    message.value = 'סיסמה חייבת להכיל לפחות 4 תווים'; messageType.value = 'error'; return
-  }
-  saving.value = true; message.value = ''
-  try {
-    const user = auth.currentUser
-    const credential = EmailAuthProvider.credential(user.email, passwords.current)
-    await reauthenticateWithCredential(user, credential)
-    await updatePassword(user, passwords.new_password)
-    message.value = 'הסיסמה שונתה בהצלחה'; messageType.value = 'success'
-    showPasswordSection.value = false
-    passwords.current = ''; passwords.new_password = ''; passwords.confirm = ''
-  } catch (e) { message.value = e.message; messageType.value = 'error' }
-  saving.value = false
-}
+// TODO Phase E: password change moves to Entra External ID self-service.
 </script>

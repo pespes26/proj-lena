@@ -1,5 +1,5 @@
 <template>
-  <div class="ui-chart-container ui-chart-container--sm">
+  <div class="ui-chart-container ui-chart-container--sm" role="img" aria-label="תרשים תזרים מזומנים: מגמה חודשית">
     <Line :data="chartData" :options="chartOptions" />
   </div>
 </template>

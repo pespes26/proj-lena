@@ -9,9 +9,9 @@
     <template v-if="!loading && myProjects.length > 0">
       <section class="ui-card animate-fade-up mb-8">
         <div class="ui-label ed-tone-muted mb-2">שלום {{ userName }}</div>
-        <div class="ui-display" style="font-size: clamp(2rem, 4vw, 2.75rem); line-height: 1.05;">
+        <h1 class="ui-display" style="font-size: clamp(2rem, 4vw, 2.75rem); line-height: 1.05;">
           {{ myProjects.length }} פרויקטים
-        </div>
+        </h1>
         <div class="font-sans ed-tone-muted text-sm mt-2">
           פעילים תחת אחריותך · {{ dateLabel }}
         </div>

@@ -63,8 +63,8 @@
               <span class="font-sans font-semibold text-ink">{{ term.type }}</span>
               <span class="ui-num font-semibold text-ink"><bdi>{{ term.percent }}%</bdi></span>
             </div>
-            <div style="width: 100%; height: 2px; background: var(--surface-muted);">
-              <div style="height: 100%; transition: width 180ms var(--ease-out);" :style="{ width: term.percent + '%', background: term.type === 'מקדמה' || term.type === 'מזומן' ? 'var(--positive)' : 'var(--warning)' }"></div>
+            <div style="width: 100%; height: 2px; background: var(--surface-muted); overflow: hidden;">
+              <div style="height: 100%; width: 100%; transform-origin: right center; transition: transform 180ms var(--ease-out);" :style="{ transform: `scaleX(${term.percent / 100})`, background: term.type === 'מקדמה' || term.type === 'מזומן' ? 'var(--positive)' : 'var(--warning)' }"></div>
             </div>
             <div class="ui-label mt-1.5" style="font-size: 0.625rem;">
               <bdi class="ui-num">{{ fmt(Math.round(totalRevenue * term.percent / 100)) }} ₪</bdi>
@@ -78,9 +78,10 @@
       <section class="ui-card lg:col-span-2">
         <div class="ui-label mb-2">תחזית</div>
         <h3 class="font-sans font-semibold text-ink text-lg mb-5">הכנסות חודשיות</h3>
-        <div class="ui-chart-container ui-chart-container--sm">
-          <Bar v-if="revenueChartData" :data="revenueChartData" :options="barOptions" />
+        <div v-if="revenueChartData" class="ui-chart-container ui-chart-container--md" role="img" aria-label="גרף עמודות: הכנסות חודשיות">
+          <Bar :data="revenueChartData" :options="barOptions" />
         </div>
+        <p v-else class="font-sans text-ink-faint text-center py-8 text-sm">לא הוגדרה תחזית הכנסות</p>
       </section>
     </div>
 
@@ -89,7 +90,7 @@
       <section class="ui-card">
         <div class="ui-label mb-2">פילוח</div>
         <h3 class="font-sans font-semibold text-ink text-lg mb-5">קטגוריות הוצאה</h3>
-        <div class="ui-chart-container" style="height: 192px;" v-if="expenseChartData">
+        <div class="ui-chart-container" style="height: 192px;" v-if="expenseChartData" role="img" aria-label="גרף עוגה: קטגוריות הוצאה">
           <Doughnut :data="expenseChartData" :options="doughnutOptions" />
         </div>
         <p v-else class="font-sans text-ink-faint text-center py-8">אין הוצאות</p>
@@ -172,7 +173,7 @@
     <section class="ui-card mb-6">
       <div class="ui-label mb-2">תזרים צפוי</div>
       <h3 class="font-sans font-semibold text-ink text-lg mb-5">כניסות, יציאות, ומצטבר</h3>
-      <div class="ui-chart-container ui-chart-container--md">
+      <div class="ui-chart-container ui-chart-container--md" role="img" aria-label="גרף עמודות: תזרים מזומנים צפוי">
         <Bar v-if="cashflowChartData" :data="cashflowChartData" :options="cashflowOptions" />
       </div>
     </section>
@@ -185,7 +186,7 @@ import { Bar, Doughnut } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend, PointElement, LineElement } from 'chart.js'
 import { getProjectForm } from '../services/api'
 import { SkeletonLoader } from './editorial'
-import { COLORS, tooltipConfig, axisConfig } from '../utils/chartDefaults'
+import { COLORS, tooltipConfig, axisConfig, hebrewLabelCallback } from '../utils/chartDefaults'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend, PointElement, LineElement)
 
@@ -373,11 +374,14 @@ const months = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
 
 const revenueChartData = computed(() => {
   if (!formData.value?.total_revenue) return null
+  const activeMos = activeMonths.value.length
+    ? activeMonths.value
+    : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
   return {
-    labels: months,
+    labels: activeMos.map(m => hebrewMonths[m]),
     datasets: [
-      { label: 'הכנסה צפויה', data: months.map((_, i) => monthlyRevenue(i + 1)), backgroundColor: COLORS.primary, borderRadius: 0 },
-      { label: 'כניסת תשלום', data: months.map((_, i) => cashInflow(i + 1)), backgroundColor: COLORS.amber, borderRadius: 0 },
+      { label: 'הכנסה צפויה', data: activeMos.map(m => monthlyRevenue(m)), backgroundColor: COLORS.primary, borderRadius: 0 },
+      { label: 'כניסת תשלום', data: activeMos.map(m => cashInflow(m)), backgroundColor: COLORS.amber, borderRadius: 0 },
     ]
   }
 })
@@ -393,15 +397,18 @@ const expenseChartData = computed(() => {
 
 const cashflowChartData = computed(() => {
   if (!formData.value) return null
+  const activeMos = activeMonths.value.length
+    ? activeMonths.value
+    : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
   let cumulative = 0
-  const inflows = months.map((_, i) => cashInflow(i + 1))
-  const outflows = months.map(() => totalExpenses.value / 12)
-  const cumulativeData = months.map((_, i) => {
+  const inflows = activeMos.map(m => cashInflow(m))
+  const outflows = activeMos.map(() => totalExpenses.value / 12)
+  const cumulativeData = activeMos.map((_, i) => {
     cumulative += inflows[i] - outflows[i]
     return cumulative
   })
   return {
-    labels: months,
+    labels: activeMos.map(m => hebrewMonths[m]),
     datasets: [
       { label: 'כניסות', data: inflows, backgroundColor: COLORS.positive || COLORS.green, borderRadius: 0, order: 2 },
       { label: 'יציאות', data: outflows.map(v => -v), backgroundColor: COLORS.amber, borderRadius: 0, order: 2 },
@@ -413,8 +420,14 @@ const cashflowChartData = computed(() => {
 const barOptions = {
   responsive: true,
   maintainAspectRatio: false,
-  plugins: { legend: legendMini(), tooltip: tooltipConfig },
-  scales: { y: axisConfig.y, x: axisConfig.x },
+  plugins: {
+    legend: legendMini(),
+    tooltip: { ...tooltipConfig, callbacks: { label: hebrewLabelCallback() } },
+  },
+  scales: {
+    y: { ...axisConfig.y, position: 'left' },
+    x: { ...axisConfig.x, ticks: { ...axisConfig.x.ticks, maxRotation: 0 } },
+  },
 }
 const doughnutOptions = {
   responsive: true,
@@ -425,8 +438,14 @@ const doughnutOptions = {
 const cashflowOptions = {
   responsive: true,
   maintainAspectRatio: false,
-  plugins: { legend: legendMini(), tooltip: tooltipConfig },
-  scales: { y: axisConfig.y, x: axisConfig.x },
+  plugins: {
+    legend: legendMini(),
+    tooltip: { ...tooltipConfig, callbacks: { label: hebrewLabelCallback() } },
+  },
+  scales: {
+    y: { ...axisConfig.y, position: 'left' },
+    x: { ...axisConfig.x, ticks: { ...axisConfig.x.ticks, maxRotation: 0 } },
+  },
 }
 
 function legendMini() {

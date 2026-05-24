@@ -20,12 +20,6 @@ backend/__pycache__
 **/__pycache__
 **/*.pyc
 
-# Secrets — never bake into image
-backend/service-account.json
-backend/firebase-service-account.json
-**/service-account*.json
-*firebase-adminsdk*.json
-
 # Data files
 *.xlsx
 backups

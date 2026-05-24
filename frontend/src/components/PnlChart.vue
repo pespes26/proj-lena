@@ -1,5 +1,5 @@
 <template>
-  <div class="ui-chart-container ui-chart-container--md">
+  <div class="ui-chart-container ui-chart-container--md" role="img" :aria-label="`גרף P&L לפרויקט ${projectName}: הכנסות, הוצאות ורווח לאורך זמן`">
     <Line :key="chartType" :data="chartData" :options="chartOptions" />
   </div>
 </template>
@@ -31,7 +31,7 @@ const chartData = computed(() => ({
       tension: 0.4,
       fill: isArea.value,
       pointBackgroundColor: COLORS.primary,
-      pointBorderColor: '#fff',
+      pointBorderColor: COLORS.paperLight,
       pointBorderWidth: 2,
       pointRadius: isArea.value ? 0 : 5,
       pointHoverRadius: 6,
@@ -41,11 +41,11 @@ const chartData = computed(() => ({
       label: 'הוצאות תפעול',
       data: props.data.map(m => m.op_expenses),
       borderColor: COLORS.amber,
-      backgroundColor: isArea.value ? COLORS.amberLight : 'rgba(166,124,0,0.06)',
+      backgroundColor: isArea.value ? COLORS.amberLight : COLORS.amberFill,
       tension: 0.4,
       fill: isArea.value,
       pointBackgroundColor: COLORS.amber,
-      pointBorderColor: '#fff',
+      pointBorderColor: COLORS.paperLight,
       pointBorderWidth: 2,
       pointRadius: isArea.value ? 0 : 5,
       pointHoverRadius: 6,
@@ -60,7 +60,7 @@ const chartData = computed(() => ({
       tension: 0.4,
       fill: isArea.value,
       pointBackgroundColor: props.data.map(m => m.operating_profit >= 0 ? COLORS.green : COLORS.red),
-      pointBorderColor: '#fff',
+      pointBorderColor: COLORS.paperLight,
       pointBorderWidth: 2,
       pointRadius: isArea.value ? 0 : 5,
       pointHoverRadius: 6,

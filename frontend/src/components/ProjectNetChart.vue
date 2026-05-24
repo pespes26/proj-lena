@@ -1,5 +1,5 @@
 <template>
-  <div class="ui-chart-container ui-chart-container--xl">
+  <div class="ui-chart-container ui-chart-container--xl" role="img" aria-label="גרף נטו לפי פרויקט: השוואה חודשית בין פרויקטים">
     <Bar :data="chartData" :options="chartOptions" />
   </div>
 </template>
@@ -8,7 +8,7 @@
 import { computed } from 'vue'
 import { Bar } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js'
-import { tooltipConfig, axisConfig, legendConfig, hebrewLabelCallback } from '../utils/chartDefaults'
+import { tooltipConfig, axisConfig, legendConfig, hebrewLabelCallback, COLORS } from '../utils/chartDefaults'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend)
 
@@ -39,7 +39,7 @@ const chartData = computed(() => {
       data: props.data.projects[name].map(m => m.profit),
       backgroundColor: PROJECT_PALETTE[idx % PROJECT_PALETTE.length],
       hoverBackgroundColor: PROJECT_PALETTE[idx % PROJECT_PALETTE.length],
-      borderColor: '#ffffff',
+      borderColor: COLORS.paperLight,
       borderWidth: 1.5,
       borderRadius: 3,
       borderSkipped: false,

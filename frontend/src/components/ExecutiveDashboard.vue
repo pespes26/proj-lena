@@ -1,5 +1,6 @@
 <template>
   <div>
+    <h1 class="sr-only">דשבורד פיננסי</h1>
     <div v-if="loading" class="space-y-8 py-4">
       <SkeletonLoader variant="kpi" :count="3" />
       <SkeletonLoader variant="table" :columns="6" :rows="5" />
@@ -14,14 +15,26 @@
         subtitle="סיכום ביצועים רבעוני · נתונים מאוחדים מכל הפרויקטים והמנהלים"
       />
 
-      <!-- KPI cards grid -->
-      <div class="ui-stagger grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+      <!-- Hero KPI — operating profit (the headline business outcome) -->
+      <section class="ui-card mb-5 animate-fade-up">
+        <HeroNumber
+          label="רווח תפעולי"
+          :value="data.total_operating_profit"
+          prefix="₪"
+          size="xl"
+          :tone="data.total_operating_profit >= 0 ? 'positive' : 'negative'"
+          footnote="מצטבר · מאוחד מכל הפרויקטים"
+        />
+      </section>
+
+      <!-- Secondary KPIs — same content, demoted visual weight -->
+      <div class="ui-stagger grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div class="ui-card">
           <div class="ui-label ed-tone-muted mb-2">מצב מזומנים</div>
-          <div class="ui-display ui-num" :class="data.cash_position >= 0 ? '' : 'ed-tone-negative'">
+          <div class="ui-num font-semibold text-ink" style="font-size: 1.5rem; line-height: 1.1;" :class="data.cash_position >= 0 ? '' : 'ed-tone-negative'">
             <bdi>₪{{ formatShort(data.cash_position) }}</bdi>
           </div>
-          <div class="mt-3">
+          <div class="mt-2">
             <span class="ui-pill" :class="data.cash_position >= 0 ? 'ui-pill-neutral' : 'ui-pill-negative'">
               {{ data.cash_position >= 0 ? 'חיובי' : 'שלילי' }}
             </span>
@@ -29,23 +42,23 @@
         </div>
 
         <div class="ui-card">
-          <div class="ui-label ed-tone-muted mb-2">רווח תפעולי</div>
-          <div class="ui-display ui-num" :class="data.total_operating_profit >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'">
-            <bdi>₪{{ formatShort(data.total_operating_profit) }}</bdi>
+          <div class="ui-label ed-tone-muted mb-2">מרווח תפעולי</div>
+          <div class="ui-num font-semibold" style="font-size: 1.5rem; line-height: 1.1;" :class="data.margin >= 20 ? 'ed-tone-positive' : data.margin >= 10 ? 'ed-tone-warning' : 'ed-tone-negative'">
+            <bdi>{{ data.margin != null ? Number(data.margin).toFixed(1) : 0 }}%</bdi>
           </div>
-          <div class="mt-3">
-            <span class="ui-pill" :class="data.total_operating_profit >= 0 ? 'ui-pill-positive' : 'ui-pill-negative'">
-              {{ data.total_operating_profit >= 0 ? 'רווחי' : 'הפסדי' }}
+          <div class="mt-2">
+            <span class="ui-pill" :class="data.margin >= 20 ? 'ui-pill-positive' : data.margin >= 10 ? 'ui-pill-warning' : 'ui-pill-negative'">
+              {{ data.margin >= 20 ? 'תקין' : data.margin >= 10 ? 'לתשומת לב' : 'חריג' }}
             </span>
           </div>
         </div>
 
         <div class="ui-card">
           <div class="ui-label ed-tone-muted mb-2">פרויקטים בסיכון</div>
-          <div class="ui-display ui-num" :class="projectsAtRisk > 0 ? 'ed-tone-warning' : 'ed-tone-positive'">
+          <div class="ui-num font-semibold" style="font-size: 1.5rem; line-height: 1.1;" :class="projectsAtRisk > 0 ? 'ed-tone-warning' : 'ed-tone-positive'">
             <bdi>{{ projectsAtRisk }}</bdi>
           </div>
-          <div class="mt-3">
+          <div class="mt-2">
             <span class="ui-pill" :class="projectsAtRisk > 0 ? 'ui-pill-warning' : 'ui-pill-positive'">
               {{ projectsAtRisk > 0 ? 'מרווח < 10%' : 'הכל תקין' }}
             </span>
@@ -54,23 +67,11 @@
 
         <div class="ui-card">
           <div class="ui-label ed-tone-muted mb-2">סה״כ פרויקטים</div>
-          <div class="ui-display ui-num">
+          <div class="ui-num font-semibold text-ink" style="font-size: 1.5rem; line-height: 1.1;">
             <bdi>{{ totalProjects }}</bdi>
           </div>
-          <div class="mt-3">
+          <div class="mt-2">
             <span class="ui-pill ui-pill-neutral">פעילים</span>
-          </div>
-        </div>
-
-        <div class="ui-card">
-          <div class="ui-label ed-tone-muted mb-2">מרווח תפעולי</div>
-          <div class="ui-display ui-num" :class="data.margin >= 20 ? 'ed-tone-positive' : data.margin >= 10 ? 'ed-tone-warning' : 'ed-tone-negative'">
-            <bdi>{{ data.margin != null ? Number(data.margin).toFixed(1) : 0 }}%</bdi>
-          </div>
-          <div class="mt-3">
-            <span class="ui-pill" :class="data.margin >= 20 ? 'ui-pill-positive' : data.margin >= 10 ? 'ui-pill-warning' : 'ui-pill-negative'">
-              {{ data.margin >= 20 ? 'תקין' : data.margin >= 10 ? 'לתשומת לב' : 'חריג' }}
-            </span>
           </div>
         </div>
       </div>
@@ -122,7 +123,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { getDashboard, getPnl, formatNumber } from '../services/api'
-import { SectionHeader, DataTable, FootnoteSource, SkeletonLoader, currentHebrewDate } from './editorial'
+import { SectionHeader, HeroNumber, DataTable, FootnoteSource, SkeletonLoader, currentHebrewDate } from './editorial'
 
 function formatShort(v) {
   if (v == null) return '0'

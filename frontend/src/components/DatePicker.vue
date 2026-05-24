@@ -7,7 +7,7 @@
         :value="displayValue"
         :placeholder="placeholder"
         :class="[inputClass || 'ui-input', invalidDate ? 'is-error' : '']"
-        style="padding-right: 2.5rem;"
+        style="padding-right: 3rem;"
         @input="onInput"
         @focus="showCalendar = true"
         @keydown.escape="showCalendar = false"
@@ -277,17 +277,17 @@ watch(showCalendar, async (val) => {
     }
     await nextTick()
     updatePosition()
-    window.addEventListener('scroll', onScrollOrResize, true)
-    window.addEventListener('resize', onScrollOrResize)
+    window.addEventListener('scroll', onScrollOrResize, { passive: true, capture: true })
+    window.addEventListener('resize', onScrollOrResize, { passive: true })
   } else {
-    window.removeEventListener('scroll', onScrollOrResize, true)
-    window.removeEventListener('resize', onScrollOrResize)
+    window.removeEventListener('scroll', onScrollOrResize, { passive: true, capture: true })
+    window.removeEventListener('resize', onScrollOrResize, { passive: true })
   }
 })
 
 onBeforeUnmount(() => {
-  window.removeEventListener('scroll', onScrollOrResize, true)
-  window.removeEventListener('resize', onScrollOrResize)
+  window.removeEventListener('scroll', onScrollOrResize, { passive: true, capture: true })
+  window.removeEventListener('resize', onScrollOrResize, { passive: true })
 })
 
 function updatePosition() {
@@ -334,11 +334,11 @@ function updatePosition() {
 /* Inline calendar trigger inside input */
 .ui-datepicker-trigger {
   position: absolute;
-  right: 0.5rem;
+  right: 0.25rem;
   top: 50%;
   transform: translateY(-50%);
-  width: 28px;
-  height: 28px;
+  width: 44px;
+  height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -363,7 +363,7 @@ function updatePosition() {
 .ui-datepicker-popover {
   position: fixed;
   z-index: 101;
-  width: 300px;
+  width: min(300px, calc(100vw - 2rem));
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
@@ -465,7 +465,7 @@ function updatePosition() {
 }
 .ui-date-cell.is-selected {
   background: var(--accent);
-  color: #ffffff;
+  color: var(--surface);
   font-weight: 700;
 }
 .ui-date-cell.is-disabled {

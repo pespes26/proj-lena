@@ -3,8 +3,8 @@ uvicorn[standard]
 openpyxl
 pandas
 python-multipart
-firebase-admin
-google-cloud-storage
-google-cloud-firestore
-anthropic
-google-genai
+psycopg[binary,pool]
+azure-identity
+azure-keyvault-secrets
+PyJWT[crypto]
+httpx

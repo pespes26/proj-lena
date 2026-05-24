@@ -7,8 +7,8 @@
         <p class="font-sans text-sm mt-1.5 ed-tone-muted">הזן הכנסות והוצאות בפועל לחודש נבחר</p>
       </div>
       <div>
-        <label class="ui-form-label">חודש</label>
-        <select v-model="selectedMonth" class="ui-select" style="min-width: 180px;">
+        <label class="ui-form-label" for="actuals-month">חודש</label>
+        <select id="actuals-month" v-model="selectedMonth" class="ui-select" style="min-width: 180px;">
           <option v-for="m in 12" :key="m" :value="m">{{ monthNames[m - 1] }}</option>
         </select>
       </div>
@@ -25,23 +25,24 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-8">
       <div>
-        <label class="ui-form-label">הכנסה בפועל (₪)</label>
-        <input v-model.number="form.revenue" type="number" min="0" step="0.01" class="ui-input ui-num" />
+        <label class="ui-form-label" for="actuals-revenue">הכנסה בפועל (₪)</label>
+        <input id="actuals-revenue" v-model.number="form.revenue" type="number" min="0" step="0.01" class="ui-input ui-num" />
         <div v-if="forecastRevenue" class="ui-label mt-1.5" style="font-size: 0.625rem;">
           תחזית: <bdi class="ui-num">{{ forecastRevenue.toLocaleString('he-IL') }}</bdi>
         </div>
       </div>
       <div>
-        <label class="ui-form-label">הוצאות תפעול בפועל (₪)</label>
-        <input v-model.number="form.op_expenses" type="number" min="0" step="0.01" class="ui-input ui-num" />
+        <label class="ui-form-label" for="actuals-op-expenses">הוצאות תפעול בפועל (₪)</label>
+        <input id="actuals-op-expenses" v-model.number="form.op_expenses" type="number" min="0" step="0.01" class="ui-input ui-num" />
       </div>
       <div>
-        <label class="ui-form-label">הוצאות שכר בפועל (₪)</label>
-        <input v-model.number="form.salary_expenses" type="number" min="0" step="0.01" class="ui-input ui-num" />
+        <label class="ui-form-label" for="actuals-salary">הוצאות שכר בפועל (₪)</label>
+        <input id="actuals-salary" v-model.number="form.salary_expenses" type="number" min="0" step="0.01" class="ui-input ui-num" />
       </div>
       <div>
-        <label class="ui-form-label">הערות</label>
+        <label class="ui-form-label" for="actuals-notes">הערות</label>
         <textarea
+          id="actuals-notes"
           v-model="form.notes"
           maxlength="200"
           rows="2"
@@ -85,7 +86,7 @@
     </div>
 
     <div class="flex items-center gap-3">
-      <button @click="save" :disabled="saving" class="ui-btn-primary">
+      <button @click="save" :disabled="saving" class="ui-btn ui-btn-dark">
         שמור ביצוע בפועל
       </button>
     </div>

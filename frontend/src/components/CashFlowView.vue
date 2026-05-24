@@ -15,36 +15,36 @@
     </div>
 
     <template v-if="cfData">
-      <!-- KPI grid -->
-      <section class="ui-stagger grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <!-- Hero KPI — cumulative balance (the "are we solvent?" number) -->
+      <section class="ui-card mb-5 animate-fade-up">
+        <HeroNumber
+          label="יתרה מצטברת"
+          :value="lastCumulative"
+          prefix="₪"
+          size="xl"
+          :tone="lastCumulative >= 0 ? 'positive' : 'negative'"
+          footnote="סוף תקופה · מצטבר חודשי"
+        />
+      </section>
+
+      <!-- Secondary KPIs — revenue / expenses / net -->
+      <section class="ui-stagger grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         <div class="ui-card">
-          <div class="ed-eyebrow mb-2">סך הכנסות</div>
-          <div class="ui-display ui-num" style="color: var(--ink);">
+          <div class="ui-label ed-tone-muted mb-2">סך הכנסות</div>
+          <div class="ui-num font-semibold text-ink" style="font-size: 1.5rem; line-height: 1.1;">
             <bdi>₪{{ fmt(totalRevenue) }}</bdi>
           </div>
         </div>
         <div class="ui-card">
-          <div class="ed-eyebrow mb-2">סך הוצאות</div>
-          <div class="ui-display ui-num" style="color: var(--ink);">
+          <div class="ui-label ed-tone-muted mb-2">סך הוצאות</div>
+          <div class="ui-num font-semibold text-ink" style="font-size: 1.5rem; line-height: 1.1;">
             <bdi>₪{{ fmt(totalExpenses) }}</bdi>
           </div>
         </div>
         <div class="ui-card">
-          <div class="ed-eyebrow mb-2">נטו תקופתי</div>
-          <div
-            class="ui-display ui-num"
-            :class="totalNet >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'"
-          >
+          <div class="ui-label ed-tone-muted mb-2">נטו תקופתי</div>
+          <div class="ui-num font-semibold" style="font-size: 1.5rem; line-height: 1.1;" :class="totalNet >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'">
             <bdi>₪{{ fmt(totalNet) }}</bdi>
-          </div>
-        </div>
-        <div class="ui-card">
-          <div class="ed-eyebrow mb-2">יתרה מצטברת</div>
-          <div
-            class="ui-display ui-num"
-            :class="lastCumulative >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'"
-          >
-            <bdi>₪{{ fmt(lastCumulative) }}</bdi>
           </div>
         </div>
       </section>
@@ -102,8 +102,8 @@
               </span>
             </div>
             <div class="flex h-1.5 overflow-hidden rounded-full" style="background: var(--surface-muted);">
-              <div style="background: var(--positive); transition: width 180ms cubic-bezier(0.4, 0, 0.2, 1);" :style="{ width: projectRevenuePercent(months) + '%' }"></div>
-              <div style="background: var(--warning); transition: width 180ms cubic-bezier(0.4, 0, 0.2, 1);" :style="{ width: projectExpensePercent(months) + '%' }"></div>
+              <div style="background: var(--positive);" :style="{ width: projectRevenuePercent(months) + '%' }"></div>
+              <div style="background: var(--warning);" :style="{ width: projectExpensePercent(months) + '%' }"></div>
             </div>
             <div class="flex justify-between mt-2 text-[11px] font-medium" style="color: var(--ink-muted);">
               <span>הכנסה <bdi class="ui-num font-semibold">{{ fmt(projectRevSum(months)) }}</bdi></span>

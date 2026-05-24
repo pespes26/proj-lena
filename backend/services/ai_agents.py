@@ -1,21 +1,13 @@
-import os
 import json
-from google import genai
 from services.unified import load_form_data
 from services.form_calculator import form_to_pnl
 
-# Load .env file if exists
-_env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
-if os.path.exists(_env_path):
-    with open(_env_path) as f:
-        for line in f:
-            line = line.strip()
-            if line and '=' in line and not line.startswith('#'):
-                k, v = line.split('=', 1)
-                os.environ[k.strip()] = v.strip()
 
-_gemini_key = os.environ.get("GEMINI_API_KEY", "")
-client = genai.Client(api_key=_gemini_key) if _gemini_key else None
+# Phase 0: Gemini client has been removed. SYSTEM_PROMPT and the context
+# builder are model-agnostic and stay so they can be wired to Azure OpenAI
+# (or another provider) later. chat_stream() emits a single SSE event so
+# the frontend's streaming consumer keeps working without changes.
+
 
 SYSTEM_PROMPT = """אתה IFMLogiX AI — אנליסט פיננסי בכיר בחברת לוגי גרופ / מנרב IFM.
 אתה מנתח פרויקטי בנייה, תחזוקה וניהול מתקנים (FM).
@@ -105,34 +97,5 @@ def _build_projects_context():
 
 
 def chat_stream(messages, user_message):
-    """Stream chat response using Gemini API with SSE."""
-    projects_context = _build_projects_context()
-
-    full_system = f"""{SYSTEM_PROMPT}
-
-## נתוני הפרויקטים הנוכחיים:
-
-{projects_context}"""
-
-    # Build conversation for Gemini
-    contents = []
-    for msg in messages:
-        role = "user" if msg["role"] == "user" else "model"
-        contents.append({"role": role, "parts": [{"text": msg["content"]}]})
-    contents.append({"role": "user", "parts": [{"text": user_message}]})
-
-    response = client.models.generate_content_stream(
-        model="gemini-3-flash-preview",
-        contents=contents,
-        config={
-            "system_instruction": full_system,
-            "temperature": 0.25,
-            "max_output_tokens": 2000,
-        },
-    )
-
-    for chunk in response:
-        if chunk.text:
-            yield f"data: {json.dumps({'token': chunk.text})}\n\n"
-
-    yield f"data: {json.dumps({'done': True})}\n\n"
+    """Phase 0 stub. Azure OpenAI wiring lands later."""
+    yield 'data: {"error": "AI service temporarily unavailable", "done": true}\n\n'

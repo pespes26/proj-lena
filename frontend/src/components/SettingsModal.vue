@@ -2,7 +2,7 @@
   <Teleport to="body">
     <div v-if="show" class="ui-modal-layer" dir="rtl">
       <div class="ui-modal-backdrop" @click="$emit('close')"></div>
-      <div class="ui-modal-card" style="max-width: 48rem;">
+      <div ref="modalCard" class="ui-modal-card" style="max-width: 48rem;">
         <!-- Header -->
         <header class="px-7 pt-6 pb-4">
           <div class="flex items-start justify-between gap-4">
@@ -51,24 +51,24 @@
               <div class="ui-label mb-4">משתמש חדש</div>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                 <div>
-                  <label class="ui-form-label">שם משתמש *</label>
-                  <input v-model="newUser.username" type="text" class="ui-input" />
+                  <label class="ui-form-label" for="settings-username">שם משתמש *</label>
+                  <input id="settings-username" v-model="newUser.username" type="text" class="ui-input" />
                 </div>
                 <div>
-                  <label class="ui-form-label">סיסמה *</label>
-                  <input v-model="newUser.password" type="password" class="ui-input" />
+                  <label class="ui-form-label" for="settings-password">סיסמה *</label>
+                  <input id="settings-password" v-model="newUser.password" type="password" class="ui-input" />
                 </div>
                 <div>
-                  <label class="ui-form-label">שם מלא</label>
-                  <input v-model="newUser.full_name" type="text" class="ui-input" />
+                  <label class="ui-form-label" for="settings-fullname">שם מלא</label>
+                  <input id="settings-fullname" v-model="newUser.full_name" type="text" class="ui-input" />
                 </div>
                 <div>
-                  <label class="ui-form-label">אימייל</label>
-                  <input v-model="newUser.email" type="email" dir="ltr" class="ui-input" />
+                  <label class="ui-form-label" for="settings-email">אימייל</label>
+                  <input id="settings-email" v-model="newUser.email" type="email" dir="ltr" class="ui-input" />
                 </div>
                 <div>
-                  <label class="ui-form-label">הרשאה</label>
-                  <select v-model="newUser.role" class="ui-select">
+                  <label class="ui-form-label" for="settings-role">הרשאה</label>
+                  <select id="settings-role" v-model="newUser.role" class="ui-select">
                     <option value="admin">מנהל מערכת</option>
                     <option value="economist">כלכלנית</option>
                     <option value="viewer">צופה מלא</option>
@@ -76,8 +76,8 @@
                   </select>
                 </div>
                 <div v-if="newUser.role === 'project_manager'">
-                  <label class="ui-form-label">מנהל משויך *</label>
-                  <select v-model="newUser.linked_manager" class="ui-select">
+                  <label class="ui-form-label" for="settings-manager">מנהל משויך *</label>
+                  <select id="settings-manager" v-model="newUser.linked_manager" class="ui-select">
                     <option value="" disabled>בחר מנהל</option>
                     <option value="אלון">אלון</option>
                     <option value="אתי">אתי</option>
@@ -87,7 +87,7 @@
               </div>
               <div class="flex justify-end gap-3 mt-6">
                 <button type="button" @click="showAddUser = false" class="ui-btn">ביטול</button>
-                <button type="button" @click="handleCreateUser" :disabled="saving" class="ui-btn ui-btn-primary">
+                <button type="button" @click="handleCreateUser" :disabled="saving" class="ui-btn ui-btn-dark">
                   {{ saving ? 'יוצר…' : 'צור משתמש' }}
                 </button>
               </div>
@@ -110,13 +110,13 @@
                     <td class="font-semibold">{{ u.username }}</td>
                     <td>
                       <template v-if="editingUser === u.username">
-                        <input v-model="editForm.full_name" type="text" class="ui-input" />
+                        <input v-model="editForm.full_name" type="text" class="ui-input" aria-label="שם מלא" />
                       </template>
                       <template v-else>{{ u.full_name || '—' }}</template>
                     </td>
                     <td>
                       <template v-if="editingUser === u.username">
-                        <select v-model="editForm.role" class="ui-select">
+                        <select v-model="editForm.role" class="ui-select" aria-label="הרשאה">
                           <option value="admin">מנהל מערכת</option>
                           <option value="economist">כלכלנית</option>
                           <option value="viewer">צופה מלא</option>
@@ -129,7 +129,7 @@
                     </td>
                     <td>
                       <template v-if="editingUser === u.username && editForm.role === 'project_manager'">
-                        <select v-model="editForm.linked_manager" class="ui-select">
+                        <select v-model="editForm.linked_manager" class="ui-select" aria-label="מנהל משויך">
                           <option value="">בחר</option>
                           <option value="אלון">אלון</option>
                           <option value="אתי">אתי</option>
@@ -229,13 +229,19 @@
 </style>
 
 <script setup>
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch, nextTick } from 'vue'
 import { getUsers, createUser, deleteUser, updateUser } from '../services/api'
 import { useToast } from '../composables/useToast'
+import { useFocusTrap } from '../composables/useFocusTrap'
 
 const props = defineProps({ show: Boolean })
 defineEmits(['close'])
 const toast = useToast()
+const modalCard = ref(null)
+const { activate, deactivate } = useFocusTrap(modalCard)
+watch(() => props.show, async (val) => {
+  if (val) { await nextTick(); activate() } else { deactivate() }
+})
 
 const ROLE_MAP = {
   admin: 'מנהל מערכת',

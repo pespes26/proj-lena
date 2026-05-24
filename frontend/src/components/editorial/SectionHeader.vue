@@ -6,7 +6,7 @@
       <span v-if="kicker" class="ui-section-header__kicker">{{ kicker }}</span>
     </div>
     <div class="ui-section-header__main">
-      <h2 v-if="title" class="ui-section-header__title">{{ title }}</h2>
+      <component :is="'h' + level" v-if="title" class="ui-section-header__title">{{ title }}</component>
       <div v-if="$slots.actions" class="ui-section-header__actions">
         <slot name="actions" />
       </div>
@@ -21,6 +21,7 @@ defineProps({
   kicker: { type: String, default: '' },
   title: { type: String, default: '' },
   subtitle: { type: String, default: '' },
+  level: { type: Number, default: 2 }, // heading level: 1-4
   rule: { type: String, default: 'none' }, // kept for backward compat — no longer renders a rule
   align: { type: String, default: 'start' }, // 'start' | 'center'
 })

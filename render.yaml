@@ -1,3 +1,4 @@
+# TODO: delete in Phase H — superseded by Azure Container Apps deploy.
 services:
   - type: web
     name: lena

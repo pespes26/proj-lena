@@ -29,7 +29,8 @@ export default {
           DEFAULT: '#0f172a',
           strong: '#020617',
           muted: '#475569',
-          faint: '#94a3b8',
+          faint: '#64748b',     // slate-500, AA-compliant body color
+          whisper: '#94a3b8',   // slate-400, decorative only
         },
         // Lines
         border: {

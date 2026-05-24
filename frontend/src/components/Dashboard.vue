@@ -1,5 +1,6 @@
 <template>
   <div>
+    <h1 class="sr-only">דשבורד פיננסי</h1>
     <SectionHeader
       eyebrow="דשבורד"
       :kicker="dateLabel"
@@ -87,7 +88,7 @@
       >
         <div class="grid grid-cols-1 lg:grid-cols-5 gap-10 items-center">
           <div class="lg:col-span-2 flex justify-center">
-            <div class="ui-chart-container ui-chart-container--md w-full max-w-xs">
+            <div class="ui-chart-container ui-chart-container--md w-full max-w-xs" role="img" aria-label="גרף עוגה: חלוקת רווח תפעולי לפי ציר">
               <Doughnut :data="axisPieData" :options="doughnutOptions" />
             </div>
           </div>
@@ -155,7 +156,7 @@
           title="צפי חודשי"
           caption="סך הכנסות צפויות מכל הפרויקטים לפי חודש."
         >
-          <div class="ui-chart-container ui-chart-container--md">
+          <div class="ui-chart-container ui-chart-container--md" role="img" aria-label="גרף עמודות: תחזית הכנסות חודשיות">
             <Bar :data="monthlyRevenueChartData" :options="barChartOptions" />
           </div>
         </RuledSection>
@@ -164,7 +165,7 @@
           title="צפי חודשי"
           caption="סך הוצאות צפויות מכל הפרויקטים לפי חודש."
         >
-          <div class="ui-chart-container ui-chart-container--md">
+          <div class="ui-chart-container ui-chart-container--md" role="img" aria-label="גרף עמודות: תחזית הוצאות חודשיות">
             <Bar :data="monthlyExpenseChartData" :options="barChartOptions" />
           </div>
         </RuledSection>
@@ -312,7 +313,7 @@ const axisPieData = computed(() => {
       data: values,
       backgroundColor: colors,
       borderWidth: 2,
-      borderColor: '#ffffff',
+      borderColor: COLORS.paperLight,
       hoverOffset: 6,
     }]
   }
@@ -325,7 +326,7 @@ const doughnutOptions = {
     legend: {
       position: 'bottom',
       rtl: true,
-      labels: { font: { family: "'Assistant', system-ui, sans-serif", size: 12 }, padding: 16, usePointStyle: true, pointStyle: 'rectRounded', color: COLORS.inkMuted },
+      labels: { font: { family: "'DM Sans', 'Rubik', system-ui, sans-serif", size: 12 }, padding: 16, usePointStyle: true, pointStyle: 'rectRounded', color: COLORS.inkMuted },
     },
     tooltip: {
       ...tooltipConfig,

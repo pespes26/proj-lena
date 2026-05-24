@@ -3,34 +3,34 @@
     <!-- Controls -->
     <section class="ed-section-top">
       <div class="ed-eyebrow mb-1">סימולציה</div>
-      <h3 class="font-sans font-semibold text-ink text-2xl mb-5 leading-none">פרמטרים</h3>
+      <h2 class="font-sans font-semibold text-ink text-2xl mb-5 leading-none">פרמטרים</h2>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
         <div>
-          <label class="ed-label flex items-center justify-between">
+          <label class="ed-label flex items-center justify-between" for="whatif-rev">
             <span>שינוי הכנסות</span>
             <span class="font-sans font-semibold text-sm ed-num" :class="revChange >= 0 ? 'ed-tone-positive' : 'ed-tone-negative'">
               <bdi>{{ revChange > 0 ? '+' : '' }}{{ revChange }}%</bdi>
             </span>
           </label>
-          <input type="range" v-model.number="revChange" min="-50" max="50" step="5" class="ed-range" />
+          <input id="whatif-rev" type="range" v-model.number="revChange" min="-50" max="50" step="5" class="ed-range" />
           <div class="flex justify-between ed-eyebrow mt-1" style="font-size: 0.625rem;"><span>−50%</span><span>0</span><span>+50%</span></div>
         </div>
 
         <div>
-          <label class="ed-label flex items-center justify-between">
+          <label class="ed-label flex items-center justify-between" for="whatif-cost">
             <span>שינוי הוצאות</span>
             <span class="font-sans font-semibold text-sm ed-num" :class="expChange <= 0 ? 'ed-tone-positive' : 'ed-tone-negative'">
               <bdi>{{ expChange > 0 ? '+' : '' }}{{ expChange }}%</bdi>
             </span>
           </label>
-          <input type="range" v-model.number="expChange" min="-30" max="30" step="5" class="ed-range" />
+          <input id="whatif-cost" type="range" v-model.number="expChange" min="-30" max="30" step="5" class="ed-range" />
           <div class="flex justify-between ed-eyebrow mt-1" style="font-size: 0.625rem;"><span>−30%</span><span>0</span><span>+30%</span></div>
         </div>
 
         <div>
-          <label class="ed-label">הארכת פרויקט (חודשים)</label>
-          <input type="number" v-model.number="extendMonths" min="0" max="6" step="1" class="ed-input ed-num" />
+          <label class="ed-label" for="whatif-delay">הארכת פרויקט (חודשים)</label>
+          <input id="whatif-delay" type="number" v-model.number="extendMonths" min="0" max="6" step="1" class="ed-input ed-num" />
         </div>
 
         <div class="flex items-end">
@@ -44,7 +44,7 @@
     <!-- Results -->
     <section v-if="result" class="ed-section">
       <div class="ed-eyebrow mb-1">תוצאות</div>
-      <h3 class="font-sans font-semibold text-ink text-2xl mb-5 leading-none">השוואת תרחישים</h3>
+      <h2 class="font-sans font-semibold text-ink text-2xl mb-5 leading-none">השוואת תרחישים</h2>
 
       <table class="ed-table">
         <thead>

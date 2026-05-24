@@ -3,7 +3,7 @@
     <div v-if="show" class="ui-modal-layer" dir="rtl">
       <div class="ui-modal-backdrop" @click="handleClose()"></div>
 
-      <div class="ui-modal-card ed-fade-up" style="max-width: 56rem; max-height: 90vh; display: flex; flex-direction: column; padding: 0;">
+      <div ref="modalCard" class="ui-modal-card ed-fade-up" style="max-width: 56rem; max-height: 90vh; display: flex; flex-direction: column; padding: 0;">
         <!-- Header + Stepper -->
         <div class="px-5 sm:px-10 pt-6 sm:pt-8 pb-4 sm:pb-5">
           <div class="flex items-start justify-between mb-5 gap-4">
@@ -41,15 +41,15 @@
             <!-- Project name + Priority ID + Recurring toggle -->
             <div class="flex flex-col sm:flex-row gap-4 sm:gap-3 sm:items-end">
               <div v-if="newProject" class="flex-[15]" data-field="project_name">
-                <label class="ed-label">שם פרויקט *</label>
-                <input v-model="form.project_name" type="text" placeholder="שם הפרויקט"
+                <label class="ed-label" for="field-project-name">שם פרויקט *</label>
+                <input id="field-project-name" v-model="form.project_name" type="text" placeholder="שם הפרויקט"
                   @blur="vf('project_name', form.project_name, { required: true, minLen: 2 })"
                   :class="['w-full ui-input', fc('project_name')]" />
                 <div v-if="fe.project_name" class="ui-field-error ui-field-error--animate"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>{{ fe.project_name }}</div>
               </div>
               <div class="flex-[4]" data-field="priority_id">
-                <label class="ed-label">מספר Priority *</label>
-                <input v-model="form.priority_id" type="text" placeholder="P-1001"
+                <label class="ed-label" for="field-priority-id">מספר Priority *</label>
+                <input id="field-priority-id" v-model="form.priority_id" type="text" placeholder="P-1001"
                   @blur="vf('priority_id', form.priority_id, { required: true, minLen: 2 })"
                   :class="['w-full ui-input ui-num', fc('priority_id')]" />
                 <div v-if="fe.priority_id" class="ui-field-error ui-field-error--animate"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>{{ fe.priority_id }}</div>
@@ -72,8 +72,8 @@
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
               <div>
-                <label class="ed-label">מנהל פרויקט *</label>
-                <select v-model="form.manager"
+                <label class="ed-label" for="field-manager">מנהל פרויקט *</label>
+                <select id="field-manager" v-model="form.manager"
                   @change="vf('manager', form.manager, { required: true })"
                   :class="['w-full ui-select', fc('manager')]">
                   <option value="" disabled>בחר מנהל פרויקט</option>
@@ -82,8 +82,8 @@
                 <div v-if="fe.manager" class="ui-field-error ui-field-error--animate"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>{{ fe.manager }}</div>
               </div>
               <div>
-                <label class="ed-label">שם המזמין *</label>
-                <input v-model="form.client" type="text" placeholder="שם החברה/לקוח"
+                <label class="ed-label" for="field-client">שם המזמין *</label>
+                <input id="field-client" v-model="form.client" type="text" placeholder="שם החברה/לקוח"
                   @blur="vf('client', form.client, { required: true, minLen: 2 })"
                   :class="['w-full ui-input', fc('client')]" />
                 <div v-if="fe.client" class="ui-field-error ui-field-error--animate"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>{{ fe.client }}</div>
@@ -91,16 +91,16 @@
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
               <div>
-                <label class="ed-label">ציר</label>
-                <select v-model="form.axis" class="w-full ui-select">
+                <label class="ed-label" for="field-axis">ציר</label>
+                <select id="field-axis" v-model="form.axis" class="w-full ui-select">
                   <option value="לוגי">לוגי</option>
                   <option value="מנרב">מנרב</option>
                   <option value="פיתוח עסקי">פיתוח עסקי</option>
                 </select>
               </div>
               <div>
-                <label class="ed-label">תחום</label>
-                <select v-model="form.area" class="w-full ui-select">
+                <label class="ed-label" for="field-area">תחום</label>
+                <select id="field-area" v-model="form.area" class="w-full ui-select">
                   <option value="מסחרי פרטי">מסחרי פרטי</option>
                   <option value="פרוייקטים">פרוייקטים</option>
                   <option value="מטה">מטה</option>
@@ -109,8 +109,8 @@
                 </select>
               </div>
               <div>
-                <label class="ed-label">סטטוס</label>
-                <select v-model="form.status" class="w-full ui-select">
+                <label class="ed-label" for="field-status">סטטוס</label>
+                <select id="field-status" v-model="form.status" class="w-full ui-select">
                   <option value="active">פעיל</option>
                   <option value="on-hold">מושהה</option>
                   <option value="completed">הושלם</option>
@@ -118,8 +118,8 @@
               </div>
             </div>
             <div>
-              <label class="ed-label">תיאור פרויקט *</label>
-              <textarea v-model="form.description" rows="3" placeholder="תיאור כללי של הפרויקט..."
+              <label class="ed-label" for="field-description">תיאור פרויקט *</label>
+              <textarea id="field-description" v-model="form.description" rows="3" placeholder="תיאור כללי של הפרויקט..."
                 @blur="vf('description', form.description, { required: true, minLen: 5 })"
                 :class="['w-full ui-input resize-none', fc('description')]"></textarea>
               <div class="flex justify-between mt-0.5">
@@ -133,8 +133,8 @@
           <!-- Step 2: Revenue -->
           <div v-if="step === 1" class="space-y-6">
             <div>
-              <label class="ed-label">סך הכנסות הפרויקט (₪) *</label>
-              <input :value="fmtNum(form.total_revenue)" @input="onNumInput(form, 'total_revenue', $event)" type="text" inputmode="numeric" placeholder="0"
+              <label class="ed-label" for="field-total-revenue">סך הכנסות הפרויקט (₪) *</label>
+              <input id="field-total-revenue" :value="fmtNum(form.total_revenue)" @input="onNumInput(form, 'total_revenue', $event)" type="text" inputmode="numeric" placeholder="0"
                 @blur="vf('total_revenue', form.total_revenue, { required: true, positive: true, max: 999999999 })"
                 :class="['w-full ui-input ui-num', fc('total_revenue')]" />
               <div v-if="fe.total_revenue" class="ui-field-error ui-field-error--animate"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>{{ fe.total_revenue }}</div>
@@ -236,44 +236,46 @@
                   </span>
                 </div>
               </div>
-              <div class="ui-card overflow-x-auto" style="padding: 0;">
-                <table class="w-full text-xs min-w-[600px]">
+              <div class="overflow-x-auto" style="border: 1px solid var(--border); border-radius: var(--radius-md);">
+                <table class="w-full text-xs" dir="rtl">
                   <thead>
                     <tr style="background: var(--surface-muted);">
-                      <th v-for="m in 12" :key="m" class="px-1 py-2 text-center w-[8.33%] ed-label" style="margin: 0;">{{ m }}</th>
+                      <th class="px-3 py-2 text-start ed-label" style="margin: 0; min-width: 72px;">חודש</th>
+                      <th class="px-3 py-2 text-end ed-label" style="margin: 0; min-width: 90px;">הכנסה צפויה (₪)</th>
+                      <th class="px-3 py-2 text-end ed-label" style="margin: 0; min-width: 72px;">אחוז מסה״כ</th>
+                      <th class="px-3 py-2 text-end ed-label" style="margin: 0; min-width: 90px;">כניסת תשלום (₪)</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <!-- Editable amount row -->
-                    <tr>
-                      <td v-for="m in 12" :key="m" class="px-0.5 py-1">
-                        <div class="w-full px-1 py-1.5 text-xs text-center ui-num"
-                          :class="revenueAmountForMonth(m) > 0 ? 'ed-tone-positive' : 'ed-tone-faint'">
-                          {{ revenueAmountForMonth(m) ? revenueAmountForMonth(m).toLocaleString('he-IL') : '-' }}
-                        </div>
+                    <tr v-for="m in activeMonthsRange" :key="m" style="border-top: 1px solid var(--border);">
+                      <td class="px-3 py-1.5 font-sans font-medium text-ink">{{ hebrewMonths[m] }}</td>
+                      <td class="px-3 py-1.5 text-end ui-num" :class="revenueAmountForMonth(m) > 0 ? 'ed-tone-positive' : 'ed-tone-faint'">
+                        {{ revenueAmountForMonth(m) ? revenueAmountForMonth(m).toLocaleString('he-IL') : '—' }}
                       </td>
-                    </tr>
-                    <!-- Percentage row (auto-computed) -->
-                    <tr style="background: var(--surface-muted);">
-                      <td v-for="m in 12" :key="m" class="px-1 py-1 text-center text-xs ed-tone-faint ui-num">
-                        {{ form.revenue_forecast[m] ? Math.round(form.revenue_forecast[m]) + '%' : '-' }}
+                      <td class="px-3 py-1.5 text-end ui-num" :class="form.revenue_forecast[m] > 0 ? '' : 'ed-tone-faint'">
+                        {{ form.revenue_forecast[m] ? Math.round(form.revenue_forecast[m]) + '%' : '—' }}
                       </td>
-                    </tr>
-                    <!-- Cash inflow per month (from payment terms) -->
-                    <tr style="background: var(--surface-muted);">
-                      <td v-for="m in 12" :key="m" class="px-1 py-2 text-center text-xs ui-num"
-                        :class="cashInflowForMonth(m) > 0 ? 'ed-tone-positive' : 'ed-tone-faint'">
-                        {{ cashInflowForMonth(m) ? cashInflowForMonth(m).toLocaleString('he-IL') : '-' }}
+                      <td class="px-3 py-1.5 text-end ui-num" :class="cashInflowForMonth(m) > 0 ? 'ed-tone-positive' : 'ed-tone-faint'">
+                        {{ cashInflowForMonth(m) ? cashInflowForMonth(m).toLocaleString('he-IL') : '—' }}
                       </td>
                     </tr>
                   </tbody>
+                  <tfoot>
+                    <tr style="background: var(--surface-muted); border-top: 2px solid var(--border-strong);">
+                      <td class="px-3 py-2 font-sans font-semibold text-ink">סה״כ</td>
+                      <td class="px-3 py-2 text-end ui-num font-semibold text-ink">
+                        <bdi>{{ manualForecastTotal.toLocaleString('he-IL') }}</bdi>
+                      </td>
+                      <td class="px-3 py-2 text-end ui-num font-semibold"
+                          :class="manualForecastPct === 100 ? 'ed-tone-positive' : manualForecastPct > 100 ? 'ed-tone-negative' : 'ed-tone-warning'">
+                        {{ manualForecastPct }}%
+                      </td>
+                      <td class="px-3 py-2 text-end ui-num font-semibold text-ink">
+                        <bdi>{{ totalCashInflow.toLocaleString('he-IL') }}</bdi>
+                      </td>
+                    </tr>
+                  </tfoot>
                 </table>
-                <!-- Legend -->
-                <div class="flex flex-wrap items-center gap-3 px-3 py-2 text-xs ed-tone-faint" style="border-top: 1px solid var(--border);">
-                  <div class="flex items-center gap-1"><span class="w-2 h-2 rounded" style="background: var(--surface); border: 1px solid var(--border-strong);"></span> סכום הכנסה (עריכה)</div>
-                  <div class="flex items-center gap-1"><span class="w-2 h-2 rounded" style="background: var(--surface-muted);"></span> אחוז מסה"כ</div>
-                  <div class="flex items-center gap-1"><span class="w-2 h-2 rounded" style="background: var(--surface-muted);"></span> כניסת תשלום בפועל</div>
-                </div>
               </div>
             </div>
           </div>
@@ -899,7 +901,7 @@
                 </li>
               </ul>
             </div>
-            <button @click="showValidationModal = false" class="ui-btn ui-btn-primary w-full" style="justify-content: center;">הבנתי, חזרה לעריכה</button>
+            <button @click="showValidationModal = false" class="ui-btn ui-btn-dark w-full" style="justify-content: center;">הבנתי, חזרה לעריכה</button>
           </div>
         </div>
 
@@ -913,11 +915,11 @@
 
           <div class="flex items-center gap-3">
             <div v-if="error" class="ed-tone-negative text-xs" style="font-weight: 500;">{{ error }}</div>
-            <button v-if="step < steps.length - 1" @click="nextStep" class="ui-btn ui-btn-primary" style="gap: 0.375rem;">
+            <button v-if="step < steps.length - 1" @click="nextStep" class="ui-btn ui-btn-dark" style="gap: 0.375rem;">
               הבא
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
             </button>
-            <button v-else @click="save" :disabled="saving" class="ui-btn ui-btn-primary disabled:opacity-50" style="gap: 0.375rem;">
+            <button v-else @click="save" :disabled="saving" class="ui-btn ui-btn-dark disabled:opacity-50" style="gap: 0.375rem;">
               <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
               {{ saving ? 'שומר...' : 'אשר ושמור' }}
             </button>
@@ -929,9 +931,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch } from 'vue'
+import { ref, reactive, computed, watch, nextTick } from 'vue'
 import { getProjectForm, saveProjectForm } from '../services/api'
 import { useToast } from '../composables/useToast'
+import { useFocusTrap } from '../composables/useFocusTrap'
 import DatePicker from './DatePicker.vue'
 
 // Format number with commas for display
@@ -965,6 +968,11 @@ const props = defineProps({
 })
 const emit = defineEmits(['close', 'saved'])
 const toast = useToast()
+const modalCard = ref(null)
+const { activate, deactivate } = useFocusTrap(modalCard)
+watch(() => props.show, async (val) => {
+  if (val) { await nextTick(); activate() } else { deactivate() }
+})
 
 const steps = ['פרטי פרויקט', 'צפי הכנסות', 'צפי הוצאות', 'סיכום']
 const step = ref(0)
@@ -1141,6 +1149,18 @@ const forecastTotal = computed(() =>
   Object.values(form.revenue_forecast).reduce((a, v) => a + (Number(v) || 0), 0)
 )
 
+const hebrewMonths = { 1: 'ינואר', 2: 'פברואר', 3: 'מרץ', 4: 'אפריל', 5: 'מאי', 6: 'יוני', 7: 'יולי', 8: 'אוגוסט', 9: 'ספטמבר', 10: 'אוקטובר', 11: 'נובמבר', 12: 'דצמבר' }
+
+const activeMonthsRange = computed(() => {
+  const result = []
+  for (let m = startMonth.value; m <= endMonth.value; m++) result.push(m)
+  return result
+})
+
+const totalCashInflow = computed(() =>
+  activeMonthsRange.value.reduce((sum, m) => sum + cashInflowForMonth(m), 0)
+)
+
 const paymentTermsTotal = computed(() =>
   (form.revenue_payment_terms || []).reduce((a, t) => a + (Number(t.percent) || 0), 0)
 )
@@ -1157,12 +1177,15 @@ const endMonth = computed(() => {
   return parts.length >= 2 ? parseInt(parts[1], 10) : 12
 })
 
-// Zero out forecast months before start date when start_date changes
-watch(startMonth, (newStart) => {
-  for (let m = 1; m < newStart; m++) {
-    form.revenue_forecast[m] = 0
+// Auto-distribute revenue equally across active months whenever dates or total change
+watch([startMonth, endMonth, () => form.total_revenue], () => {
+  const active = activeMonthsRange.value
+  const pct = active.length > 0 ? 100 / active.length : 0
+  for (let m = 1; m <= 12; m++) {
+    form.revenue_forecast[m] = active.includes(m) ? pct : 0
   }
-})
+  initRevenueAmounts()
+}, { immediate: false })
 
 // Extract X days from שוטף+X
 function extractShotefDays(type) {

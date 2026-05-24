@@ -26,10 +26,10 @@
 
           <!-- Hamburger (mobile) -->
           <button @click="mobileMenuOpen = !mobileMenuOpen" class="ui-icon-btn md:hidden ms-auto" aria-label="פתח תפריט">
-            <svg v-if="!mobileMenuOpen" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <svg v-if="!mobileMenuOpen" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
               <path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/>
             </svg>
-            <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
               <path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/>
             </svg>
           </button>
@@ -46,9 +46,9 @@
 
             <!-- Projects dropdown trigger -->
             <div class="relative" ref="projectsBtn">
-              <button type="button" class="ui-nav-pill" :class="{ 'is-active': activeTab === 'pnl' }" @click="pnlOpen = !pnlOpen">
+              <button type="button" class="ui-nav-pill" :class="{ 'is-active': activeTab === 'pnl' }" @click="pnlOpen = !pnlOpen" :aria-expanded="pnlOpen" aria-haspopup="listbox">
                 פרויקטים
-                <svg class="w-3 h-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" d="M19 9l-7 7-7-7"/></svg>
+                <svg class="w-3 h-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" aria-hidden="true"><path stroke-linecap="round" d="M19 9l-7 7-7-7"/></svg>
               </button>
             </div>
 
@@ -56,13 +56,17 @@
               <div v-if="pnlOpen" class="ui-dropdown-backdrop" @click="pnlOpen = false"></div>
               <div v-if="pnlOpen" dir="rtl"
                 class="ui-dropdown ui-popover"
-                :style="dropdownStyle">
+                :style="dropdownStyle"
+                role="listbox"
+                aria-label="פרויקטים">
                 <div class="px-4 pb-2 mb-1 border-b border-[color:var(--border)]">
                   <span class="ui-label">רשימת פרויקטים</span>
                 </div>
                 <button
                   v-for="p in projects" :key="p"
                   type="button"
+                  role="option"
+                  :aria-selected="activeTab === 'pnl' && selectedProject === p"
                   @click="selectProject(p); pnlOpen = false"
                   class="ui-dropdown-item ui-press"
                   :class="{ 'is-active': activeTab === 'pnl' && selectedProject === p }">
@@ -79,24 +83,24 @@
           <div class="hidden md:flex items-center gap-2 flex-shrink-0">
             <!-- Alerts bell -->
             <div class="relative" ref="alertsBtn">
-              <button @click="showAlertsModal = !showAlertsModal" class="ui-icon-btn relative" aria-label="התראות">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <button @click="showAlertsModal = !showAlertsModal" class="ui-icon-btn relative" :aria-label="alertCount > 0 ? alertCount + ' התראות פעילות' : 'התראות'" :aria-expanded="showAlertsModal" aria-haspopup="dialog">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                 </svg>
-                <span v-if="alertCount > 0" class="ui-alert-badge ui-num">{{ alertCount }}</span>
+                <span v-if="alertCount > 0" class="ui-alert-badge ui-num" aria-hidden="true">{{ alertCount }}</span>
               </button>
             </div>
 
             <!-- New project -->
             <button v-if="canEdit" @click="showNewProjectModal = true"
               class="ui-btn ui-btn-primary text-sm">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" d="M12 4v16m8-8H4"/></svg>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" d="M12 4v16m8-8H4"/></svg>
               <span>פרויקט חדש</span>
             </button>
 
             <!-- User menu -->
             <div class="relative ms-1">
-              <button @click="showUserMenu = !showUserMenu" class="ui-user-btn" aria-label="תפריט משתמש">
+              <button @click="showUserMenu = !showUserMenu" class="ui-user-btn" aria-label="תפריט משתמש" :aria-expanded="showUserMenu" aria-haspopup="menu">
                 <div class="ui-user-avatar">
                   <img v-if="userProfile.avatar" :src="userProfile.avatar" class="w-full h-full object-cover" alt="" />
                   <span v-else>{{ userInitials }}</span>
@@ -105,21 +109,21 @@
                   <div class="ui-user-name">{{ userDisplayName }}</div>
                   <div class="ui-user-role">{{ userRoleLabel }}</div>
                 </div>
-                <svg class="w-3.5 h-3.5 text-ink-faint hidden lg:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" d="M19 9l-7 7-7-7"/></svg>
+                <svg class="w-3.5 h-3.5 text-ink-faint hidden lg:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" d="M19 9l-7 7-7-7"/></svg>
               </button>
               <div v-if="showUserMenu" class="fixed inset-0 z-40" @click="showUserMenu = false"></div>
               <div v-if="showUserMenu" class="ui-user-menu ui-popover" dir="rtl">
                 <button type="button" @click="showUserProfile = true; showUserMenu = false" class="ui-menu-item ui-press">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                   פרטי משתמש
                 </button>
                 <button v-if="isAdmin" type="button" @click="showSettings = true; showUserMenu = false" class="ui-menu-item ui-press">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                   הגדרות
                 </button>
                 <hr class="ui-divider my-1" />
                 <button type="button" @click="logout(); showUserMenu = false" class="ui-menu-item ui-menu-item--danger ui-press">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                   התנתקות
                 </button>
               </div>
@@ -131,7 +135,7 @@
 
     <!-- Mobile menu -->
     <transition name="slide-down">
-      <div v-if="mobileMenuOpen" class="fixed inset-0 top-16 z-20 bg-bg md:hidden overflow-y-auto" dir="rtl">
+      <nav v-if="mobileMenuOpen" class="fixed inset-0 top-16 z-20 bg-bg md:hidden overflow-y-auto" dir="rtl" aria-label="ניווט ראשי">
         <div class="max-w-app mx-auto px-6 py-5 flex flex-col gap-1.5 ui-safe-bottom">
           <button @click="mobileNav('dashboard')" class="ui-mobile-nav-item" :class="{ 'is-active': activeTab === 'dashboard' }">דשבורד</button>
           <button v-if="isAdmin" @click="mobileNav('operations')" class="ui-mobile-nav-item" :class="{ 'is-active': activeTab === 'operations' }">תפעול</button>
@@ -148,14 +152,14 @@
           <hr class="border-border my-4" />
 
           <button v-if="canEdit" @click="showNewProjectModal = true; mobileMenuOpen = false" class="ui-btn ui-btn-primary self-start">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" d="M12 4v16m8-8H4"/></svg>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" d="M12 4v16m8-8H4"/></svg>
             פרויקט חדש
           </button>
           <button @click="showUserProfile = true; mobileMenuOpen = false" class="ui-mobile-nav-item">פרטי משתמש</button>
           <button v-if="isAdmin" @click="showSettings = true; mobileMenuOpen = false" class="ui-mobile-nav-item">הגדרות</button>
           <button @click="logout(); mobileMenuOpen = false" class="ui-mobile-nav-item ui-mobile-nav-item--danger">יציאה</button>
         </div>
-      </div>
+      </nav>
     </transition>
 
     <!-- Page content -->
@@ -197,17 +201,17 @@
 
     <!-- Toast notifications -->
     <Teleport to="body">
-      <div class="fixed top-5 left-1/2 -translate-x-1/2 z-[200] flex flex-col gap-2.5 w-full max-w-sm px-4" dir="rtl">
+      <div class="fixed top-5 left-1/2 -translate-x-1/2 z-[200] flex flex-col gap-2.5 w-full max-w-[min(24rem,calc(100vw-2rem))] px-4" dir="rtl" role="status" aria-live="polite" aria-atomic="true">
         <TransitionGroup name="toast">
           <div v-for="t in toasts" :key="t.id"
             class="ui-toast"
             :class="'ui-toast--' + t.type"
             @click="dismissToast(t.id)">
             <div class="flex items-start gap-2.5">
-              <svg v-if="t.type === 'success'" class="w-4.5 h-4.5 text-accent mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-              <svg v-else-if="t.type === 'error'" class="w-4.5 h-4.5 text-negative mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-              <svg v-else-if="t.type === 'warning'" class="w-4.5 h-4.5 text-warning mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-              <svg v-else class="w-4.5 h-4.5 text-ink-muted mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <svg v-if="t.type === 'success'" class="w-4.5 h-4.5 text-accent mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              <svg v-else-if="t.type === 'error'" class="w-4.5 h-4.5 text-negative mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+              <svg v-else-if="t.type === 'warning'" class="w-4.5 h-4.5 text-warning mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+              <svg v-else class="w-4.5 h-4.5 text-ink-muted mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
               <span class="font-sans text-sm font-medium text-ink leading-snug">{{ t.message }}</span>
             </div>
           </div>
@@ -228,7 +232,7 @@
           <div class="flex items-center gap-2">
             <button v-if="alerts.length > 0" type="button" @click="alerts = []; alertCount = 0" class="ed-link text-[11px]">נקה הכל</button>
             <button type="button" @click="showAlertsModal = false" class="ui-icon-btn" aria-label="סגור">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
                 <path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/>
               </svg>
             </button>
@@ -237,9 +241,9 @@
         <div class="ui-alerts-panel__body">
           <div v-if="alerts.length === 0" class="py-14 text-center px-6">
             <div class="ui-alerts-empty-icon">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
             </div>
-            <h4 class="ui-alerts-empty-title">הכל תקין</h4>
+            <p class="ui-alerts-empty-title">הכל תקין</p>
             <p class="ui-alerts-empty-text">כל הפרויקטים פועלים בטווח הצפוי</p>
           </div>
           <button v-for="(alert, i) in alerts" :key="i"
@@ -248,7 +252,7 @@
             class="ui-alert-item ui-press">
             <div class="ui-alert-icon"
               :class="alert.severity === 'high' ? 'ui-alert-icon--high' : 'ui-alert-icon--medium'">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
               </svg>
             </div>
@@ -273,17 +277,15 @@
 
 <script setup>
 import { ref, computed, onMounted, defineAsyncComponent } from 'vue'
-import { auth } from './firebase'
-import { onAuthStateChanged, signOut } from 'firebase/auth'
 import LoginPage from './components/LoginPage.vue'
 import Dashboard from './components/Dashboard.vue'
 import ExecutiveDashboard from './components/ExecutiveDashboard.vue'
-import MyProjectsView from './components/MyProjectsView.vue'
-import PnlView from './components/PnlView.vue'
-import CashFlowView from './components/CashFlowView.vue'
 import { getPnl, getProjects, getProjectsDetail, getProfile } from './services/api'
 import { createToastProvider, setGlobalToast } from './composables/useToast'
 
+const MyProjectsView = defineAsyncComponent(() => import('./components/MyProjectsView.vue'))
+const PnlView = defineAsyncComponent(() => import('./components/PnlView.vue'))
+const CashFlowView = defineAsyncComponent(() => import('./components/CashFlowView.vue'))
 const ProjectFormModal = defineAsyncComponent(() => import('./components/ProjectFormModal.vue'))
 const UserProfileModal = defineAsyncComponent(() => import('./components/UserProfileModal.vue'))
 const SettingsModal = defineAsyncComponent(() => import('./components/SettingsModal.vue'))
@@ -292,40 +294,21 @@ const AiChat = defineAsyncComponent(() => import('./components/AiChat.vue'))
 const isLoggedIn = ref(false)
 const authReady = ref(false)
 
+// TODO Phase E: replace with MSAL.js (Entra External ID).
+// Phase 0 stub — boot from a Bearer token in localStorage.
 onMounted(() => {
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      try {
-        await user.getIdToken(true)
-      } catch {
-        await signOut(auth)
-        isLoggedIn.value = false
-        authReady.value = true
-        return
-      }
-      isLoggedIn.value = true
-      authReady.value = true
-      loadAppData()
-      getProfile().then(p => {
-        if (p.role === 'project_manager') {
-          activeTab.value = 'my-projects'
-        }
-      }).catch(() => {})
-    } else {
-      // DEV MODE: check localStorage on page refresh
-      if (import.meta.env.VITE_DEV_MODE === 'true' && localStorage.getItem('dev_token')) {
-        isLoggedIn.value = true
-        authReady.value = true
-        loadAppData()
-        getProfile().then(p => {
-          if (p.role === 'project_manager') activeTab.value = 'my-projects'
-        }).catch(() => {})
-        return
-      }
-      isLoggedIn.value = false
-      authReady.value = true
-    }
-  })
+  const token = localStorage.getItem('auth_token')
+  if (token) {
+    isLoggedIn.value = true
+    authReady.value = true
+    loadAppData()
+    getProfile().then(p => {
+      if (p.role === 'project_manager') activeTab.value = 'my-projects'
+    }).catch(() => {})
+  } else {
+    isLoggedIn.value = false
+    authReady.value = true
+  }
 })
 
 const activeTab = ref('dashboard')
@@ -391,10 +374,8 @@ function handleDevLogin() {
 }
 
 function logout() {
-  if (import.meta.env.VITE_DEV_MODE === 'true') {
-    localStorage.removeItem('dev_token')
-  }
-  signOut(auth).catch(() => {})
+  // TODO Phase E: call MSAL logoutRedirect / logoutPopup.
+  localStorage.removeItem('auth_token')
   isLoggedIn.value = false
 }
 
@@ -493,7 +474,7 @@ function loadAppData() {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
+  color: var(--surface);
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 15px;
@@ -583,7 +564,7 @@ function loadAppData() {
 }
 .ui-mobile-nav-item.is-active {
   background: var(--ink);
-  color: #ffffff;
+  color: var(--surface);
   font-weight: 600;
 }
 .ui-mobile-nav-item--danger { color: var(--negative); }
@@ -598,55 +579,7 @@ function loadAppData() {
   backdrop-filter: none;
 }
 
-/* Dropdown (projects picker) */
-.ui-dropdown-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 90;
-}
-.ui-dropdown {
-  position: fixed;
-  z-index: 100;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  padding: 0.625rem 0;
-  min-width: 280px;
-  max-height: 20rem;
-  overflow-y: auto;
-  transform-origin: top center;
-}
-.ui-dropdown-item {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  padding: 0.625rem 1rem;
-  background: transparent;
-  border: 0;
-  font-family: var(--font-sans);
-  font-size: 0.875rem;
-  color: var(--ink);
-  cursor: pointer;
-  transition: background 160ms var(--ease-out), color 160ms var(--ease-out), transform var(--dur-press) var(--ease-out);
-}
-@media (hover: hover) and (pointer: fine) {
-  .ui-dropdown-item:hover { background: var(--surface-muted); }
-}
-.ui-dropdown-item.is-active {
-  background: var(--accent-soft);
-  color: var(--accent);
-  font-weight: 600;
-}
-.ui-dropdown-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 9999px;
-  background: var(--border-strong);
-  flex-shrink: 0;
-}
-.ui-dropdown-item.is-active .ui-dropdown-dot { background: var(--accent); }
+/* Dropdown styles are canonical in src/style.css — Teleport+fixed pattern. */
 
 /* Alerts bell badge */
 .ui-alert-badge {
@@ -657,7 +590,7 @@ function loadAppData() {
   height: 16px;
   padding: 0 4px;
   background: var(--negative);
-  color: #ffffff;
+  color: var(--surface);
   font-size: 10px;
   font-weight: 700;
   border-radius: 9999px;
@@ -719,7 +652,7 @@ function loadAppData() {
 /* User dropdown menu */
 .ui-user-menu {
   position: absolute;
-  left: 0;
+  inset-inline-end: 0;
   top: 100%;
   margin-top: 0.5rem;
   background: var(--surface);
@@ -729,7 +662,7 @@ function loadAppData() {
   padding: 0.375rem;
   min-width: 220px;
   z-index: 50;
-  transform-origin: top left;
+  transform-origin: top right;
 }
 .ui-menu-item {
   width: 100%;
@@ -859,7 +792,7 @@ function loadAppData() {
   margin-top: 0.25rem;
 }
 
-/* Toast notifications */
+/* Toast notifications — type is communicated by icon + tinted background, never a side stripe */
 .ui-toast {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -867,13 +800,12 @@ function loadAppData() {
   box-shadow: var(--shadow-lg);
   padding: 0.75rem 1rem;
   cursor: pointer;
-  border-inline-start: 3px solid var(--ink-muted);
   transition: transform var(--dur-press) var(--ease-out);
 }
 .ui-toast:active { transform: scale(0.98); }
-.ui-toast--success { border-inline-start-color: var(--accent); }
-.ui-toast--error   { border-inline-start-color: var(--negative); }
-.ui-toast--warning { border-inline-start-color: var(--warning); }
+.ui-toast--success { background: var(--positive-soft); border-color: rgba(5, 150, 105, 0.20); }
+.ui-toast--error   { background: var(--negative-soft); border-color: rgba(225, 29, 72, 0.20); }
+.ui-toast--warning { background: var(--warning-soft);  border-color: rgba(217, 119, 6, 0.20); }
 
 /* Toast animation — opacity + transform only, ease-out */
 .toast-enter-active { transition: opacity 220ms var(--ease-out), transform 220ms var(--ease-out); }

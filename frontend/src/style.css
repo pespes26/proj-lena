@@ -17,7 +17,8 @@
   --ink: #0f172a;
   --ink-strong: #020617;
   --ink-muted: #475569;
-  --ink-faint: #94a3b8;
+  --ink-faint: #64748b;     /* slate-500 — passes WCAG AA on white (4.92:1) */
+  --ink-whisper: #94a3b8;   /* slate-400 — decorative only (placeholders, disabled) */
 
   /* Lines */
   --border: #e2e8f0;
@@ -168,12 +169,10 @@ body {
   position: absolute;
   inset: 0;
   background: rgba(15, 23, 42, 0.55);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
 }
 .ui-modal-card {
   position: relative;
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-lg);
@@ -224,9 +223,8 @@ body {
 /* Alert / pullquote → fintech alert card */
 .ui-alert,
 .ed-pullquote {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-inline-start: 4px solid var(--warning);
+  background: var(--warning-soft);
+  border: 1px solid rgba(217, 119, 6, 0.20);
   border-radius: var(--radius-lg);
   padding: 1.125rem 1.25rem;
   margin: 0.75rem 0;
@@ -295,7 +293,7 @@ body {
 }
 .ui-btn:disabled,
 .ed-btn:disabled {
-  color: var(--ink-faint);
+  color: var(--ink-whisper);
   cursor: not-allowed;
   opacity: 0.6;
 }
@@ -303,32 +301,41 @@ body {
 .ed-btn:disabled:active {
   transform: none;
 }
-.ui-btn-primary,
-.ed-btn-primary {
-  color: #ffffff;
+/* Dark button — used for modal confirms and destructive actions */
+.ui-btn-dark,
+.ed-btn-dark {
+  color: var(--surface);
   background: var(--ink);
   border-color: var(--ink);
   box-shadow: var(--shadow-sm);
 }
 @media (hover: hover) and (pointer: fine) {
-  .ui-btn-primary:hover,
-  .ed-btn-primary:hover {
+  .ui-btn-dark:hover,
+  .ed-btn-dark:hover {
     background: var(--ink-strong);
     border-color: var(--ink-strong);
-    color: #ffffff;
+    color: var(--surface);
     box-shadow: var(--shadow-md);
   }
 }
+
+/* Primary (brand) button — emerald. `ui-btn-primary` and `ui-btn-accent` are
+   aliases. Use for main CTAs that should carry the brand. */
+.ui-btn-primary,
+.ed-btn-primary,
 .ui-btn-accent {
-  color: #ffffff;
+  color: var(--surface);
   background: var(--accent);
   border-color: var(--accent);
   box-shadow: var(--shadow-sm);
 }
 @media (hover: hover) and (pointer: fine) {
+  .ui-btn-primary:hover,
+  .ed-btn-primary:hover,
   .ui-btn-accent:hover {
     background: var(--accent-hover);
     border-color: var(--accent-hover);
+    color: var(--surface);
     box-shadow: var(--shadow-md);
   }
 }
@@ -339,8 +346,8 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   color: var(--ink-muted);
   background: transparent;
   border: 1px solid transparent;
@@ -377,7 +384,7 @@ body {
   font-feature-settings: "lnum" 1, "tnum" 1;
 }
 .ui-input::placeholder,
-.ed-input::placeholder { color: var(--ink-faint); }
+.ed-input::placeholder { color: var(--ink-whisper); }
 .ui-input:focus,
 .ed-input:focus {
   border-color: var(--accent);
@@ -550,12 +557,13 @@ body {
   position: relative;
   width: 100%;
   min-width: 0;
-  height: 260px;
+  height: clamp(200px, 30vh, 300px);
+  contain: layout paint;
 }
-.ui-chart-container--sm { height: 200px; }
-.ui-chart-container--md { height: 280px; }
-.ui-chart-container--lg { height: 360px; }
-.ui-chart-container--xl { height: 440px; }
+.ui-chart-container--sm { height: clamp(160px, 24vh, 220px); }
+.ui-chart-container--md { height: clamp(220px, 33vh, 320px); }
+.ui-chart-container--lg { height: clamp(260px, 42vh, 400px); }
+.ui-chart-container--xl { height: clamp(300px, 50vh, 480px); }
 .ui-chart-container > canvas,
 .ui-chart-container > div {
   min-width: 0 !important;
@@ -594,7 +602,7 @@ body {
   bottom: 0;
   left: 0;
   width: 2rem;
-  background: linear-gradient(to right, #ffffff, transparent);
+  background: linear-gradient(to right, var(--surface), transparent);
   pointer-events: none;
   opacity: 0.8;
   z-index: 1;
@@ -612,11 +620,7 @@ body {
    Top bar / Navigation (App.vue chrome)
    ═══════════════════════════════════════════════════════════════════ */
 
-.ui-topbar {
-  background: var(--surface);
-  backdrop-filter: saturate(180%) blur(8px);
-  -webkit-backdrop-filter: saturate(180%) blur(8px);
-}
+/* .ui-topbar is defined in App.vue (scoped) — fully opaque, no blur. */
 
 .ui-brand-btn {
   display: inline-flex;
@@ -634,21 +638,7 @@ body {
 }
 .ui-brand-btn:active { transform: scale(0.97); }
 
-.ui-logo-mark {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  background: var(--ink);
-  position: relative;
-  flex-shrink: 0;
-}
-.ui-logo-mark::after {
-  content: '';
-  position: absolute;
-  inset: 6px;
-  border-radius: 3px;
-  background: var(--accent);
-}
+/* .ui-logo-mark and .ui-brand-name are defined in App.vue (scoped). */
 
 .ui-brand-name {
   font-family: var(--font-display);
@@ -695,23 +685,25 @@ body {
   background: var(--ink);
 }
 
-/* Dropdown (Projects list) */
+/* Dropdown (Projects list, alerts, anything Teleport'd to body and anchored
+   by viewport coordinates from getBoundingClientRect — hence `fixed`).      */
 .ui-dropdown-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 40;
+  z-index: 90;
 }
 .ui-dropdown {
-  position: absolute;
-  z-index: 50;
+  position: fixed;
+  z-index: 100;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-xl);
   padding: 0.5rem;
-  min-width: 260px;
+  min-width: 280px;
   max-height: 24rem;
   overflow-y: auto;
+  transform-origin: top center;
 }
 .ui-dropdown-item {
   display: flex;
@@ -757,7 +749,7 @@ body {
   height: 18px;
   padding: 0 5px;
   background: var(--negative);
-  color: #ffffff;
+  color: var(--surface);
   font-size: 10px;
   font-weight: 700;
   border-radius: 999px;
@@ -793,7 +785,7 @@ body {
   height: 32px;
   border-radius: 999px;
   background: var(--ink);
-  color: #ffffff;
+  color: var(--surface);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -904,8 +896,8 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   color: var(--ink-faint);
   background: transparent;
   border: 0;
@@ -994,6 +986,9 @@ body {
 .animate-fade-up { animation: ed-fade-up 320ms var(--ease-out) both; }
 
 /* Stagger helper — applies 50ms-spaced delays to children */
+/* will-change pre-promotes compositor layers before the animation runs,
+   eliminating the mid-sequence promotion jank on the first stagger frame. */
+.ui-stagger > * { will-change: transform, opacity; }
 .ui-stagger > *:nth-child(1) { animation: ed-fade-up 320ms var(--ease-out) 0ms both; }
 .ui-stagger > *:nth-child(2) { animation: ed-fade-up 320ms var(--ease-out) 50ms both; }
 .ui-stagger > *:nth-child(3) { animation: ed-fade-up 320ms var(--ease-out) 100ms both; }
@@ -1075,12 +1070,35 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+  /* Suppress decorative entrance animations and choreography.
+     Press feedback (scale transforms) and focus/hover transitions are
+     deliberately preserved — they communicate interaction state, not decoration. */
+  .ed-fade-up,
+  .ed-fade-up-delay-1,
+  .ed-fade-up-delay-2,
+  .ed-fade-up-delay-3,
+  .ed-fade-up-delay-4,
+  .animate-fade-up,
+  .ui-stagger > *,
+  .ed-rule-draw {
+    animation: none !important;
   }
+  .view-fade-enter-active,
+  .view-fade-leave-active,
+  .slide-down-enter-active,
+  .slide-down-leave-active,
+  .ui-modal-card,
+  .ui-modal-backdrop,
+  .ui-popover,
+  .ui-drawer,
+  .ui-tooltip,
+  .toast-enter-active,
+  .toast-leave-active,
+  .toast-move {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+  html { scroll-behavior: auto !important; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════
