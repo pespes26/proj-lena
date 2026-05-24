@@ -47,4 +47,27 @@ cd "$CLAUDE_PROJECT_DIR/frontend"
 npm install --prefer-offline --no-audit --no-fund
 echo "[startup] Frontend dependencies installed."
 
+# ── Backend server ────────────────────────────────────────────────────────────
+echo "[startup] Starting backend..."
+cd "$CLAUDE_PROJECT_DIR/backend"
+DATABASE_URL=postgresql://logfi:logfi123@localhost:5432/logfi DEV_MODE=true \
+  uvicorn main:app --host 0.0.0.0 --port 8000 > /tmp/backend.log 2>&1 &
+sleep 2
+if curl -sf http://localhost:8000/api/health > /dev/null; then
+  echo "[startup] Backend ready on :8000"
+else
+  echo "[startup] WARNING: backend did not start — check /tmp/backend.log"
+fi
+
+# ── Frontend dev server ───────────────────────────────────────────────────────
+echo "[startup] Starting frontend..."
+cd "$CLAUDE_PROJECT_DIR/frontend"
+npm run dev -- --host 0.0.0.0 --port 3000 > /tmp/frontend.log 2>&1 &
+sleep 3
+if curl -sf http://localhost:3000/ > /dev/null; then
+  echo "[startup] Frontend ready on :3000"
+else
+  echo "[startup] WARNING: frontend did not start — check /tmp/frontend.log"
+fi
+
 echo "[startup] Done."
