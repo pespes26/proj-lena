@@ -1185,7 +1185,7 @@ watch([startMonth, endMonth, () => form.total_revenue], () => {
     form.revenue_forecast[m] = active.includes(m) ? pct : 0
   }
   initRevenueAmounts()
-}, { immediate: true })
+}, { immediate: false })
 
 // Extract X days from שוטף+X
 function extractShotefDays(type) {
@@ -1218,7 +1218,8 @@ function initRevenueAmounts() {
 }
 
 function revenueAmountForMonth(m) {
-  return revenueAmounts[m] || 0
+  const pct = Number(form.revenue_forecast[m]) || 0
+  return (pct && form.total_revenue) ? Math.round(form.total_revenue * pct / 100) : 0
 }
 
 function onRevenueAmountInput(m, rawValue) {
