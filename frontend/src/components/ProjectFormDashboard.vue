@@ -78,9 +78,10 @@
       <section class="ui-card lg:col-span-2">
         <div class="ui-label mb-2">תחזית</div>
         <h3 class="font-sans font-semibold text-ink text-lg mb-5">הכנסות חודשיות</h3>
-        <div class="ui-chart-container ui-chart-container--sm" role="img" aria-label="גרף עמודות: הכנסות חודשיות">
-          <Bar v-if="revenueChartData" :data="revenueChartData" :options="barOptions" />
+        <div v-if="revenueChartData" class="ui-chart-container ui-chart-container--md" role="img" aria-label="גרף עמודות: הכנסות חודשיות">
+          <Bar :data="revenueChartData" :options="barOptions" />
         </div>
+        <p v-else class="font-sans text-ink-faint text-center py-8 text-sm">לא הוגדרה תחזית הכנסות</p>
       </section>
     </div>
 
@@ -424,7 +425,7 @@ const barOptions = {
     tooltip: { ...tooltipConfig, callbacks: { label: hebrewLabelCallback() } },
   },
   scales: {
-    y: axisConfig.y,
+    y: { ...axisConfig.y, position: 'left' },
     x: { ...axisConfig.x, ticks: { ...axisConfig.x.ticks, maxRotation: 0 } },
   },
 }
@@ -442,7 +443,7 @@ const cashflowOptions = {
     tooltip: { ...tooltipConfig, callbacks: { label: hebrewLabelCallback() } },
   },
   scales: {
-    y: axisConfig.y,
+    y: { ...axisConfig.y, position: 'left' },
     x: { ...axisConfig.x, ticks: { ...axisConfig.x.ticks, maxRotation: 0 } },
   },
 }
