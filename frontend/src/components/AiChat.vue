@@ -439,7 +439,7 @@ async function scrollToBottom() {
 .ai-message h2 { font-size: 0.9375rem; }
 .ai-message h3 { font-size: 0.875rem; }
 .ai-message p { margin: 4px 0; }
-.ai-message ul, .ai-message ol { padding-right: 1.2em; margin: 4px 0; }
+.ai-message ul, .ai-message ol { padding-inline-start: 1.2em; margin: 4px 0; }
 .ai-message li { margin: 2px 0; }
 .ai-message strong { font-weight: 700; color: var(--ink); }
 .ai-message table {

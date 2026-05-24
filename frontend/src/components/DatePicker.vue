@@ -7,7 +7,7 @@
         :value="displayValue"
         :placeholder="placeholder"
         :class="[inputClass || 'ui-input', invalidDate ? 'is-error' : '']"
-        style="padding-right: 2.5rem;"
+        style="padding-right: 3rem;"
         @input="onInput"
         @focus="showCalendar = true"
         @keydown.escape="showCalendar = false"
@@ -334,11 +334,11 @@ function updatePosition() {
 /* Inline calendar trigger inside input */
 .ui-datepicker-trigger {
   position: absolute;
-  right: 0.5rem;
+  right: 0.25rem;
   top: 50%;
   transform: translateY(-50%);
-  width: 28px;
-  height: 28px;
+  width: 44px;
+  height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
