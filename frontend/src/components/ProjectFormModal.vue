@@ -253,11 +253,11 @@
                   <tbody>
                     <tr v-for="m in activeMonthsRange" :key="m" style="border-top: 1px solid var(--border);">
                       <td class="px-3 py-1.5 font-sans font-medium text-ink">{{ hebrewMonths[m] }}</td>
-                      <td class="px-3 py-1.5 text-end ui-num" :class="revenueAmountForMonth(m) > 0 ? 'ed-tone-positive' : 'ed-tone-faint'">
-                        {{ revenueAmountForMonth(m) ? revenueAmountForMonth(m).toLocaleString('he-IL') : '—' }}
+                      <td class="px-3 py-1.5 text-end ui-num" :class="revenueInvoicedForMonth(m) > 0 ? 'ed-tone-positive' : 'ed-tone-faint'">
+                        {{ revenueInvoicedForMonth(m) ? revenueInvoicedForMonth(m).toLocaleString('he-IL') : '—' }}
                       </td>
-                      <td class="px-3 py-1.5 text-end ui-num" :class="form.revenue_forecast[m] > 0 ? '' : 'ed-tone-faint'">
-                        {{ form.revenue_forecast[m] ? Math.round(form.revenue_forecast[m]) + '%' : '—' }}
+                      <td class="px-3 py-1.5 text-end ui-num" :class="revenueInvoicedForMonth(m) > 0 ? '' : 'ed-tone-faint'">
+                        {{ revenueInvoicedForMonth(m) ? Math.round(revenueInvoicedForMonth(m) / form.total_revenue * 100) + '%' : '—' }}
                       </td>
                       <td class="px-3 py-1.5 text-end ui-num" :class="cashInflowForMonth(m) > 0 ? 'ed-tone-positive' : 'ed-tone-faint'">
                         {{ cashInflowForMonth(m) ? cashInflowForMonth(m).toLocaleString('he-IL') : '—' }}
@@ -936,7 +936,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch, nextTick, onMounted } from 'vue'
+import { ref, reactive, computed, watch, nextTick } from 'vue'
 import { getProjectForm, saveProjectForm } from '../services/api'
 import { useToast } from '../composables/useToast'
 import { useFocusTrap } from '../composables/useFocusTrap'
@@ -1182,26 +1182,6 @@ const endMonth = computed(() => {
   return parts.length >= 2 ? parseInt(parts[1], 10) : 12
 })
 
-// Auto-distribute revenue equally across active months whenever dates or total change
-watch([startMonth, endMonth, () => form.total_revenue], () => {
-  const active = activeMonthsRange.value
-  const pct = active.length > 0 ? 100 / active.length : 0
-  for (let m = 1; m <= 12; m++) {
-    form.revenue_forecast[m] = active.includes(m) ? pct : 0
-  }
-  initRevenueAmounts()
-}, { immediate: false })
-
-// Run initial distribution once after mount so existing projects load with correct values
-onMounted(async () => {
-  await nextTick()
-  const active = activeMonthsRange.value
-  if (!active.length) return
-  const pct = 100 / active.length
-  for (let m = 1; m <= 12; m++) {
-    form.revenue_forecast[m] = active.includes(m) ? pct : 0
-  }
-})
 
 // Extract X days from שוטף+X
 function extractShotefDays(type) {
@@ -1223,41 +1203,32 @@ function shotefPaymentMonth(invoiceMonth, invoiceYear, xDays) {
   return paymentDate.getMonth() + 1 // 1-based
 }
 
-// Revenue forecast helpers: amount ↔ percentage conversion
-// Local amounts array — breaks the reactive loop so typing works freely
-const revenueAmounts = reactive({})
-
-function initRevenueAmounts() {
-  for (let m = 1; m <= 12; m++) {
-    const pct = Number(form.revenue_forecast[m]) || 0
-    revenueAmounts[m] = (pct && form.total_revenue) ? Math.round(form.total_revenue * pct / 100) : 0
-  }
-}
-
-function revenueAmountForMonth(m) {
-  const pct = Number(form.revenue_forecast[m]) || 0
-  return (pct && form.total_revenue) ? Math.round(form.total_revenue * pct / 100) : 0
-}
-
-function onRevenueAmountInput(m, rawValue) {
-  const amount = Number(rawValue) || 0
-  revenueAmounts[m] = amount
-  if (!form.total_revenue || form.total_revenue <= 0) {
-    form.revenue_forecast[m] = 0
-    return
-  }
-  form.revenue_forecast[m] = (amount / form.total_revenue) * 100
-}
-
-const manualForecastTotal = computed(() => {
+// Revenue invoiced per month: מקדמה → start month, שוטף+X → end month (invoice timing)
+function revenueInvoicedForMonth(targetMonth) {
+  if (!form.total_revenue) return 0
   let total = 0
-  for (let m = 1; m <= 12; m++) total += revenueAmountForMonth(m)
+  const sm = startMonth.value
+  const em = endMonth.value
+  for (const term of (form.revenue_payment_terms || [])) {
+    const termPct = Number(term.percent) || 0
+    if (!termPct) continue
+    const termAmount = form.total_revenue * termPct / 100
+    if (term.type === 'מקדמה') {
+      if (targetMonth === sm) total += Math.round(termAmount)
+    } else if (term.type !== 'פעימות תשלום') {
+      if (targetMonth === em) total += Math.round(termAmount)
+    }
+  }
   return total
-})
+}
 
-const manualForecastPct = computed(() => {
-  return Math.round(Object.values(form.revenue_forecast).reduce((a, v) => a + (Number(v) || 0), 0))
-})
+const manualForecastTotal = computed(() =>
+  activeMonthsRange.value.reduce((sum, m) => sum + revenueInvoicedForMonth(m), 0)
+)
+
+const manualForecastPct = computed(() =>
+  Math.round((form.revenue_payment_terms || []).reduce((a, t) => a + (Number(t.percent) || 0), 0))
+)
 
 // Calculate actual cash inflow per month based on שוטף+ logic
 function cashInflowForMonth(targetMonth) {
