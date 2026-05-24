@@ -474,7 +474,7 @@ function loadAppData() {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
+  color: var(--surface);
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 15px;
@@ -564,7 +564,7 @@ function loadAppData() {
 }
 .ui-mobile-nav-item.is-active {
   background: var(--ink);
-  color: #ffffff;
+  color: var(--surface);
   font-weight: 600;
 }
 .ui-mobile-nav-item--danger { color: var(--negative); }
@@ -590,7 +590,7 @@ function loadAppData() {
   height: 16px;
   padding: 0 4px;
   background: var(--negative);
-  color: #ffffff;
+  color: var(--surface);
   font-size: 10px;
   font-weight: 700;
   border-radius: 9999px;
