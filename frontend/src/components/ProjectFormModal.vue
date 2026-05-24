@@ -1198,11 +1198,12 @@ function extractShotefDays(type) {
   return 0
 }
 
-// Calculate payment month: end of invoice month + X days
+// Calculate payment month: start of invoice month + X days
+// שוטף+30 → same month (1st + 30d = 31st)
+// שוטף+45/60 → next month, שוטף+90 → two months later
 function shotefPaymentMonth(invoiceMonth, invoiceYear, xDays) {
-  const lastDay = new Date(invoiceYear, invoiceMonth, 0).getDate() // last day of month
-  const endOfMonth = new Date(invoiceYear, invoiceMonth - 1, lastDay)
-  const paymentDate = new Date(endOfMonth.getTime() + xDays * 86400000)
+  const startOfMonth = new Date(invoiceYear, invoiceMonth - 1, 1)
+  const paymentDate = new Date(startOfMonth.getTime() + xDays * 86400000)
   return paymentDate.getMonth() + 1 // 1-based
 }
 
