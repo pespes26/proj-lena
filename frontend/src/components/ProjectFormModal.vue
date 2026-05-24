@@ -236,44 +236,55 @@
                   </span>
                 </div>
               </div>
-              <div class="ui-card overflow-x-auto" style="padding: 0;">
-                <table class="w-full text-xs min-w-[600px]">
+              <div class="overflow-x-auto" style="border: 1px solid var(--border); border-radius: var(--radius-md);">
+                <table class="w-full text-xs" dir="rtl">
                   <thead>
                     <tr style="background: var(--surface-muted);">
-                      <th v-for="m in 12" :key="m" class="px-1 py-2 text-center w-[8.33%] ed-label" style="margin: 0;">{{ m }}</th>
+                      <th class="px-3 py-2 text-start ed-label" style="margin: 0; min-width: 72px;">חודש</th>
+                      <th class="px-3 py-2 text-end ed-label" style="margin: 0; min-width: 90px;">הכנסה צפויה (₪)</th>
+                      <th class="px-3 py-2 text-end ed-label" style="margin: 0; min-width: 72px;">אחוז מסה״כ</th>
+                      <th class="px-3 py-2 text-end ed-label" style="margin: 0; min-width: 90px;">כניסת תשלום (₪)</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <!-- Editable amount row -->
-                    <tr>
-                      <td v-for="m in 12" :key="m" class="px-0.5 py-1">
-                        <div class="w-full px-1 py-1.5 text-xs text-center ui-num"
-                          :class="revenueAmountForMonth(m) > 0 ? 'ed-tone-positive' : 'ed-tone-faint'">
-                          {{ revenueAmountForMonth(m) ? revenueAmountForMonth(m).toLocaleString('he-IL') : '-' }}
-                        </div>
+                    <tr v-for="m in activeMonthsRange" :key="m" style="border-top: 1px solid var(--border);">
+                      <td class="px-3 py-1.5 font-sans font-medium text-ink">{{ hebrewMonths[m] }}</td>
+                      <td class="px-2 py-1">
+                        <input
+                          type="number"
+                          :value="revenueAmountForMonth(m) || ''"
+                          @input="onRevenueAmountInput(m, $event.target.value)"
+                          class="w-full ui-input text-xs ui-num"
+                          style="padding: 0.25rem 0.375rem; text-align: end;"
+                          :class="revenueAmountForMonth(m) > 0 ? 'ed-tone-positive' : ''"
+                          placeholder="0"
+                          min="0"
+                        />
                       </td>
-                    </tr>
-                    <!-- Percentage row (auto-computed) -->
-                    <tr style="background: var(--surface-muted);">
-                      <td v-for="m in 12" :key="m" class="px-1 py-1 text-center text-xs ed-tone-faint ui-num">
-                        {{ form.revenue_forecast[m] ? Math.round(form.revenue_forecast[m]) + '%' : '-' }}
+                      <td class="px-3 py-1.5 text-end ui-num" :class="form.revenue_forecast[m] > 0 ? '' : 'ed-tone-faint'">
+                        {{ form.revenue_forecast[m] ? Math.round(form.revenue_forecast[m]) + '%' : '—' }}
                       </td>
-                    </tr>
-                    <!-- Cash inflow per month (from payment terms) -->
-                    <tr style="background: var(--surface-muted);">
-                      <td v-for="m in 12" :key="m" class="px-1 py-2 text-center text-xs ui-num"
-                        :class="cashInflowForMonth(m) > 0 ? 'ed-tone-positive' : 'ed-tone-faint'">
-                        {{ cashInflowForMonth(m) ? cashInflowForMonth(m).toLocaleString('he-IL') : '-' }}
+                      <td class="px-3 py-1.5 text-end ui-num" :class="cashInflowForMonth(m) > 0 ? 'ed-tone-positive' : 'ed-tone-faint'">
+                        {{ cashInflowForMonth(m) ? cashInflowForMonth(m).toLocaleString('he-IL') : '—' }}
                       </td>
                     </tr>
                   </tbody>
+                  <tfoot>
+                    <tr style="background: var(--surface-muted); border-top: 2px solid var(--border-strong);">
+                      <td class="px-3 py-2 font-sans font-semibold text-ink">סה״כ</td>
+                      <td class="px-3 py-2 text-end ui-num font-semibold text-ink">
+                        <bdi>{{ manualForecastTotal.toLocaleString('he-IL') }}</bdi>
+                      </td>
+                      <td class="px-3 py-2 text-end ui-num font-semibold"
+                          :class="manualForecastPct === 100 ? 'ed-tone-positive' : manualForecastPct > 100 ? 'ed-tone-negative' : 'ed-tone-warning'">
+                        {{ manualForecastPct }}%
+                      </td>
+                      <td class="px-3 py-2 text-end ui-num font-semibold text-ink">
+                        <bdi>{{ totalCashInflow.toLocaleString('he-IL') }}</bdi>
+                      </td>
+                    </tr>
+                  </tfoot>
                 </table>
-                <!-- Legend -->
-                <div class="flex flex-wrap items-center gap-3 px-3 py-2 text-xs ed-tone-faint" style="border-top: 1px solid var(--border);">
-                  <div class="flex items-center gap-1"><span class="w-2 h-2 rounded" style="background: var(--surface); border: 1px solid var(--border-strong);"></span> סכום הכנסה (עריכה)</div>
-                  <div class="flex items-center gap-1"><span class="w-2 h-2 rounded" style="background: var(--surface-muted);"></span> אחוז מסה"כ</div>
-                  <div class="flex items-center gap-1"><span class="w-2 h-2 rounded" style="background: var(--surface-muted);"></span> כניסת תשלום בפועל</div>
-                </div>
               </div>
             </div>
           </div>
@@ -1145,6 +1156,18 @@ function validateStep2() {
 
 const forecastTotal = computed(() =>
   Object.values(form.revenue_forecast).reduce((a, v) => a + (Number(v) || 0), 0)
+)
+
+const hebrewMonths = { 1: 'ינואר', 2: 'פברואר', 3: 'מרץ', 4: 'אפריל', 5: 'מאי', 6: 'יוני', 7: 'יולי', 8: 'אוגוסט', 9: 'ספטמבר', 10: 'אוקטובר', 11: 'נובמבר', 12: 'דצמבר' }
+
+const activeMonthsRange = computed(() => {
+  const result = []
+  for (let m = startMonth.value; m <= endMonth.value; m++) result.push(m)
+  return result
+})
+
+const totalCashInflow = computed(() =>
+  activeMonthsRange.value.reduce((sum, m) => sum + cashInflowForMonth(m), 0)
 )
 
 const paymentTermsTotal = computed(() =>
