@@ -1214,8 +1214,9 @@ function extractShotefDays(type) {
 // שוטף+30 → same month (1st + 30d = 31st)
 // שוטף+45/60 → next month, שוטף+90 → two months later
 function shotefPaymentMonth(invoiceMonth, invoiceYear, xDays) {
-  const startOfMonth = new Date(invoiceYear, invoiceMonth - 1, 1)
-  const paymentDate = new Date(startOfMonth.getTime() + xDays * 86400000)
+  // Israeli practice: שוטף+X counts from end of invoice month
+  const endOfMonth = new Date(invoiceYear, invoiceMonth, 0) // last day of invoiceMonth
+  const paymentDate = new Date(endOfMonth.getTime() + xDays * 86400000)
   return paymentDate.getMonth() + 1 // 1-based
 }
 
