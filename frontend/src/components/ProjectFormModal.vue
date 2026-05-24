@@ -1156,9 +1156,25 @@ const forecastTotal = computed(() =>
 
 const hebrewMonths = { 1: 'ינואר', 2: 'פברואר', 3: 'מרץ', 4: 'אפריל', 5: 'מאי', 6: 'יוני', 7: 'יולי', 8: 'אוגוסט', 9: 'ספטמבר', 10: 'אוקטובר', 11: 'נובמבר', 12: 'דצמבר' }
 
+const lastPaymentMonth = computed(() => {
+  if (!form.start_date || !form.expected_end_date) return endMonth.value
+  const startYear = parseInt(form.start_date.split('-')[0]) || 2026
+  const em = endMonth.value
+  const sm = startMonth.value
+  const invYear = em < sm ? startYear + 1 : startYear
+  let last = em
+  for (const term of (form.revenue_payment_terms || [])) {
+    if (!term.percent || term.type === 'מקדמה' || term.type === 'פעימות תשלום') continue
+    const xDays = extractShotefDays(term.type)
+    const payMonth = shotefPaymentMonth(em, invYear, xDays)
+    if (payMonth > last && payMonth <= 12) last = payMonth
+  }
+  return last
+})
+
 const activeMonthsRange = computed(() => {
   const result = []
-  for (let m = startMonth.value; m <= endMonth.value; m++) result.push(m)
+  for (let m = startMonth.value; m <= lastPaymentMonth.value; m++) result.push(m)
   return result
 })
 
