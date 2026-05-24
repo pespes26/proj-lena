@@ -236,14 +236,18 @@
                   </span>
                 </div>
               </div>
-              <div class="overflow-x-auto" style="border: 1px solid var(--border); border-radius: var(--radius-md);">
+              <div v-if="!form.start_date || !form.expected_end_date"
+                   class="ui-card text-center" style="background: var(--surface-muted); padding: 1rem;">
+                <p class="ed-tone-faint text-sm">יש להגדיר תאריך התחלה וצפי סיום לפני הגדרת צפי הכנסות</p>
+              </div>
+              <div v-else class="overflow-x-auto" style="border: 1px solid var(--border); border-radius: var(--radius-md);">
                 <table class="w-full text-xs" dir="rtl">
                   <thead>
                     <tr style="background: var(--surface-muted);">
-                      <th class="px-3 py-2 text-start ed-label" style="margin: 0; min-width: 72px;">חודש</th>
-                      <th class="px-3 py-2 text-end ed-label" style="margin: 0; min-width: 90px;">הכנסה צפויה (₪)</th>
-                      <th class="px-3 py-2 text-end ed-label" style="margin: 0; min-width: 72px;">אחוז מסה״כ</th>
-                      <th class="px-3 py-2 text-end ed-label" style="margin: 0; min-width: 90px;">כניסת תשלום (₪)</th>
+                      <th class="px-3 py-2 text-start ed-label whitespace-nowrap" style="margin: 0; min-width: 80px;">חודש</th>
+                      <th class="px-3 py-2 text-end ed-label whitespace-nowrap" style="margin: 0; min-width: 110px;">הכנסה צפויה (₪)</th>
+                      <th class="px-3 py-2 text-end ed-label whitespace-nowrap" style="margin: 0; min-width: 90px;">אחוז מסה״כ</th>
+                      <th class="px-3 py-2 text-end ed-label whitespace-nowrap" style="margin: 0; min-width: 110px;">כניסת תשלום (₪)</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -281,6 +285,7 @@
           </div>
 
           <!-- Step 3: Expenses -->
+
           <div v-if="step === 2" class="space-y-6">
 
             <!-- Default payment terms for expenses -->
@@ -931,7 +936,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch, nextTick } from 'vue'
+import { ref, reactive, computed, watch, nextTick, onMounted } from 'vue'
 import { getProjectForm, saveProjectForm } from '../services/api'
 import { useToast } from '../composables/useToast'
 import { useFocusTrap } from '../composables/useFocusTrap'
@@ -1186,6 +1191,17 @@ watch([startMonth, endMonth, () => form.total_revenue], () => {
   }
   initRevenueAmounts()
 }, { immediate: false })
+
+// Run initial distribution once after mount so existing projects load with correct values
+onMounted(async () => {
+  await nextTick()
+  const active = activeMonthsRange.value
+  if (!active.length) return
+  const pct = 100 / active.length
+  for (let m = 1; m <= 12; m++) {
+    form.revenue_forecast[m] = active.includes(m) ? pct : 0
+  }
+})
 
 // Extract X days from שוטף+X
 function extractShotefDays(type) {
