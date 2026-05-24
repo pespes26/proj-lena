@@ -1154,12 +1154,11 @@ const lastPaymentMonth = computed(() => {
   const startYear = parseInt(form.start_date.split('-')[0]) || 2026
   const em = endMonth.value
   const sm = startMonth.value
-  const invYear = em < sm ? startYear + 1 : startYear
   let last = em
   for (const term of (form.revenue_payment_terms || [])) {
     if (!term.percent || term.type === 'מקדמה' || term.type === 'פעימות תשלום') continue
     const xDays = extractShotefDays(term.type)
-    const payMonth = shotefPaymentMonth(em, invYear, xDays)
+    const payMonth = shotefPaymentMonth(sm, startYear, xDays)
     if (payMonth > last && payMonth <= 12) last = payMonth
   }
   return last
@@ -1261,10 +1260,9 @@ function cashInflowForMonth(targetMonth) {
     } else if (term.type === 'פעימות תשלום') {
       // Milestones handled separately
     } else {
-      // שוטף+X: invoice at project END, payment = end of end_month + X days
+      // שוטף+X: payment = end of start_month + X days
       const xDays = extractShotefDays(term.type)
-      const invYear = em < sm ? startYear + 1 : startYear
-      const payMonth = shotefPaymentMonth(em, invYear, xDays)
+      const payMonth = shotefPaymentMonth(sm, startYear, xDays)
       if (payMonth === targetMonth) {
         total += Math.round(termAmount)
       }
