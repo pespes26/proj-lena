@@ -244,10 +244,10 @@
                 <table class="w-full text-xs" dir="rtl">
                   <thead>
                     <tr style="background: var(--surface-muted);">
-                      <th class="px-3 py-2 text-start ed-label whitespace-nowrap" style="margin: 0; min-width: 80px;">חודש</th>
-                      <th class="px-3 py-2 text-end ed-label whitespace-nowrap" style="margin: 0; min-width: 110px;">הכנסה צפויה (₪)</th>
-                      <th class="px-3 py-2 text-end ed-label whitespace-nowrap" style="margin: 0; min-width: 90px;">אחוז מסה״כ</th>
-                      <th class="px-3 py-2 text-end ed-label whitespace-nowrap" style="margin: 0; min-width: 110px;">כניסת תשלום (₪)</th>
+                      <th class="px-3 py-2 text-start" style="white-space: nowrap; min-width: 80px; font-family: var(--font-sans); font-size: 0.8125rem; font-weight: 500; color: var(--ink-muted);">חודש</th>
+                      <th class="px-3 py-2 text-end" style="white-space: nowrap; min-width: 110px; font-family: var(--font-sans); font-size: 0.8125rem; font-weight: 500; color: var(--ink-muted);">הכנסה צפויה (₪)</th>
+                      <th class="px-3 py-2 text-end" style="white-space: nowrap; min-width: 90px; font-family: var(--font-sans); font-size: 0.8125rem; font-weight: 500; color: var(--ink-muted);">אחוז מסה״כ</th>
+                      <th class="px-3 py-2 text-end" style="white-space: nowrap; min-width: 110px; font-family: var(--font-sans); font-size: 0.8125rem; font-weight: 500; color: var(--ink-muted);">כניסת תשלום (₪)</th>
                     </tr>
                   </thead>
                   <tbody>
