@@ -78,7 +78,7 @@
       <section class="ui-card lg:col-span-2">
         <div class="ui-label mb-2">תחזית</div>
         <h3 class="font-sans font-semibold text-ink text-lg mb-5">הכנסות חודשיות</h3>
-        <div class="ui-chart-container ui-chart-container--sm">
+        <div class="ui-chart-container ui-chart-container--sm" role="img" aria-label="גרף עמודות: הכנסות חודשיות">
           <Bar v-if="revenueChartData" :data="revenueChartData" :options="barOptions" />
         </div>
       </section>
@@ -89,7 +89,7 @@
       <section class="ui-card">
         <div class="ui-label mb-2">פילוח</div>
         <h3 class="font-sans font-semibold text-ink text-lg mb-5">קטגוריות הוצאה</h3>
-        <div class="ui-chart-container" style="height: 192px;" v-if="expenseChartData">
+        <div class="ui-chart-container" style="height: 192px;" v-if="expenseChartData" role="img" aria-label="גרף עוגה: קטגוריות הוצאה">
           <Doughnut :data="expenseChartData" :options="doughnutOptions" />
         </div>
         <p v-else class="font-sans text-ink-faint text-center py-8">אין הוצאות</p>
@@ -172,7 +172,7 @@
     <section class="ui-card mb-6">
       <div class="ui-label mb-2">תזרים צפוי</div>
       <h3 class="font-sans font-semibold text-ink text-lg mb-5">כניסות, יציאות, ומצטבר</h3>
-      <div class="ui-chart-container ui-chart-container--md">
+      <div class="ui-chart-container ui-chart-container--md" role="img" aria-label="גרף עמודות: תזרים מזומנים צפוי">
         <Bar v-if="cashflowChartData" :data="cashflowChartData" :options="cashflowOptions" />
       </div>
     </section>
