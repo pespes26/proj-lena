@@ -1212,34 +1212,13 @@ function shotefPaymentMonth(invoiceMonth, invoiceYear, xDays) {
   return paymentDate.getMonth() + 1 // 1-based
 }
 
-// Revenue invoiced per month: מקדמה → start month, שוטף+X → end month (invoice timing)
-function revenueInvoicedForMonth(targetMonth) {
-  if (!form.total_revenue) return 0
-  let total = 0
-  const sm = startMonth.value
-  const em = endMonth.value
-  for (const term of (form.revenue_payment_terms || [])) {
-    const termPct = Number(term.percent) || 0
-    if (!termPct) continue
-    const termAmount = form.total_revenue * termPct / 100
-    if (term.type === 'מקדמה') {
-      if (targetMonth === sm) total += Math.round(termAmount)
-    } else if (term.type !== 'פעימות תשלום') {
-      if (targetMonth === em) total += Math.round(termAmount)
-    }
-  }
-  return total
-}
-
-const manualForecastTotal = computed(() =>
-  activeMonthsRange.value.reduce((sum, m) => sum + revenueInvoicedForMonth(m), 0)
-)
 
 const manualForecastPct = computed(() =>
   Math.round((form.revenue_payment_terms || []).reduce((a, t) => a + (Number(t.percent) || 0), 0))
 )
 
 // Calculate actual cash inflow per month based on שוטף+ logic
+// מקדמה → project start month; שוטף+X → end of start month + X days (Israeli שוטף+ standard)
 function cashInflowForMonth(targetMonth) {
   if (!form.total_revenue) return 0
   let total = 0
