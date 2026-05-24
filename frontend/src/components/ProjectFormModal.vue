@@ -230,7 +230,7 @@
               <div class="flex items-center justify-between mb-2">
                 <label class="ed-label" style="margin: 0;">צפי הכנסות חודשי</label>
                 <div class="flex items-center gap-2">
-                  <span class="ed-tone-faint text-xs">סה"כ: <span class="ui-num">{{ manualForecastTotal.toLocaleString('he-IL') }}</span> ₪</span>
+                  <span class="ed-tone-faint text-xs">סה"כ: <span class="ui-num">{{ totalCashInflow.toLocaleString('he-IL') }}</span> ₪</span>
                   <span class="ui-pill" :class="manualForecastPct === 100 ? 'ui-pill-positive' : manualForecastPct > 100 ? 'ui-pill-negative' : 'ui-pill-neutral'">
                     <span class="ui-num">{{ manualForecastPct }}</span>%
                   </span>
@@ -247,20 +247,16 @@
                       <th class="px-3 py-2 text-start" style="white-space: nowrap; min-width: 80px; font-family: var(--font-sans); font-size: 0.8125rem; font-weight: 500; color: var(--ink-muted);">חודש</th>
                       <th class="px-3 py-2 text-end" style="white-space: nowrap; min-width: 110px; font-family: var(--font-sans); font-size: 0.8125rem; font-weight: 500; color: var(--ink-muted);">הכנסה צפויה (₪)</th>
                       <th class="px-3 py-2 text-end" style="white-space: nowrap; min-width: 90px; font-family: var(--font-sans); font-size: 0.8125rem; font-weight: 500; color: var(--ink-muted);">אחוז מסה״כ</th>
-                      <th class="px-3 py-2 text-end" style="white-space: nowrap; min-width: 110px; font-family: var(--font-sans); font-size: 0.8125rem; font-weight: 500; color: var(--ink-muted);">כניסת תשלום (₪)</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="m in activeMonthsRange" :key="m" style="border-top: 1px solid var(--border);">
                       <td class="px-3 py-1.5 font-sans font-medium text-ink">{{ hebrewMonths[m] }}</td>
-                      <td class="px-3 py-1.5 text-end ui-num" :class="revenueInvoicedForMonth(m) > 0 ? 'ed-tone-positive' : 'ed-tone-faint'">
-                        {{ revenueInvoicedForMonth(m) ? revenueInvoicedForMonth(m).toLocaleString('he-IL') : '—' }}
-                      </td>
-                      <td class="px-3 py-1.5 text-end ui-num" :class="revenueInvoicedForMonth(m) > 0 ? '' : 'ed-tone-faint'">
-                        {{ revenueInvoicedForMonth(m) ? Math.round(revenueInvoicedForMonth(m) / form.total_revenue * 100) + '%' : '—' }}
-                      </td>
                       <td class="px-3 py-1.5 text-end ui-num" :class="cashInflowForMonth(m) > 0 ? 'ed-tone-positive' : 'ed-tone-faint'">
                         {{ cashInflowForMonth(m) ? cashInflowForMonth(m).toLocaleString('he-IL') : '—' }}
+                      </td>
+                      <td class="px-3 py-1.5 text-end ui-num" :class="cashInflowForMonth(m) > 0 ? '' : 'ed-tone-faint'">
+                        {{ cashInflowForMonth(m) ? Math.round(cashInflowForMonth(m) / form.total_revenue * 100) + '%' : '—' }}
                       </td>
                     </tr>
                   </tbody>
@@ -268,14 +264,11 @@
                     <tr style="background: var(--surface-muted); border-top: 2px solid var(--border-strong);">
                       <td class="px-3 py-2 font-sans font-semibold text-ink">סה״כ</td>
                       <td class="px-3 py-2 text-end ui-num font-semibold text-ink">
-                        <bdi>{{ manualForecastTotal.toLocaleString('he-IL') }}</bdi>
+                        <bdi>{{ totalCashInflow.toLocaleString('he-IL') }}</bdi>
                       </td>
                       <td class="px-3 py-2 text-end ui-num font-semibold"
                           :class="manualForecastPct === 100 ? 'ed-tone-positive' : manualForecastPct > 100 ? 'ed-tone-negative' : 'ed-tone-warning'">
                         {{ manualForecastPct }}%
-                      </td>
-                      <td class="px-3 py-2 text-end ui-num font-semibold text-ink">
-                        <bdi>{{ totalCashInflow.toLocaleString('he-IL') }}</bdi>
                       </td>
                     </tr>
                   </tfoot>
