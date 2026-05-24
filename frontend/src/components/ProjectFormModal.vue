@@ -1203,6 +1203,7 @@ const endMonth = computed(() => {
 function extractShotefDays(type) {
   if (!type) return 0
   if (type.includes('שוטף+90')) return 90
+  if (type.includes('שוטף+75')) return 75
   if (type.includes('שוטף+60')) return 60
   if (type.includes('שוטף+45')) return 45
   if (type.includes('שוטף+30')) return 30
@@ -1210,9 +1211,8 @@ function extractShotefDays(type) {
   return 0
 }
 
-// Calculate payment month: start of invoice month + X days
-// שוטף+30 → same month (1st + 30d = 31st)
-// שוטף+45/60 → next month, שוטף+90 → two months later
+// Calculate payment month: end of invoice month + X days (Israeli שוטף+X convention)
+// שוטף+0 → same month, שוטף+30 → +1 month, שוטף+90 → +3 months
 function shotefPaymentMonth(invoiceMonth, invoiceYear, xDays) {
   // Israeli practice: שוטף+X counts from end of invoice month
   const endOfMonth = new Date(invoiceYear, invoiceMonth, 0) // last day of invoiceMonth
