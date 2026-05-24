@@ -249,17 +249,8 @@
                   <tbody>
                     <tr v-for="m in activeMonthsRange" :key="m" style="border-top: 1px solid var(--border);">
                       <td class="px-3 py-1.5 font-sans font-medium text-ink">{{ hebrewMonths[m] }}</td>
-                      <td class="px-2 py-1">
-                        <input
-                          type="number"
-                          :value="revenueAmountForMonth(m) || ''"
-                          @input="onRevenueAmountInput(m, $event.target.value)"
-                          class="w-full ui-input text-xs ui-num"
-                          style="padding: 0.25rem 0.375rem; text-align: end;"
-                          :class="revenueAmountForMonth(m) > 0 ? 'ed-tone-positive' : ''"
-                          placeholder="0"
-                          min="0"
-                        />
+                      <td class="px-3 py-1.5 text-end ui-num" :class="revenueAmountForMonth(m) > 0 ? 'ed-tone-positive' : 'ed-tone-faint'">
+                        {{ revenueAmountForMonth(m) ? revenueAmountForMonth(m).toLocaleString('he-IL') : '—' }}
                       </td>
                       <td class="px-3 py-1.5 text-end ui-num" :class="form.revenue_forecast[m] > 0 ? '' : 'ed-tone-faint'">
                         {{ form.revenue_forecast[m] ? Math.round(form.revenue_forecast[m]) + '%' : '—' }}
@@ -1186,12 +1177,15 @@ const endMonth = computed(() => {
   return parts.length >= 2 ? parseInt(parts[1], 10) : 12
 })
 
-// Zero out forecast months before start date when start_date changes
-watch(startMonth, (newStart) => {
-  for (let m = 1; m < newStart; m++) {
-    form.revenue_forecast[m] = 0
+// Auto-distribute revenue equally across active months whenever dates or total change
+watch([startMonth, endMonth, () => form.total_revenue], () => {
+  const active = activeMonthsRange.value
+  const pct = active.length > 0 ? 100 / active.length : 0
+  for (let m = 1; m <= 12; m++) {
+    form.revenue_forecast[m] = active.includes(m) ? pct : 0
   }
-})
+  initRevenueAmounts()
+}, { immediate: false })
 
 // Extract X days from שוטף+X
 function extractShotefDays(type) {
